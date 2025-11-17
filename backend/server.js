@@ -8,11 +8,12 @@ const hostelRoutes = require("./routes/hostelRoutes");
 
 app.use(cors());//enables CORS so frontend can access the API
 app.use(express.json());// allows parsing JSON in request body
-
+//// API routes
 app.use("/api/users", userRoutes);
 app.use("/api/daycare", daycareRoutes);
 app.use("/api/hostel", hostelRoutes);
 
-app.listen(8080, () => {
-  console.log("Server running on port 8080");
+const PORT = 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
