@@ -1,43 +1,37 @@
-.auth-container {
-  max-width: 380px;
-  margin: 80px auto;
-  padding: 30px;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.1);
-}
-
-.auth-container h2 {
+/* Popup sliding from bottom */
+.popup-slide {
+  position: fixed;
+  bottom: -200px; /* hidden initially */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
   text-align: center;
-  margin-bottom: 20px;
-  font-weight: 600;
+  z-index: 1000;
+  transition: bottom 0.5s ease-in-out; /* smooth slide */
 }
 
-.auth-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+/* Slide-up visible */
+.popup-slide.show {
+  bottom: 0;
 }
 
-.auth-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background: #4CAF50;
-  color: white;
-  font-size: 16px;
-  border-radius: 8px;
+/* Buttons inside popup */
+.popup-btn {
+  margin: 0 5px;
+  padding: 10px 20px;
   cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
 }
 
-.auth-btn:hover {
-  background: #45a049;
-}
-
-.message {
-  margin-top: 12px;
-  color: #444;
-  text-align: center;
+.popup-btn:hover {
+  background-color: #45a049;
 }

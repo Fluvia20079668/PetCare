@@ -5,7 +5,7 @@ import "./AuthForm.css";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false); // popup visibility
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -21,16 +21,22 @@ export default function Login() {
       const data = await res.json();
 
       if (data.status === "success") {
-        navigate("/home");
-      } else if (data.status === "fail") {
-        // Pass backend message to Signup page
-        navigate("/signup", { state: { message: data.message } });
+        navigate("/home"); // successful login
       } else {
-        setMessage("Server error, please try again later");
+        // wrong login → show popup
+        setShowPopup(true);
       }
     } catch {
-      setMessage("Server error, please try again later");
+      setShowPopup(true);
     }
+  };
+
+  const handleSignInRedirect = () => {
+    navigate("/"); // redirect back to login page
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
   return (
@@ -55,7 +61,19 @@ export default function Login() {
         />
         <button className="auth-btn" type="submit">Login</button>
       </form>
-      {message && <p className="message">{message}</p>}
+
+      {/* Sliding popup */}
+      <div className={`popup-slide ${showPopup ? "show" : ""}`}>
+        <p>Invalid login!</p>
+        <div style={{ marginTop: "15px" }}>
+          <button className="popup-btn" onClick={handleSignInRedirect}>
+            Sign In
+          </button>
+          <button className="popup-btn" onClick={handleClosePopup}>
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
