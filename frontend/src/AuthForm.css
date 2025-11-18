@@ -1,7 +1,57 @@
-/* Popup sliding from bottom */
+/* Container */
+.auth-container {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 40px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+/* Input fields */
+.auth-input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+/* Buttons */
+.auth-btn,
+.popup-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effects */
+.auth-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.popup-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Sliding popup */
 .popup-slide {
   position: fixed;
-  bottom: -200px; /* hidden initially */
+  bottom: -200px;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
@@ -12,26 +62,41 @@
   box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
   text-align: center;
   z-index: 1000;
-  transition: bottom 0.5s ease-in-out; /* smooth slide */
+  transition: bottom 0.5s ease-in-out;
 }
 
-/* Slide-up visible */
 .popup-slide.show {
   bottom: 0;
 }
 
-/* Buttons inside popup */
-.popup-btn {
-  margin: 0 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #4caf50;
-  color: white;
-  font-weight: bold;
+/* Slide in from right */
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.popup-btn:hover {
-  background-color: #45a049;
+.slide-in-right {
+  animation: slideInRight 0.5s ease forwards;
+}
+
+/* Slide out to right */
+@keyframes slideOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.5s ease forwards;
 }

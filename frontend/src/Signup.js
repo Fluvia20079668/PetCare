@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // make sure this is imported
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AuthForm.css";
 
 export default function Signup() {
@@ -7,14 +7,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-
-  const routerLocation = useLocation(); // rename to avoid ESLint conflict
-//// Show flash message from Login
-  useEffect(() => {
-    if (routerLocation.state && routerLocation.state.message) {
-      setMessage(routerLocation.state.message);
-    }
-  }, [routerLocation.state]);
+  const [slideOut, setSlideOut] = useState(false); // state for slide-out
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -24,7 +18,6 @@ export default function Signup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-
       const data = await res.json();
       setMessage(data.message || data.error);
     } catch {
@@ -32,8 +25,13 @@ export default function Signup() {
     }
   };
 
+  const handleBackToLogin = () => {
+    setSlideOut(true); // trigger slide-out animation
+    setTimeout(() => navigate("/"), 500); // navigate after animation
+  };
+
   return (
-    <div className="auth-container">
+    <div className={`auth-container slide-in-right ${slideOut ? "slide-out-right" : ""}`}>
       <h2>Create Account</h2>
       <form onSubmit={handleSignup}>
         <input
@@ -60,9 +58,19 @@ export default function Signup() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button className="auth-btn" type="submit">Signup</button>
+        <button className="auth-btn" type="submit">Sign Up</button>
       </form>
-      {message && <p className="message">{message}</p>}
+
+      {message && <p style={{ marginTop: "15px", color: "red" }}>{message}</p>}
+
+      {/* Back to Login */}
+      <button
+        className="auth-btn"
+        style={{ marginTop: "20px", backgroundColor: "#007bff" }}
+        onClick={handleBackToLogin}
+      >
+        Back to Login
+      </button>
     </div>
   );
 }
