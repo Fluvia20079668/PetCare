@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
+// Connect to MySQL
+require("./db.js");
+
 const userRoutes = require("./routes/userRoutes");
 const daycareRoutes = require("./routes/daycareRoutes");
 const hostelRoutes = require("./routes/hostelRoutes");

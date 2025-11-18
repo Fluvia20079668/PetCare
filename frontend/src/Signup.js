@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./AuthForm.css";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -19,41 +20,28 @@ export default function Signup() {
       const data = await res.json();
       setMessage(data.message || data.error);
     } catch (err) {
-      setMessage("Error connecting to server");
+      setMessage("Server error");
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto" }}>
-      <h2>Signup</h2>
+    <div className="auth-container">
+      <h2>Create Account</h2>
+
       <form onSubmit={handleSignup}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          style={{ display: "block", marginBottom: 10, width: "100%" }}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ display: "block", marginBottom: 10, width: "100%" }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ display: "block", marginBottom: 10, width: "100%" }}
-        />
-        <button type="submit">Signup</button>
+        <input className="auth-input" type="text" placeholder="Full Name"
+          value={name} onChange={(e) => setName(e.target.value)} required />
+
+        <input className="auth-input" type="email" placeholder="Email"
+          value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+        <input className="auth-input" type="password" placeholder="Password"
+          value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+        <button className="auth-btn" type="submit">Signup</button>
       </form>
-      {message && <p>{message}</p>}
+
+      {message && <p className="message">{message}</p>}
     </div>
   );
 }

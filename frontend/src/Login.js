@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./AuthForm.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,39 +17,30 @@ export default function Login() {
       });
 
       const data = await res.json();
-      if (data.status === "success") {
-        setMessage(`Welcome, ${data.user.name}`);
-      } else {
-        setMessage(data.message);
-      }
-    } catch (err) {
-      setMessage("Error connecting to server");
+      setMessage(data.status === "success"
+        ? `Welcome back, ${data.user.name}!`
+        : data.message
+      );
+    } catch {
+      setMessage("Server error");
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto" }}>
+    <div className="auth-container">
       <h2>Login</h2>
+
       <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ display: "block", marginBottom: 10, width: "100%" }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ display: "block", marginBottom: 10, width: "100%" }}
-        />
-        <button type="submit">Login</button>
+        <input className="auth-input" type="email" placeholder="Email"
+          value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+        <input className="auth-input" type="password" placeholder="Password"
+          value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+        <button className="auth-btn" type="submit">Login</button>
       </form>
-      {message && <p>{message}</p>}
+
+      {message && <p className="message">{message}</p>}
     </div>
   );
 }
