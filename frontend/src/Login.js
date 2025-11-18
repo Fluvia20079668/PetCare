@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AuthForm.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,10 +20,18 @@ export default function Login() {
       });
 
       const data = await res.json();
-      setMessage(data.status === "success"
-        ? `Welcome back, ${data.user.name}!`
-        : data.message
-      );
+
+      if (data.status === "success") {
+        setMessage(`Welcome, ${data.user.name}`);
+      } 
+      else {
+        setMessage("Invalid credentials! Redirecting to signup...");
+
+        setTimeout(() => {
+          navigate("/signup");
+        }, 2000); // 2 seconds delay
+      }
+
     } catch {
       setMessage("Server error");
     }
@@ -31,11 +42,23 @@ export default function Login() {
       <h2>Login</h2>
 
       <form onSubmit={handleLogin}>
-        <input className="auth-input" type="email" placeholder="Email"
-          value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <input className="auth-input" type="password" placeholder="Password"
-          value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
         <button className="auth-btn" type="submit">Login</button>
       </form>
