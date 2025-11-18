@@ -9,7 +9,7 @@ export default function Signup() {
   const [message, setMessage] = useState("");
 
   const routerLocation = useLocation(); // rename to avoid ESLint conflict
-
+//// Show flash message from Login
   useEffect(() => {
     if (routerLocation.state && routerLocation.state.message) {
       setMessage(routerLocation.state.message);
