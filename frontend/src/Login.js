@@ -6,7 +6,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -22,25 +21,23 @@ export default function Login() {
       const data = await res.json();
 
       if (data.status === "success") {
-        setMessage(`Welcome, ${data.user.name}`);
-      } 
-      else {
-        setMessage("Invalid credentials! Redirecting to signup...");
-
-        setTimeout(() => {
-          navigate("/signup");
-        }, 2000); // 2 seconds delay
+        navigate("/home");
+      } else {
+        navigate("/signup", {
+          state: {
+            message:
+              "You tried logging in with wrong credentials, please register!",
+          },
+        });
       }
-
-    } catch {
-      setMessage("Server error");
+    } catch (err) {
+      setMessage("Server error, please try again later");
     }
   };
 
   return (
     <div className="auth-container">
       <h2>Login</h2>
-
       <form onSubmit={handleLogin}>
         <input
           className="auth-input"
@@ -50,7 +47,6 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-
         <input
           className="auth-input"
           type="password"
@@ -59,10 +55,8 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
         <button className="auth-btn" type="submit">Login</button>
       </form>
-
       {message && <p className="message">{message}</p>}
     </div>
   );
