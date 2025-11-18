@@ -18,8 +18,8 @@ export default function Signup() {
       });
 
       const data = await res.json();
-      setMessage(data.message || data.error);
-    } catch (err) {
+      setMessage(data.message);
+    } catch {
       setMessage("Server error");
     }
   };
@@ -29,14 +29,14 @@ export default function Signup() {
       <h2>Create Account</h2>
 
       <form onSubmit={handleSignup}>
-        <input className="auth-input" type="text" placeholder="Full Name"
-          value={name} onChange={(e) => setName(e.target.value)} required />
+        <input className="auth-input" type="text" placeholder="Name"
+          value={name} onChange={(e) => setName(e.target.value)} />
 
         <input className="auth-input" type="email" placeholder="Email"
-          value={email} onChange={(e) => setEmail(e.target.value)} required />
+          value={email} onChange={(e) => setEmail(e.target.value)} />
 
         <input className="auth-input" type="password" placeholder="Password"
-          value={password} onChange={(e) => setPassword(e.target.value)} required />
+          value={password} onChange={(e) => setPassword(e.target.value)} />
 
         <button className="auth-btn" type="submit">Signup</button>
       </form>
