@@ -7,6 +7,13 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+   // Show flash message from Login
+  useEffect(() => {
+    if (location.state && location.state.message) {
+      setMessage(location.state.message);
+    }
+  }, [location.state]);
+
   const handleSignup = async (e) => {
     e.preventDefault();
 
