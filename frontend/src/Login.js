@@ -22,15 +22,13 @@ export default function Login() {
 
       if (data.status === "success") {
         navigate("/home");
+      } else if (data.status === "fail") {
+        // Pass backend message to Signup page
+        navigate("/signup", { state: { message: data.message } });
       } else {
-        navigate("/signup", {
-          state: {
-            message:
-              "You tried logging in with wrong credentials, please register!",
-          },
-        });
+        setMessage("Server error, please try again later");
       }
-    } catch (err) {
+    } catch {
       setMessage("Server error, please try again later");
     }
   };

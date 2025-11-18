@@ -35,18 +35,24 @@ router.post("/login", (req, res) => {
 
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) return res.json({ status: "error", error: err });
-    if (results.length === 0)
+    
+    // If email not found
+    if (results.length === 0) {
       return res.json({ status: "fail", message: "Invalid credentials" });
+    }
 
-    // Compare hashed password
+    // Compare password
     bcrypt.compare(password, results[0].password, (err, isMatch) => {
       if (err) return res.json({ status: "error", error: err });
-      if (!isMatch)
+
+      if (!isMatch) {
         return res.json({ status: "fail", message: "Invalid credentials" });
+      }
 
       res.json({ status: "success", user: results[0] });
     });
   });
 });
+
 
 module.exports = router;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // make sure this is imported
 import "./AuthForm.css";
 
 export default function Signup() {
@@ -7,16 +8,16 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-   // Show flash message from Login
+  const routerLocation = useLocation(); // rename to avoid ESLint conflict
+
   useEffect(() => {
-    if (location.state && location.state.message) {
-      setMessage(location.state.message);
+    if (routerLocation.state && routerLocation.state.message) {
+      setMessage(routerLocation.state.message);
     }
-  }, [location.state]);
+  }, [routerLocation.state]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch("http://localhost:8080/api/users/signup", {
         method: "POST",
@@ -25,29 +26,42 @@ export default function Signup() {
       });
 
       const data = await res.json();
-      setMessage(data.message);
+      setMessage(data.message || data.error);
     } catch {
-      setMessage("Server error");
+      setMessage("Server error, please try again later");
     }
   };
 
   return (
     <div className="auth-container">
       <h2>Create Account</h2>
-
       <form onSubmit={handleSignup}>
-        <input className="auth-input" type="text" placeholder="Name"
-          value={name} onChange={(e) => setName(e.target.value)} />
-
-        <input className="auth-input" type="email" placeholder="Email"
-          value={email} onChange={(e) => setEmail(e.target.value)} />
-
-        <input className="auth-input" type="password" placeholder="Password"
-          value={password} onChange={(e) => setPassword(e.target.value)} />
-
+        <input
+          className="auth-input"
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
         <button className="auth-btn" type="submit">Signup</button>
       </form>
-
       {message && <p className="message">{message}</p>}
     </div>
   );
