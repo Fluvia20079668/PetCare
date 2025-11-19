@@ -1,47 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AuthForm.css";
 
-export default function Signup() {
-  const [name, setName] = useState("");
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false); // default: false
+  const [slideIn, setSlideIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  useEffect(() => {
+    setSlideIn(true); // slide in effect on mount
+  }, []);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setShowPopup(false); // reset popup on new login attempt
+
     try {
-      const res = await fetch("http://localhost:8080/api/users/signup", {
+      const res = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
-      setMessage(data.message || data.error);
-    } catch {
-      setMessage("Server error, please try again later");
+
+      // Show popup only if credentials are invalid
+      if (data.status === "success") {
+        navigate("/home");
+      } else if (data.status === "fail") {
+        setShowPopup(true);
+      } else {
+        console.error("Unexpected response:", data);
+      }
+    } catch (err) {
+      console.error(err);
+      setShowPopup(true);
     }
   };
 
-  const handleBackToLogin = () => {
-    const container = document.querySelector(".auth-container");
-    container.classList.add("slide-out-right");
-    setTimeout(() => navigate("/"), 500); // wait for slide-out
+  const handleSignUpRedirect = () => {
+    navigate("/signup");
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
   return (
-    <div className="auth-container slide-in-right">
-      <h2>Create Account</h2>
-      <form onSubmit={handleSignup}>
-        <input
-          className="auth-input"
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+    <div className={`auth-container ${slideIn ? "slide-in-left" : ""}`}>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
         <input
           className="auth-input"
           type="email"
@@ -58,19 +68,25 @@ export default function Signup() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button className="auth-btn" type="submit">Sign Up</button>
+        <button className="auth-btn" type="submit">
+          Login
+        </button>
       </form>
 
-      {message && <p style={{ marginTop: "15px", color: "red" }}>{message}</p>}
-
-      {/* Back to Login */}
-      <button
-        className="auth-btn"
-        style={{ marginTop: "20px", backgroundColor: "#007bff" }}
-        onClick={handleBackToLogin}
-      >
-        Back to Login
-      </button>
+      {/* Sliding popup shows only on invalid login */}
+      {showPopup && (
+        <div className="popup-slide show">
+          <p>Invalid login! Please register if you don't have an account.</p>
+          <div style={{ marginTop: "15px" }}>
+            <button className="popup-btn" onClick={handleSignUpRedirect}>
+              Sign Up
+            </button>
+            <button className="popup-btn" onClick={handleClosePopup}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
