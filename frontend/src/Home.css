@@ -1,0 +1,200 @@
+/* Global */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #ffffff;
+  scroll-behavior: smooth;
+}
+
+/* Navigation Bar */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 15px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+  color: #008c95;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #008c95;
+}
+
+.auth-buttons button {
+  margin-left: 10px;
+  padding: 8px 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-login {
+  background: white;
+  border: 2px solid #008c95;
+  color: #008c95;
+}
+
+.btn-login:hover {
+  background: #008c95;
+  color: white;
+}
+
+.btn-signup {
+  background: #008c95;
+  color: white;
+}
+
+.btn-signup:hover {
+  opacity: 0.85;
+}
+
+/* Hero Section */
+.hero-section {
+  margin-top: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 80px;
+}
+
+.hero-text {
+  max-width: 50%;
+}
+
+.hero-text h1 {
+  font-size: 48px;
+  color: #003b46;
+}
+
+.hero-text p {
+  font-size: 18px;
+  color: #444;
+  margin: 15px 0 30px;
+}
+
+.hero-btn {
+  padding: 12px 25px;
+  background: #008c95;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.hero-btn:hover {
+  background: #006f75;
+}
+
+.hero-image img {
+  width: 450px;
+}
+
+/* About, Services, Contact */
+section {
+  padding: 60px 80px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 34px;
+  color: #003b46;
+  margin-bottom: 30px;
+}
+
+p {
+  color: #444;
+}
+
+/* Services Section */
+.services-grid {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.service-card {
+  width: 280px;
+  background: #f8fafa;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.service-card img {
+  width: 80px;
+  margin-bottom: 15px;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Contact */
+.contact-box {
+  background: #f2ffff;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: auto;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+/* Footer */
+.footer {
+  background: #003b46;
+  text-align: center;
+  padding: 15px;
+  color: white;
+  margin-top: 50px;
+}
+
+/* Animations */
+.fade-in {
+  animation: fade 1s ease-in forwards;
+}
+
+.slide-up {
+  opacity: 0;
+  animation: slideUp 1s ease forwards;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
