@@ -1,76 +1,63 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { setUser } from "./utils/auth";
 import "./AuthForm.css";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirect = location.state?.redirect; // optional
+  const service = location.state?.service;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [slideOut, setSlideOut] = useState(false); // state for slide-out
-  const navigate = useNavigate();
+  const [msg, setMsg] = useState("");
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setMsg("");
+
     try {
       const res = await fetch("http://localhost:8080/api/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password })
       });
       const data = await res.json();
-      setMessage(data.message || data.error);
-    } catch {
-      setMessage("Server error, please try again later");
+
+      if (data.status === "success") {
+        // Optionally auto-login the new user - here we'll store minimal user
+        setUser({ name, email });
+        // Redirect to booking if requested
+        if (redirect) {
+          if (redirect === "/booking" && service) {
+            navigate(`/booking?service=${encodeURIComponent(service)}`);
+          } else {
+            navigate(redirect);
+          }
+        } else {
+          navigate("/");
+        }
+      } else {
+        setMsg(data.message || "Signup error");
+      }
+    } catch (err) {
+      console.error(err);
+      setMsg("Server error");
     }
   };
 
-  const handleBackToLogin = () => {
-    setSlideOut(true); // trigger slide-out animation
-    setTimeout(() => navigate("/"), 500); // navigate after animation
-  };
-
   return (
-    <div className={`auth-container slide-in-right ${slideOut ? "slide-out-right" : ""}`}>
+    <div className="auth-container slide-in-right">
       <h2>Create Account</h2>
       <form onSubmit={handleSignup}>
-        <input
-          className="auth-input"
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          className="auth-input"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="auth-input"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <input className="auth-input" type="text" placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} required />
+        <input className="auth-input" type="email" placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} required />
+        <input className="auth-input" type="password" placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required />
         <button className="auth-btn" type="submit">Sign Up</button>
       </form>
-
-      {message && <p style={{ marginTop: "15px", color: "red" }}>{message}</p>}
-
-      {/* Back to Login */}
-      <button
-        className="auth-btn"
-        style={{ marginTop: "20px", backgroundColor: "#007bff" }}
-        onClick={handleBackToLogin}
-      >
-        Back to Login
-      </button>
+      {msg && <p className="message">{msg}</p>}
     </div>
   );
 }
