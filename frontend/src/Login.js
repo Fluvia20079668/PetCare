@@ -1,92 +1,63 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { setUser } from "./utils/auth";
 import "./AuthForm.css";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirect = location.state?.redirect; // e.g. "/booking"
+  const service = location.state?.service; // e.g. "daycare"
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPopup, setShowPopup] = useState(false); // default: false
-  const [slideIn, setSlideIn] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setSlideIn(true); // slide in effect on mount
-  }, []);
+  const [msg, setMsg] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setShowPopup(false); // reset popup on new login attempt
+    setMsg("");
 
     try {
       const res = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
 
-      // Show popup only if credentials are invalid
       if (data.status === "success") {
-        navigate("/home");
-      } else if (data.status === "fail") {
-        setShowPopup(true);
+        // store user
+        setUser({ id: data.user.id, name: data.user.name, email: data.user.email });
+        // if redirect requested, attach service query if needed
+        if (redirect) {
+          if (redirect === "/booking" && service) {
+            navigate(`/booking?service=${encodeURIComponent(service)}`);
+          } else {
+            navigate(redirect);
+          }
+        } else {
+          navigate("/"); // go to homepage by default
+        }
       } else {
-        console.error("Unexpected response:", data);
+        setMsg(data.message || "Invalid credentials");
       }
     } catch (err) {
       console.error(err);
-      setShowPopup(true);
+      setMsg("Server error");
     }
   };
 
-  const handleSignUpRedirect = () => {
-    navigate("/signup");
-  };
-
-  const handleClosePopup = () => {
-    setShowPopup(false);
-  };
-
   return (
-    <div className={`auth-container ${slideIn ? "slide-in-left" : ""}`}>
+    <div className="auth-container slide-in-left">
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <input
-          className="auth-input"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="auth-input"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button className="auth-btn" type="submit">
-          Login
-        </button>
+        <input className="auth-input" type="email" placeholder="Email" value={email}
+          onChange={(e)=>setEmail(e.target.value)} required />
+        <input className="auth-input" type="password" placeholder="Password" value={password}
+          onChange={(e)=>setPassword(e.target.value)} required />
+        <button className="auth-btn" type="submit">Login</button>
       </form>
-
-      {/* Sliding popup shows only on invalid login */}
-      {showPopup && (
-        <div className="popup-slide show">
-          <p>Invalid login! Please register if you don't have an account.</p>
-          <div style={{ marginTop: "15px" }}>
-            <button className="popup-btn" onClick={handleSignUpRedirect}>
-              Sign Up
-            </button>
-            <button className="popup-btn" onClick={handleClosePopup}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      {msg && <p className="message">{msg}</p>}
     </div>
   );
 }
