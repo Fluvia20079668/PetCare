@@ -1,63 +1,83 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { setUser } from "./utils/auth";
+import { useNavigate } from "react-router-dom";
 import "./AuthForm.css";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const redirect = location.state?.redirect; // e.g. "/booking"
-  const service = location.state?.service; // e.g. "daycare"
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMsg("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/login", {
+      const res = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
 
-      if (data.status === "success") {
-        // store user
-        setUser({ id: data.user.id, name: data.user.name, email: data.user.email });
-        // if redirect requested, attach service query if needed
-        if (redirect) {
-          if (redirect === "/booking" && service) {
-            navigate(`/booking?service=${encodeURIComponent(service)}`);
-          } else {
-            navigate(redirect);
-          }
-        } else {
-          navigate("/"); // go to homepage by default
-        }
+      if (res.ok) {
+        navigate("/"); // Successful login → Home
       } else {
-        setMsg(data.message || "Invalid credentials");
+        setShowPopup(true); // Wrong credentials → Show popup slide
       }
-    } catch (err) {
-      console.error(err);
-      setMsg("Server error");
+    } catch (error) {
+      setShowPopup(true);
     }
   };
 
   return (
     <div className="auth-container slide-in-left">
+
       <h2>Login</h2>
+
       <form onSubmit={handleLogin}>
-        <input className="auth-input" type="email" placeholder="Email" value={email}
-          onChange={(e)=>setEmail(e.target.value)} required />
-        <input className="auth-input" type="password" placeholder="Password" value={password}
-          onChange={(e)=>setPassword(e.target.value)} required />
-        <button className="auth-btn" type="submit">Login</button>
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Enter Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button className="auth-btn" type="submit">
+          Login
+        </button>
       </form>
-      {msg && <p className="message">{msg}</p>}
+
+      {/* ---- SLIDING POPUP ---- */}
+      <div className={`popup-slide ${showPopup ? "show" : ""}`}>
+        <h3>Invalid Credentials</h3>
+        <p>Email or password is incorrect.</p>
+
+        <button
+          className="popup-btn"
+          onClick={() => navigate("/signup")}
+        >
+          Go to Sign Up
+        </button>
+
+        <button
+          className="popup-btn"
+          style={{ backgroundColor: "gray", marginTop: "10px" }}
+          onClick={() => setShowPopup(false)}
+        >
+          Close
+        </button>
+      </div>
+
     </div>
   );
 }
