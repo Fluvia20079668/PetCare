@@ -136,3 +136,15 @@
 .slide-in-left {
   animation: slideInLeft 0.5s ease forwards;
 }
+.back-home-link {
+  margin-top: 15px;
+  cursor: pointer;
+  color: #008c95;
+  font-weight: bold;
+  text-decoration: underline;
+  display: inline-block;
+}
+
+.back-home-link:hover {
+  opacity: 0.7;
+}
