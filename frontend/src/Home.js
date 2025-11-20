@@ -1,94 +1,166 @@
+// Home.js - Clean Vibrant Pet-Themed UI
 import React, { useState } from "react";
-import "./AuthForm.css";// Using same CSS file for popup styles
-import { FaDog, FaClinicMedical, FaWalking, FaUtensils, FaHome, FaBath } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { isLoggedIn } from "./utils/auth";
+import "./Home.css";
+
+const SERVICES = [
+  {
+    id: "daycare",
+    title: "Daycare",
+    short: "Safe & playful day environment for pets.",
+    details:
+      "Full-day supervision, playtime, feeding, and short walks. Staffed by trained carers."
+  },
+  {
+    id: "hostel",
+    title: "Hostel",
+    short: "Comfortable overnight stays with supervision.",
+    details:
+      "Overnight accommodation, regular feeding, temperature-controlled rooms and nightly checks."
+  },
+  {
+    id: "grooming",
+    title: "Grooming",
+    short: "Professional grooming for cats & dogs.",
+    details:
+      "Bathing, brushing, nail trimming and coat styling performed by experienced groomers."
+  },
+  {
+    id: "walking",
+    title: "Pet Walking",
+    short: "Daily walks tailored to your pet’s needs.",
+    details:
+      "Short/long walks, solo or group, enrichment activities and GPS-tracked routes (optional)."
+  },
+  {
+    id: "vetcheck",
+    title: "Veterinary Checkup",
+    short: "Routine health check and vaccinations.",
+    details:
+      "Qualified vets for routine checkups, vaccination checks and basic medical advice."
+  },
+  {
+    id: "food",
+    title: "Food Delivery",
+    short: "Healthy pet food delivered to your door.",
+    details:
+      "Premium food brands, subscription or one-off deliveries. Custom diet plans available."
+  }
+];
 
 export default function Home() {
-  const [popupData, setPopupData] = useState(null);
+  const [modalService, setModalService] = useState(null);
+  const navigate = useNavigate();
 
-  const services = [
-    { id: 1, title: "Daycare", icon: <FaHome size={40} /> },
-    { id: 2, title: "Hostel", icon: <FaDog size={40} /> },
-    { id: 3, title: "Grooming", icon: <FaBath size={40} /> },
-    { id: 4, title: "Pet Walking", icon: <FaWalking size={40} /> },
-    { id: 5, title: "Veterinary Checkup", icon: <FaClinicMedical size={40} /> },
-    { id: 6, title: "Food Delivery", icon: <FaUtensils size={40} /> }
-  ];
+  const openService = (svc) => setModalService(svc);
+  const closeModal = () => setModalService(null);
 
-  const openPopup = (service) => {
-    setPopupData(service);
-  };
-
-  const closePopup = () => {
-    setPopupData(null);
+  const handleBookNow = (svc) => {
+    if (!isLoggedIn()) {
+      navigate("/login", { state: { redirect: "/booking", service: svc.id } });
+      return;
+    }
+    navigate(`/booking?service=${encodeURIComponent(svc.id)}`);
   };
 
   return (
-    <div className="home-container" style={styles.container}>
-      <h1 style={styles.heading}>Our Services</h1>
+    <div className="home-root fade-in">
+      {/* NAVBAR */}
+      <nav className="pc-nav">
+        <div className="pc-logo">🐾 PetCare+</div>
+        <ul className="pc-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div className="pc-auth">
+          <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
+          <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
+        </div>
+      </nav>
 
-      <div style={styles.grid}>
-        {services.map((service) => (
-          <div key={service.id} style={styles.card} className="slide-in-right">
-            <div style={styles.icon}>{service.icon}</div>
-            <h3>{service.title}</h3>
-            <button style={styles.button} onClick={() => openPopup(service)}>
-              Book Now
+      {/* HERO SECTION */}
+      <header id="home" className="hero">
+        <div className="hero-left slide-in-left">
+          <h1>Your Pet’s Health, Our Priority</h1>
+          <p>
+            Professional daycare, safe hostels, grooming and premium services —
+            everything your pet needs.
+          </p>
+          <div className="hero-ctas">
+            <button
+              className="btn-primary big"
+              onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              Explore Services
             </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {popupData && (
-        <div className={`popup-slide show`}> 
-          <h2>{popupData.title}</h2>
-          <p>Click below to proceed with booking.</p>
+        <div className="hero-right slide-in-right">
+          <img
+            alt="happy dog"
+            src="https://cdn.pixabay.com/photo/2016/02/19/11/19/dog-1209283_1280.png"
+          />
+        </div>
+      </header>
 
-          <button className="popup-btn">Proceed</button>
-          <button className="popup-btn" onClick={closePopup} style={{ background: "#e74c3c" }}>
-            Close
-          </button>
+      {/* ABOUT */}
+      <section id="about" className="section about fade-in">
+        <h2>About Us</h2>
+        <p>
+          With years of trusted experience, PetCare+ provides a warm and caring environment
+          for pets of all kinds. Your pet’s comfort and safety are our top priorities.
+        </p>
+      </section>
+
+      {/* SERVICES */}
+      <section id="services" className="section services fade-in">
+        <h2>Our Services</h2>
+
+        <div className="services-grid">
+          {SERVICES.map((s) => (
+            <article key={s.id} className="service-card zoom-in">
+              <h3>{s.title}</h3>
+              <p className="muted">{s.short}</p>
+              <div className="service-actions">
+                <button className="btn-link" onClick={() => openService(s)}>Learn More</button>
+                <button className="btn-primary small" onClick={() => handleBookNow(s)}>Book</button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="section contact fade-in">
+        <h2>Contact Us</h2>
+        <div className="contact-card">
+          <p><strong>Email:</strong> support@petcare.com</p>
+          <p><strong>Phone:</strong> +353 01 234 5678</p>
+          <p><strong>Address:</strong> Dublin, Ireland</p>
+        </div>
+      </section>
+
+      <footer className="pc-footer">
+        © {new Date().getFullYear()} PetCare+. All rights reserved.
+      </footer>
+
+      {/* MODAL */}
+      {modalService && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal slide-up" onClick={(e) => e.stopPropagation()}>
+            <h3>{modalService.title}</h3>
+            <p>{modalService.details}</p>
+            <div className="modal-actions">
+              <button className="btn-primary" onClick={() => handleBookNow(modalService)}>Book Now</button>
+              <button className="btn-outline" onClick={closeModal}>Close</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "30px",
-    textAlign: "center",
-    animation: "slideInLeft 0.5s ease"
-  },
-  heading: {
-    fontSize: "32px",
-    fontWeight: "bold",
-    marginBottom: "25px"
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-    padding: "10px"
-  },
-  card: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-    transition: "0.3s",
-    cursor: "pointer"
-  },
-  icon: {
-    marginBottom: "10px"
-  },
-  button: {
-    marginTop: "10px",
-    background: "#4caf50",
-    color: "white",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontWeight: "bold"
-  }
-};
