@@ -65,7 +65,15 @@ export default function Home() {
   };
 
   return (
-    <div className="home-root fade-in">
+    <div
+      className="home-root fade-in"
+      style={{
+        backgroundImage: 'url("/pet-directory.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {/* NAVBAR */}
       <nav className="pc-nav">
         <div className="pc-logo">🐾 PetCare+</div>
@@ -92,7 +100,11 @@ export default function Home() {
           <div className="hero-ctas">
             <button
               className="btn-primary big"
-              onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() =>
+                document
+                  .getElementById("services")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
             >
               Explore Services
             </button>
@@ -100,14 +112,7 @@ export default function Home() {
         </div>
 
         <div className="hero-right slide-in-right">
-          <img
-  alt="all pets"
-  src="/pet-directory.jpg"
-  style={{ width: "100%", maxWidth: "420px" }}
-/>
-
-
-     </div>
+        </div>
       </header>
 
       {/* ABOUT */}
@@ -129,8 +134,15 @@ export default function Home() {
               <h3>{s.title}</h3>
               <p className="muted">{s.short}</p>
               <div className="service-actions">
-                <button className="btn-link" onClick={() => openService(s)}>Learn More</button>
-                <button className="btn-primary small" onClick={() => handleBookNow(s)}>Book</button>
+                <button className="btn-link" onClick={() => openService(s)}>
+                  Learn More
+                </button>
+                <button
+                  className="btn-primary small"
+                  onClick={() => handleBookNow(s)}
+                >
+                  Book
+                </button>
               </div>
             </article>
           ))}
@@ -158,8 +170,15 @@ export default function Home() {
             <h3>{modalService.title}</h3>
             <p>{modalService.details}</p>
             <div className="modal-actions">
-              <button className="btn-primary" onClick={() => handleBookNow(modalService)}>Book Now</button>
-              <button className="btn-outline" onClick={closeModal}>Close</button>
+              <button
+                className="btn-primary"
+                onClick={() => handleBookNow(modalService)}
+              >
+                Book Now
+              </button>
+              <button className="btn-outline" onClick={closeModal}>
+                Close
+              </button>
             </div>
           </div>
         </div>
