@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./authform.css"; // Using same CSS file for popup styles
+import "./AuthForm.css";// Using same CSS file for popup styles
 import { FaDog, FaClinicMedical, FaWalking, FaUtensils, FaHome, FaBath } from "react-icons/fa";
 
 export default function Home() {
