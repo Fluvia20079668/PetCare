@@ -59,6 +59,9 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   gap: 30px;
   padding: 110px 60px 60px 60px;
   align-items: center;
+
+  height: 100vh;          /* FULL SCREEN HERO */
+  min-height: 600px;      /* safety */
 }
 
 .hero-left { max-width: 50%; }
