@@ -101,10 +101,13 @@ export default function Home() {
 
         <div className="hero-right slide-in-right">
           <img
-            alt="happy dog"
-            src="https://cdn.pixabay.com/photo/2016/02/19/11/19/dog-1209283_1280.png"
-          />
-        </div>
+  alt="all pets"
+  src="/pet-directory.jpg"
+  style={{ width: "100%", maxWidth: "420px" }}
+/>
+
+
+     </div>
       </header>
 
       {/* ABOUT */}
