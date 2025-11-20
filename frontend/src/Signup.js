@@ -57,6 +57,13 @@ export default function Signup() {
         <input className="auth-input" type="password" placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required />
         <button className="auth-btn" type="submit">Sign Up</button>
       </form>
+      <p
+    className="back-home-link"
+    onClick={() => navigate("/")}
+      >
+      ← Back to Home
+      </p>
+
       {msg && <p className="message">{msg}</p>}
     </div>
   );

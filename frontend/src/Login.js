@@ -56,6 +56,13 @@ export default function Login() {
           Login
         </button>
       </form>
+            <p
+      className="back-home-link"
+      onClick={() => navigate("/")}
+          >
+             ← Back to Home
+          </p>
+
 
       {/* ---- SLIDING POPUP ---- */}
       <div className={`popup-slide ${showPopup ? "show" : ""}`}>
