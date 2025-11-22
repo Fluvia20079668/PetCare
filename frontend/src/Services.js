@@ -1,87 +1,119 @@
+// Services.js
 import React, { useState } from "react";
 import "./Services.css";
+import { useNavigate } from "react-router-dom";
+
+/* --- ICONS (react-icons) --- */
+import { 
+  FaDog, 
+  FaCat, 
+  FaBath, 
+  FaWalking,
+  FaClinicMedical, 
+  FaBone 
+} from "react-icons/fa";
 
 export default function Services() {
-  const [open, setOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState("");
+  const navigate = useNavigate();
+  const [bookingService, setBookingService] = useState(null);
 
-  const handleBooking = (service) => {
-    setSelectedService(service);
-    setOpen(true);
-  };
+  const SERVICES = [
+    {
+      id: "hostel",
+      title: "Pet Hostel",
+      desc: "Safe and comfortable overnight stay.",
+      icon: <FaDog size={40} color="#008c95" />
+    },
+    {
+      id: "daycare",
+      title: "Pet Daycare",
+      desc: "Play, rest, and supervision all day.",
+      icon: <FaCat size={40} color="#008c95" />
+    },
+    {
+      id: "grooming",
+      title: "Grooming",
+      desc: "Bath, nail trim & coat care.",
+      icon: <FaBath size={40} color="#008c95" />
+    },
+    {
+      id: "walking",
+      title: "Pet Walking",
+      desc: "Daily walks with trained staff.",
+      icon: <FaWalking size={40} color="#008c95" />
+    },
+    {
+      id: "vet",
+      title: "Vet Checkup",
+      desc: "Basic health assessment & advice.",
+      icon: <FaClinicMedical size={40} color="#008c95" />
+    },
+    {
+      id: "food",
+      title: "Pet Food Delivery",
+      desc: "Healthy meals delivered at home.",
+      icon: <FaBone size={40} color="#008c95" />
+    }
+  ];
+
+  const openBooking = (service) => setBookingService(service);
+  const closeBooking = () => setBookingService(null);
 
   return (
     <div className="services-page">
+
       <h1 className="services-title">Our Services</h1>
+      <p className="services-subtitle">Choose the best care for your furry friend</p>
 
       <div className="services-grid">
-        {/* PET DAYCARE */}
-        <div className="service-card">
-          <h3>Pet Daycare</h3>
-          <p>Safe, playful, and supervised environment for your pets.</p>
-          <button className="book-btn" onClick={() => handleBooking("Pet Daycare")}>
-            Book Now
-          </button>
-        </div>
+        {SERVICES.map((svc) => (
+          <div key={svc.id} className="service-card">
+            <div className="service-icon">{svc.icon}</div>
 
-        {/* PET HOSTEL */}
-        <div className="service-card">
-          <h3>Pet Hostel</h3>
-          <p>Comfortable and secure overnight stays.</p>
-          <button className="book-btn" onClick={() => handleBooking("Pet Hostel")}>
-            Book Now
-          </button>
-        </div>
+            <h3>{svc.title}</h3>
+            <p className="service-desc">{svc.desc}</p>
 
-        {/* EXISTING SERVICES */}
-        <div className="service-card">
-          <h3>Pet Food Delivary</h3>
-          <p>Premium nutrition, good delivery service.</p>
-          <button className="book-btn" onClick={() => handleBooking("Pet Boarding")}>
-            Book Now
-          </button>
-        </div>
-
-        <div className="service-card">
-          <h3>Veterinary Care</h3>
-          <p>Qualified vets for all your pet’s health needs.</p>
-          <button className="book-btn" onClick={() => handleBooking("Veterinary Care")}>
-            Book Now
-          </button>
-        </div>
-
-        <div className="service-card">
-          <h3>Pet Grooming</h3>
-          <p>Professional grooming to keep your pet happy & fresh.</p>
-          <button className="book-btn" onClick={() => handleBooking("Pet Grooming")}>
-            Book Now
-          </button>
-        </div>
-
-        <div className="service-card">
-          <h3>Pet Training</h3>
-          <p>Expert trainers for behavior and obedience training.</p>
-          <button className="book-btn" onClick={() => handleBooking("Pet Training")}>
-            Book Now
-          </button>
-        </div>
+            <button 
+              className="book-btn"
+              onClick={() => openBooking(svc)}
+            >
+              Book Now
+            </button>
+          </div>
+        ))}
       </div>
 
       {/* Booking Modal */}
-      {open && (
-        <div className="booking-overlay">
-          <div className="booking-modal">
-            <h2>Book: {selectedService}</h2>
+      {bookingService && (
+        <div className="booking-overlay" onClick={closeBooking}>
+          <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Book {bookingService.title}</h2>
 
-            <input type="text" placeholder="Your Name" className="booking-input" />
-            <input type="text" placeholder="Your Phone" className="booking-input" />
-            <input type="date" className="booking-input" />
+            <input 
+              type="text"
+              className="booking-input"
+              placeholder="Your Name"
+            />
+
+            <input 
+              type="text"
+              className="booking-input"
+              placeholder="Your Pet's Name"
+            />
+
+            <input 
+              type="date"
+              className="booking-input"
+            />
 
             <button className="booking-submit">Confirm Booking</button>
-            <button className="booking-close" onClick={() => setOpen(false)}>Close</button>
+            <button className="booking-close" onClick={closeBooking}>
+              Close
+            </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }
