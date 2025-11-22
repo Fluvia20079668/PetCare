@@ -98,16 +98,6 @@ export default function Home() {
             everything your pet needs.
           </p>
           <div className="hero-ctas">
-            <button
-              className="btn-primary big"
-              onClick={() =>
-                document
-                  .getElementById("services")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Explore Services
-            </button>
           </div>
         </div>
 
@@ -115,44 +105,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* SERVICES */}
-      <section id="services" className="section services fade-in">
-        <h2>Our Services</h2>
-
-        <div className="services-grid">
-          {SERVICES.map((s) => (
-            <article key={s.id} className="service-card zoom-in">
-              <h3>{s.title}</h3>
-              <p className="muted">{s.short}</p>
-              <div className="service-actions">
-                <button className="btn-link" onClick={() => openService(s)}>
-                  Learn More
-                </button>
-                <button
-                  className="btn-primary small"
-                  onClick={() => handleBookNow(s)}
-                >
-                  Book
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section id="contact" className="section contact fade-in">
-        <h2>Contact Us</h2>
-        <div className="contact-card">
-          <p><strong>Email:</strong> support@petcare.com</p>
-          <p><strong>Phone:</strong> +353 01 234 5678</p>
-          <p><strong>Address:</strong> Dublin, Ireland</p>
-        </div>
-      </section>
-
-      <footer className="pc-footer">
-        © {new Date().getFullYear()} PetCare+. All rights reserved.
-      </footer>
 
       {/* MODAL */}
       {modalService && (
