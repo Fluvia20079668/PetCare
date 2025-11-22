@@ -35,8 +35,8 @@ export default function Services() {
 
         {/* EXISTING SERVICES */}
         <div className="service-card">
-          <h3>Pet Boarding</h3>
-          <p>Safe and comfortable stay for your pets.</p>
+          <h3>Pet Food Delivary</h3>
+          <p>Premium nutrition, good delivery service.</p>
           <button className="book-btn" onClick={() => handleBooking("Pet Boarding")}>
             Book Now
           </button>
