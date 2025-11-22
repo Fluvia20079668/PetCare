@@ -1,12 +1,12 @@
-/* Services.css - matching Home look & feel */
+/* Contact.css - matching Home look & feel */
 
 /* base */
 * { box-sizing: border-box; }
 html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
 
-.services-page {
+.contact-page {
   min-height: 100vh;
-  padding-top: 80px; /* room for navbar */
+  padding-top: 80px; /* for fixed navbar */
   background: #fff;
 }
 
@@ -28,48 +28,49 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
 .pc-links li:hover { color: #008c95; }
 
 /* header */
-.services-header {
-  max-width: 1000px;
+.contact-header {
+  max-width: 900px;
   margin: 28px auto 10px;
   text-align: center;
   padding: 8px 20px;
 }
-.services-header h1 {
-  font-size: 38px;
-  color: #03323a;
-  margin: 0;
-}
-.services-header p { color: #555; margin-top: 8px; }
+.contact-header h1 { font-size: 36px; color: #03323a; margin: 0; }
+.contact-header p { color: #555; margin-top: 8px; }
 
-/* services grid (large) */
-.services-grid {
-  max-width: 1100px;
-  margin: 20px auto 60px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 22px;
+/* contact details */
+.contact-details {
+  max-width: 700px;
+  margin: 22px auto;
+  background: #f6fffe;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  text-align: left;
+  color: #333;
+}
+.contact-details p { margin: 8px 0; font-size: 16px; }
+
+/* contact form (optional) */
+.contact-form {
+  max-width: 700px;
+  margin: 18px auto;
   padding: 0 20px;
 }
-
-/* card */
-.service-card {
-  background: #fbfeff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  text-align: center;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdfe6;
+  margin-bottom: 10px;
 }
-.service-card h3 { margin: 6px 0; color:#03323a; }
-.service-card p { color:#666; margin: 8px 0 12px; }
-.service-card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-
-.btn-primary {
+.contact-form button {
+  display: inline-block;
   background: #008c95;
   color: #fff;
-  border: none;
   padding: 10px 14px;
   border-radius: 8px;
+  border: 0;
   cursor: pointer;
   font-weight: 600;
 }
@@ -87,12 +88,9 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
 .fade-in { animation: fadeIn 0.6s ease forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.zoom-in { animation: zoomIn 0.35s ease; }
-@keyframes zoomIn { from { transform: scale(0.98); opacity: 0 } to { transform: scale(1); opacity: 1 } }
-
 /* responsive */
 @media (max-width: 900px) {
-  .services-grid { grid-template-columns: repeat(1, 1fr); padding: 0 12px; }
+  .contact-details { padding: 14px; margin: 12px; text-align: left; }
   .pc-links { display: none; }
-  .services-page { padding-top: 70px; }
+  .contact-page { padding-top: 70px; }
 }
