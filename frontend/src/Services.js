@@ -15,6 +15,25 @@ export default function Services() {
       <h1 className="services-title">Our Services</h1>
 
       <div className="services-grid">
+        {/* PET DAYCARE */}
+        <div className="service-card">
+          <h3>Pet Daycare</h3>
+          <p>Safe, playful, and supervised environment for your pets.</p>
+          <button className="book-btn" onClick={() => handleBooking("Pet Daycare")}>
+            Book Now
+          </button>
+        </div>
+
+        {/* PET HOSTEL */}
+        <div className="service-card">
+          <h3>Pet Hostel</h3>
+          <p>Comfortable and secure overnight stays.</p>
+          <button className="book-btn" onClick={() => handleBooking("Pet Hostel")}>
+            Book Now
+          </button>
+        </div>
+
+        {/* EXISTING SERVICES */}
         <div className="service-card">
           <h3>Pet Boarding</h3>
           <p>Safe and comfortable stay for your pets.</p>
