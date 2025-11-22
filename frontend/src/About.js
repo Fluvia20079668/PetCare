@@ -1,15 +1,33 @@
 import React from "react";
 import "./About.css";
+import { useNavigate } from "react-router-dom";
 
 export default function About() {
+  const navigate = useNavigate();
+
   return (
     <div className="about-page fade-in">
 
+      {/* ---- TOP NAVBAR ---- */}
+      <nav className="about-nav">
+        <div className="about-logo" onClick={() => navigate("/")}>
+          🐾 PetCare+
+        </div>
+
+        <ul className="about-links">
+          <li onClick={() => navigate("/")}>Home</li>
+          <li onClick={() => navigate("/services")}>Services</li>
+          <li onClick={() => navigate("/contact")}>Contact</li>
+        </ul>
+      </nav>
+
+      {/* ---- HEADER ---- */}
       <header className="about-header">
         <h1>About PetCare+</h1>
         <p>Your trusted partner in pet wellness and comfort.</p>
       </header>
 
+      {/* ---- CONTENT ---- */}
       <section className="about-section">
         <h2>Who We Are</h2>
         <p>

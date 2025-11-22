@@ -79,7 +79,7 @@ export default function Home() {
         <div className="pc-logo">🐾 PetCare+</div>
         <ul className="pc-links">
           <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="about">About</a></li>
           <li><a href="#services">Services</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
@@ -114,15 +114,6 @@ export default function Home() {
         <div className="hero-right slide-in-right">
         </div>
       </header>
-
-      {/* ABOUT */}
-      <section id="about" className="section about fade-in">
-        <h2>About Us</h2>
-        <p>
-          With years of trusted experience, PetCare+ provides a warm and caring environment
-          for pets of all kinds. Your pet’s comfort and safety are our top priorities.
-        </p>
-      </section>
 
       {/* SERVICES */}
       <section id="services" className="section services fade-in">
