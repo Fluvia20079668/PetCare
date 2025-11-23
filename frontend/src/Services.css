@@ -2,6 +2,40 @@
 
 * { box-sizing: border-box; }
 html,body,#root { margin: 0; font-family: "Inter", system-ui; }
+/* ---------- NAVBAR ---------- */
+.services-navbar {
+  width: 100%;
+  background: #ffffff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}
+
+.services-navbar .nav-left {
+  font-size: 22px;
+  font-weight: 700;
+  color: #008c95;
+}
+
+.services-navbar .nav-links {
+  display: flex;
+  gap: 22px;
+}
+
+.services-navbar .nav-links a {
+  text-decoration: none;
+  color: #03323a;
+  font-weight: 600;
+}
+
+.services-navbar .nav-links a.active {
+  color: #008c95;
+}
 
 /* ---------- BANNER ---------- */
 .services-banner {
