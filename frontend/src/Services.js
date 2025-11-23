@@ -1,6 +1,6 @@
-// Services.js (Hybrid: banner + grid + filtering + side-by-side details + booking modal)
+// Services.js (final clean version — with navbar + small banner + grid + filtering + learn more + booking)
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Services.css";
 
 /* icons */
@@ -11,29 +11,30 @@ import {
   FaWalking,
   FaClinicMedical,
   FaBone,
-  FaThLarge,
   FaFilter,
 } from "react-icons/fa";
 
-const BANNER_IMAGE = "/mnt/data/all_pets_image.png"; // uploaded local file path
+/* banner image from public folder */
+const BANNER_IMAGE = "/dogbanner.jpg";
 
+/* all services */
 const ALL_SERVICES = [
   {
     id: "daycare",
     title: "Daycare",
-    short: "Safe & playful day environment for pets.",
+    short: "Safe & playful environment for pets.",
     details:
-      "Full-day supervision, playtime, feeding, enrichment activities and short walks. Staffed by trained carers to keep your pet safe and happy.",
+      "Full-day supervision, playtime, feeding and enrichment activities with trained caretakers.",
     category: "daycare",
     icon: <FaCat size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
   {
     id: "hostel",
-    title: "Hostel",
-    short: "Comfortable overnight stays with supervision.",
+    title: "Pet Hostel",
+    short: "Comfortable overnight stay for your pet.",
     details:
-      "Overnight accommodation with temperature-control, nightly checks, personalized feeding and supervised rest times. Happy, secure stays for overnight guests.",
+      "Temperature-controlled rooms, 24/7 supervision, feeding schedules, comfort bedding and playtime.",
     category: "hostel",
     icon: <FaDog size={36} color="#008c95" />,
     image: BANNER_IMAGE,
@@ -41,9 +42,9 @@ const ALL_SERVICES = [
   {
     id: "grooming",
     title: "Grooming",
-    short: "Professional grooming for cats & dogs.",
+    short: "Bathing, nail trimming & coat styling.",
     details:
-      "Bathing, brushing, nail trimming, ear cleaning and coat styling performed by experienced groomers with pet-safe products.",
+      "Professional groomers providing washing, ear cleaning, coat trimming and spa treatments.",
     category: "grooming",
     icon: <FaBath size={36} color="#008c95" />,
     image: BANNER_IMAGE,
@@ -51,29 +52,29 @@ const ALL_SERVICES = [
   {
     id: "walking",
     title: "Pet Walking",
-    short: "Daily walks tailored to your pet’s needs.",
+    short: "Daily walks for exercise & happiness.",
     details:
-      "Short/long walks, solo or group, enrichment and optional GPS-tracked routes for owner peace of mind.",
+      "Short or long walks, GPS tracking, solo or group walking options available.",
     category: "walking",
     icon: <FaWalking size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
   {
     id: "vetcheck",
-    title: "Veterinary Checkup",
-    short: "Routine health check and vaccinations.",
+    title: "Vet Checkup",
+    short: "Routine health check & treatments.",
     details:
-      "Qualified vets for routine checkups, vaccination reviews, minor treatments and professional advice for at-home care.",
+      "Vaccinations, general checkups, minor treatments and professional health advice.",
     category: "vet",
     icon: <FaClinicMedical size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
   {
     id: "food",
-    title: "Food Delivery",
-    short: "Healthy pet food delivered to your door.",
+    title: "Pet Food Delivery",
+    short: "Healthy food delivered to your doorstep.",
     details:
-      "Premium food brands, subscription or one-off deliveries with custom diet plans and recommended portion sizes.",
+      "Premium diet plans, fast delivery & monthly subscription options.",
     category: "food",
     icon: <FaBone size={36} color="#008c95" />,
     image: BANNER_IMAGE,
@@ -84,9 +85,9 @@ export default function Services() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState("all");
   const [bookingService, setBookingService] = useState(null);
-  const [detailsService, setDetailsService] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({ name: "", petName: "", date: "" });
+  const [detailsService, setDetailsService] = useState(null);
 
   const categories = [
     { id: "all", label: "All" },
@@ -107,77 +108,74 @@ export default function Services() {
     setBookingService(svc);
     setForm({ name: "", petName: "", date: "" });
   };
+
   const closeBooking = () => setBookingService(null);
 
   const openDetails = (svc) => {
     setDetailsService(svc);
-    // scroll to details panel smoothly
-    setTimeout(() => {
-      document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
-    }, 80);
+    document.getElementById("service-details")?.scrollIntoView({
+      behavior: "smooth",
+    });
   };
+
   const closeDetails = () => setDetailsService(null);
 
   const confirmBooking = () => {
-    // placeholder - hook into backend here
-    alert(`Booking confirmed for ${bookingService.title}\nName: ${form.name}\nPet: ${form.petName}\nDate: ${form.date}`);
+    alert(
+      `Booking confirmed for ${bookingService.title}
+Name: ${form.name}
+Pet Name: ${form.petName}
+Date: ${form.date}`
+    );
     closeBooking();
   };
 
   return (
     <div className="services-page">
 
-      {/* TOP BANNER */}
-      <section className="services-banner">
-        <div className="banner-inner">
-          <div className="banner-text">
-            <h1>Services for Every Pet</h1>
-            <p>Daycare, hostels, grooming, vet checkups and food delivery — everything under one roof.</p>
-            <div className="banner-ctas">
-              <button className="btn-primary" onClick={() => document.getElementById("services-grid")?.scrollIntoView({behavior: "smooth"})}>
-                Explore Services
-              </button>
-              <button className="btn-outline" onClick={() => navigate("/contact")}>
-                Contact Us
-              </button>
-            </div>
-          </div>
-
-          <div className="banner-image">
-            <img src={BANNER_IMAGE} alt="pets banner" />
-          </div>
+      {/* NAVIGATION BAR */}
+      <nav className="services-navbar">
+        <div className="nav-left">PetCare+</div>
+        <div className="nav-links">
+          <Link to="/">Home</Link>
+          <Link to="/services" className="active">Services</Link>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
         </div>
-      </section>
+      </nav>
 
-      {/* FILTERS */}
+      {/* SMALL BANNER */}
+      <div className="small-banner">
+        <img src={BANNER_IMAGE} alt="pets banner" />
+        <div className="banner-overlay">
+          <h1>Our Services</h1>
+          <p>Everything your pet needs, in one place.</p>
+        </div>
+      </div>
+
+      {/* FILTER BAR */}
       <div className="filter-bar">
         <div className="filter-left">
-          <FaFilter style={{ marginRight: 8 }} />
-          <strong>Filter</strong>
+          <FaFilter /> Filter
         </div>
 
         <div className="filter-buttons">
           {categories.map((c) => (
             <button
               key={c.id}
-              className={`filter-btn ${filter === c.id ? "active" : ""}`}
               onClick={() => setFilter(c.id)}
+              className={`filter-btn ${filter === c.id ? "active" : ""}`}
             >
               {c.label}
             </button>
           ))}
         </div>
-
-        <div className="filter-right">
-          <FaThLarge style={{ marginRight: 8 }} />
-          <span>{visibleServices.length} services</span>
-        </div>
       </div>
 
       {/* GRID */}
-      <section id="services-grid" className="services-grid">
+      <div id="services-grid" className="services-grid">
         {visibleServices.map((svc) => (
-          <article key={svc.id} className={`service-card fade-up`}>
+          <div key={svc.id} className="service-card fade-up">
             <div className="service-card-top">
               <div className="service-icon">{svc.icon}</div>
               <h3>{svc.title}</h3>
@@ -190,29 +188,27 @@ export default function Services() {
                 className="learn-btn"
                 onClick={() => {
                   setExpandedId(expandedId === svc.id ? null : svc.id);
-                  // also show details panel
                   openDetails(svc);
                 }}
               >
-                {expandedId === svc.id ? "Hide details ▲" : "Learn more ▼"}
+                {expandedId === svc.id ? "Hide ▲" : "Learn More ▼"}
               </button>
 
               <button className="book-btn" onClick={() => openBooking(svc)}>
-                Book Now
+                Book
               </button>
             </div>
 
-            {/* inline expand (short) */}
             {expandedId === svc.id && (
               <div className="service-more small">
                 <p>{svc.details}</p>
               </div>
             )}
-          </article>
+          </div>
         ))}
-      </section>
+      </div>
 
-      {/* SIDE-BY-SIDE DETAILS PANEL (appears when user clicks learn more) */}
+      {/* DETAILS PANEL */}
       {detailsService && (
         <section id="service-details" className="details-panel">
           <div className="details-inner">
@@ -222,11 +218,14 @@ export default function Services() {
 
             <div className="details-content">
               <h2>{detailsService.title}</h2>
-              <p className="muted">{detailsService.details}</p>
+              <p>{detailsService.details}</p>
 
               <div className="details-actions">
-                <button className="btn-primary" onClick={() => openBooking(detailsService)}>
-                  Book {detailsService.title}
+                <button
+                  className="btn-primary"
+                  onClick={() => openBooking(detailsService)}
+                >
+                  Book Now
                 </button>
                 <button className="btn-outline" onClick={closeDetails}>
                   Close
@@ -240,32 +239,41 @@ export default function Services() {
       {/* BOOKING MODAL */}
       {bookingService && (
         <div className="booking-overlay" onClick={closeBooking}>
-          <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="booking-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2>Book: {bookingService.title}</h2>
 
             <input
               className="booking-input"
-              placeholder="Your name"
+              placeholder="Your Name"
               value={form.name}
-              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, name: e.target.value }))
+              }
             />
 
             <input
               className="booking-input"
-              placeholder="Your pet's name"
+              placeholder="Pet Name"
               value={form.petName}
-              onChange={(e) => setForm((p) => ({ ...p, petName: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, petName: e.target.value }))
+              }
             />
 
             <input
               type="date"
               className="booking-input"
               value={form.date}
-              onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, date: e.target.value }))
+              }
             />
 
             <button className="booking-submit" onClick={confirmBooking}>
-              Confirm Booking
+              Confirm
             </button>
             <button className="booking-close" onClick={closeBooking}>
               Close
@@ -273,7 +281,6 @@ export default function Services() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
