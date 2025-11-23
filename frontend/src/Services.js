@@ -1,4 +1,4 @@
-// Services.js (final clean version — with navbar + small banner + grid + filtering + learn more + booking)
+// Services.js (fixed version with working navbar + centered banner)
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Services.css";
@@ -133,7 +133,7 @@ Date: ${form.date}`
   return (
     <div className="services-page">
 
-      {/* NAVIGATION BAR */}
+      {/* NAVBAR */}
       <nav className="services-navbar">
         <div className="nav-left">PetCare+</div>
         <div className="nav-links">
@@ -144,9 +144,9 @@ Date: ${form.date}`
         </div>
       </nav>
 
-      {/* SMALL BANNER */}
+      {/* FIXED SMALL BANNER */}
       <div className="small-banner">
-        <img src={BANNER_IMAGE} alt="pets banner" />
+        <img src={BANNER_IMAGE} alt="banner" />
         <div className="banner-overlay">
           <h1>Our Services</h1>
           <p>Everything your pet needs, in one place.</p>
