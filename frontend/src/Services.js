@@ -1,6 +1,6 @@
-// Services.js (fixed version with working navbar + centered banner)
+// Services.js (filters removed)
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Services.css";
 
 /* icons */
@@ -11,10 +11,9 @@ import {
   FaWalking,
   FaClinicMedical,
   FaBone,
-  FaFilter,
 } from "react-icons/fa";
 
-/* banner image from public folder */
+/* banner image */
 const BANNER_IMAGE = "/dogbanner.jpg";
 
 /* all services */
@@ -25,7 +24,6 @@ const ALL_SERVICES = [
     short: "Safe & playful environment for pets.",
     details:
       "Full-day supervision, playtime, feeding and enrichment activities with trained caretakers.",
-    category: "daycare",
     icon: <FaCat size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
@@ -35,7 +33,6 @@ const ALL_SERVICES = [
     short: "Comfortable overnight stay for your pet.",
     details:
       "Temperature-controlled rooms, 24/7 supervision, feeding schedules, comfort bedding and playtime.",
-    category: "hostel",
     icon: <FaDog size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
@@ -45,7 +42,6 @@ const ALL_SERVICES = [
     short: "Bathing, nail trimming & coat styling.",
     details:
       "Professional groomers providing washing, ear cleaning, coat trimming and spa treatments.",
-    category: "grooming",
     icon: <FaBath size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
@@ -55,7 +51,6 @@ const ALL_SERVICES = [
     short: "Daily walks for exercise & happiness.",
     details:
       "Short or long walks, GPS tracking, solo or group walking options available.",
-    category: "walking",
     icon: <FaWalking size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
@@ -65,7 +60,6 @@ const ALL_SERVICES = [
     short: "Routine health check & treatments.",
     details:
       "Vaccinations, general checkups, minor treatments and professional health advice.",
-    category: "vet",
     icon: <FaClinicMedical size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
@@ -75,34 +69,16 @@ const ALL_SERVICES = [
     short: "Healthy food delivered to your doorstep.",
     details:
       "Premium diet plans, fast delivery & monthly subscription options.",
-    category: "food",
     icon: <FaBone size={36} color="#008c95" />,
     image: BANNER_IMAGE,
   },
 ];
 
 export default function Services() {
-  const navigate = useNavigate();
-  const [filter, setFilter] = useState("all");
   const [bookingService, setBookingService] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({ name: "", petName: "", date: "" });
   const [detailsService, setDetailsService] = useState(null);
-
-  const categories = [
-    { id: "all", label: "All" },
-    { id: "hostel", label: "Hostel" },
-    { id: "daycare", label: "Daycare" },
-    { id: "grooming", label: "Grooming" },
-    { id: "walking", label: "Walking" },
-    { id: "vet", label: "Vet" },
-    { id: "food", label: "Food" },
-  ];
-
-  const visibleServices =
-    filter === "all"
-      ? ALL_SERVICES
-      : ALL_SERVICES.filter((s) => s.category === filter);
 
   const openBooking = (svc) => {
     setBookingService(svc);
@@ -144,7 +120,7 @@ Date: ${form.date}`
         </div>
       </nav>
 
-      {/* FIXED SMALL BANNER */}
+      {/* BANNER */}
       <div className="small-banner">
         <img src={BANNER_IMAGE} alt="banner" />
         <div className="banner-overlay">
@@ -153,28 +129,9 @@ Date: ${form.date}`
         </div>
       </div>
 
-      {/* FILTER BAR */}
-      <div className="filter-bar">
-        <div className="filter-left">
-          <FaFilter /> Filter
-        </div>
-
-        <div className="filter-buttons">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setFilter(c.id)}
-              className={`filter-btn ${filter === c.id ? "active" : ""}`}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* GRID */}
-      <div id="services-grid" className="services-grid">
-        {visibleServices.map((svc) => (
+      <div className="services-grid">
+        {ALL_SERVICES.map((svc) => (
           <div key={svc.id} className="service-card fade-up">
             <div className="service-card-top">
               <div className="service-icon">{svc.icon}</div>
@@ -208,7 +165,7 @@ Date: ${form.date}`
         ))}
       </div>
 
-      {/* DETAILS PANEL */}
+      {/* DETAILS SECTION */}
       {detailsService && (
         <section id="service-details" className="details-panel">
           <div className="details-inner">
@@ -221,15 +178,8 @@ Date: ${form.date}`
               <p>{detailsService.details}</p>
 
               <div className="details-actions">
-                <button
-                  className="btn-primary"
-                  onClick={() => openBooking(detailsService)}
-                >
-                  Book Now
-                </button>
-                <button className="btn-outline" onClick={closeDetails}>
-                  Close
-                </button>
+                <button className="btn-primary" onClick={() => openBooking(detailsService)}>Book Now</button>
+                <button className="btn-outline" onClick={closeDetails}>Close</button>
               </div>
             </div>
           </div>
@@ -239,48 +189,36 @@ Date: ${form.date}`
       {/* BOOKING MODAL */}
       {bookingService && (
         <div className="booking-overlay" onClick={closeBooking}>
-          <div
-            className="booking-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Book: {bookingService.title}</h2>
 
             <input
               className="booking-input"
               placeholder="Your Name"
               value={form.name}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, name: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             />
 
             <input
               className="booking-input"
               placeholder="Pet Name"
               value={form.petName}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, petName: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, petName: e.target.value }))}
             />
 
             <input
               type="date"
               className="booking-input"
               value={form.date}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, date: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))}
             />
 
-            <button className="booking-submit" onClick={confirmBooking}>
-              Confirm
-            </button>
-            <button className="booking-close" onClick={closeBooking}>
-              Close
-            </button>
+            <button className="booking-submit" onClick={confirmBooking}>Confirm</button>
+            <button className="booking-close" onClick={closeBooking}>Close</button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -1,4 +1,4 @@
-/* Full CSS - navbar fixed + banner centered + grid aligned */
+/* Full CSS with FILTERS REMOVED */
 
 * { box-sizing: border-box; }
 html,body,#root { margin: 0; font-family: "Inter", system-ui; }
@@ -17,106 +17,40 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
   z-index: 500;
 }
 
-.services-navbar .nav-left {
-  font-size: 22px;
-  font-weight: 800;
-  color: #008c95;
-}
+.nav-left { font-size: 22px; font-weight: 800; color: #008c95; }
+.nav-links { display: flex; gap: 22px; }
+.nav-links a { text-decoration: none; color: #03323a; font-weight: 600; }
+.nav-links a.active { color: #008c95; }
 
-.services-navbar .nav-links {
-  display: flex;
-  gap: 22px;
-}
-
-.services-navbar .nav-links a {
-  text-decoration: none;
-  color: #03323a;
-  font-weight: 600;
-}
-
-.services-navbar .nav-links a.active {
-  color: #008c95;
-}
-
-/* ---------- SMALL BANNER ---------- */
+/* ---------- BANNER ---------- */
 .small-banner {
   width: 100%;
   position: relative;
-  display: block;
-  overflow: hidden;
 }
 
 .small-banner img {
   width: 100%;
   height: 300px;
   object-fit: cover;
-  display: block;
 }
 
 .banner-overlay {
   position: absolute;
-  color: #fff;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  color: white;
   text-shadow: 0 2px 8px rgba(0,0,0,0.6);
   text-align: center;
 }
 
-.banner-overlay h1 {
-  font-size: 42px;
-  margin: 0 0 8px;
-}
-
-.banner-overlay p {
-  font-size: 18px;
-  margin: 0;
-}
-
-/* ---------- FILTER BAR ---------- */
-.filter-bar {
-  max-width: 1200px;
-  margin: 22px auto;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 16px;
-  align-items: center;
-}
-
-.filter-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #333;
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.filter-btn {
-  border: 1px solid rgba(0,0,0,0.1);
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.filter-btn.active {
-  background: #008c95;
-  color: white;
-  border-color: #007a82;
-}
+.banner-overlay h1 { font-size: 42px; margin-bottom: 8px; }
+.banner-overlay p { font-size: 18px; }
 
 /* ---------- GRID ---------- */
 .services-grid {
   max-width: 1200px;
-  margin: 10px auto 40px;
+  margin: 20px auto 40px;
   padding: 0 16px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -124,13 +58,11 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
 }
 
 .service-card {
-  background: #fff;
+  background: white;
   padding: 18px;
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
   transition: 0.25s;
-  display: flex;
-  flex-direction: column;
 }
 
 .service-card:hover {
@@ -150,85 +82,31 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
   background: #eafffb;
   border-radius: 10px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.service-desc {
-  color: #555;
-  margin-top: 6px;
-  margin-bottom: 16px;
-}
+.service-desc { margin: 8px 0 14px; color: #555; }
 
-/* buttons */
-.card-actions {
-  display: flex;
-  gap: 10px;
-}
+/* Buttons */
+.card-actions { display: flex; gap: 10px; }
+.learn-btn, .book-btn { cursor: pointer; padding: 8px 12px; border-radius: 8px; font-weight: 600; }
+.learn-btn { border: 1px solid #008c95; background: transparent; color: #008c95; }
+.book-btn { background: #008c95; color: white; border: none; }
 
-.learn-btn {
-  border: 1px solid #008c95;
-  background: transparent;
-  color: #008c95;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.book-btn {
-  background: #008c95;
-  border: none;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* ---------- EXPANDED TEXT ---------- */
+/* Expanded */
 .service-more.small {
   margin-top: 12px;
-  background: #f0fffd;
   padding: 10px;
+  background: #f0fffd;
   border-radius: 8px;
-  color: #333;
 }
 
-/* ---------- DETAILS PANEL ---------- */
-.details-panel {
-  max-width: 1200px;
-  margin: 30px auto 60px;
-  padding: 0 16px;
-}
-
-.details-inner {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
-
-.details-image {
-  flex: 0 0 420px;
-}
-
-.details-image img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.details-content {
-  flex: 1;
-}
-
-.details-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
+/* ---------- DETAILS ---------- */
+.details-panel { max-width: 1200px; margin: 30px auto; padding: 0 16px; }
+.details-inner { background: white; padding: 20px; border-radius: 12px; display: flex; gap: 20px; }
+.details-image img { width: 100%; border-radius: 10px; }
+.details-actions { margin-top: 12px; display: flex; gap: 10px; }
 
 /* ---------- BOOKING MODAL ---------- */
 .booking-overlay {
@@ -242,12 +120,11 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
 }
 
 .booking-modal {
+  background: white;
+  padding: 22px;
   width: 90%;
   max-width: 420px;
-  background: #fff;
-  padding: 22px;
   border-radius: 12px;
-  box-shadow: 0 18px 45px rgba(0,0,0,0.15);
 }
 
 .booking-input {
@@ -258,7 +135,6 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
   border: 1px solid #ccc;
 }
 
-/* animations */
 .fade-up {
   animation: fadeUp .45s ease both;
 }
@@ -266,15 +142,4 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-/* responsive */
-@media (max-width: 900px) {
-  .details-inner {
-    flex-direction: column;
-  }
-
-  .details-image {
-    width: 100%;
-  }
 }
