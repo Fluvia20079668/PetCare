@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "./Services.css";
 import { useNavigate } from "react-router-dom";
 
-/* --- ICONS (react-icons) --- */
+/* ICONS */
 import { 
   FaDog, 
   FaCat, 
@@ -51,19 +51,33 @@ export default function Services() {
     {
       id: "food",
       title: "Pet Food Delivery",
-      desc: "Healthy meals delivered at home.",
+      desc: "Healthy meals delivered to your home.",
       icon: <FaBone size={40} color="#008c95" />
     }
   ];
 
-  const openBooking = (service) => setBookingService(service);
+  const openBooking = (svc) => setBookingService(svc);
   const closeBooking = () => setBookingService(null);
 
   return (
     <div className="services-page">
 
+      {/* ======================= NAVBAR ======================= */}
+      <nav className="pc-nav">
+        <div className="pc-logo">🐾 PetCare+</div>
+
+        <ul className="pc-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+      {/* ====================================================== */}
+
       <h1 className="services-title">Our Services</h1>
-      <p className="services-subtitle">Choose the best care for your furry friend</p>
+      <p className="services-subtitle">
+        Choose the best care for your furry friend
+      </p>
 
       <div className="services-grid">
         {SERVICES.map((svc) => (
@@ -113,7 +127,6 @@ export default function Services() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
