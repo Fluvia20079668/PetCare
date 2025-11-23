@@ -82,18 +82,33 @@ export default function Services() {
       <div className="services-grid">
         {SERVICES.map((svc) => (
           <div key={svc.id} className="service-card">
-            <div className="service-icon">{svc.icon}</div>
+  <div className="service-icon">{svc.icon}</div>
 
-            <h3>{svc.title}</h3>
-            <p className="service-desc">{svc.desc}</p>
+  <h3>{svc.title}</h3>
+  <p className="service-desc">{svc.desc}</p>
 
-            <button 
-              className="book-btn"
-              onClick={() => openBooking(svc)}
-            >
-              Book Now
-            </button>
-          </div>
+  {/* Learn More Toggle */}
+  <p 
+    className="learn-more" 
+    onClick={() => setExpanded(expanded === svc.id ? null : svc.id)}
+  >
+    {expanded === svc.id ? "Hide details ▲" : "Learn more ▼"}
+  </p>
+
+  {/* Expanded Details */}
+  {expanded === svc.id && (
+    <div className="service-more">
+      <p>{svc.details}</p>
+    </div>
+  )}
+
+  <button 
+    className="book-btn"
+    onClick={() => openBooking(svc)}
+  >
+    Book Now
+  </button>
+</div>
         ))}
       </div>
 
