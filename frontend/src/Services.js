@@ -1,6 +1,6 @@
 // Services.js (filters removed)
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Services.css";
 
 /* icons */
