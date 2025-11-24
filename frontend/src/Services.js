@@ -93,11 +93,13 @@ React.useEffect(() => {
     const svc = ALL_SERVICES.find((x) => x.id === svcId);
     if (svc) setBookingService(svc);
   }, [location.search]);
-  
+
   const openBooking = (svc) => {
-    setBookingService(svc);
-    setForm({ name: "", petName: "", date: "" });
-  };
+    if (!isLoggedIn) {
+      const returnUrl = `/services?book=${svc.id}`;
+      navigate(`/login?return=${encodeURIComponent(returnUrl)}`);
+      return; // stop here
+    }
 
   const closeBooking = () => setBookingService(null);
 
