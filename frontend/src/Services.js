@@ -80,6 +80,9 @@ export default function Services() {
   const [form, setForm] = useState({ name: "", petName: "", date: "" });
   const [detailsService, setDetailsService] = useState(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const openBooking = (svc) => {
     setBookingService(svc);
     setForm({ name: "", petName: "", date: "" });
