@@ -27,8 +27,8 @@ export default function Signup() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        navigate(returnUrl);
+      if (data.status === "success") {
+        navigate(`/login?return=${encodeURIComponent(returnUrl)}`);
       } else {
         setMsg(data.message || "Signup error");
       }
@@ -69,9 +69,7 @@ export default function Signup() {
           required
         />
 
-        <button className="auth-btn" type="submit">
-          Sign Up
-        </button>
+        <button className="auth-btn" type="submit">Sign Up</button>
       </form>
 
       <p className="back-home-link" onClick={() => navigate("/")}>
