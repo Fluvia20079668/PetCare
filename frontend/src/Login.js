@@ -20,12 +20,13 @@ export default function Login() {
       const res = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
 
       if (data.status === "success") {
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate(returnUrl);
       } else {
         setShowPopup(true);
@@ -56,9 +57,7 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="auth-btn" type="submit">
-          Login
-        </button>
+        <button className="auth-btn" type="submit">Login</button>
       </form>
 
       <p className="back-home-link" onClick={() => navigate("/")}>
@@ -71,11 +70,7 @@ export default function Login() {
 
         <button
           className="popup-btn"
-          onClick={() =>
-            navigate(
-              `/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`
-            )
-          }
+          onClick={() => navigate(`/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`)}
         >
           Go to Sign Up
         </button>
