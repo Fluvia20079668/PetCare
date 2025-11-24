@@ -25,7 +25,8 @@ export default function Login() {
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
         navigate(returnUrl);
       } else {
         setShowPopup(true);
@@ -72,7 +73,9 @@ export default function Login() {
         <button
           className="popup-btn"
           onClick={() =>
-            navigate(`/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`)
+            navigate(
+              `/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`
+            )
           }
         >
           Go to Sign Up
