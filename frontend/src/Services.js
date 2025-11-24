@@ -83,6 +83,17 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
+const isLoggedIn =
+    localStorage.getItem("token") || document.cookie.includes("session=");
+React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const svcId = params.get("book");
+    if (!svcId) return;
+
+    const svc = ALL_SERVICES.find((x) => x.id === svcId);
+    if (svc) setBookingService(svc);
+  }, [location.search]);
+  
   const openBooking = (svc) => {
     setBookingService(svc);
     setForm({ name: "", petName: "", date: "" });
