@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthForm.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const params = new URLSearchParams(location.search);
+  const returnUrl = params.get("return") || "/";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,9 +26,9 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        navigate("/"); // Successful login → Home
+        navigate(returnUrl);
       } else {
-        setShowPopup(true); // Wrong credentials → Show popup slide
+        setShowPopup(true);
       }
     } catch (error) {
       setShowPopup(true);
@@ -32,7 +37,6 @@ export default function Login() {
 
   return (
     <div className="auth-container slide-in-left">
-
       <h2>Login</h2>
 
       <form onSubmit={handleLogin}>
@@ -56,22 +60,20 @@ export default function Login() {
           Login
         </button>
       </form>
-            <p
-      className="back-home-link"
-      onClick={() => navigate("/")}
-          >
-             ← Back to Home
-          </p>
 
+      <p className="back-home-link" onClick={() => navigate("/")}>
+        ← Back to Home
+      </p>
 
-      {/* ---- SLIDING POPUP ---- */}
       <div className={`popup-slide ${showPopup ? "show" : ""}`}>
         <h3>Invalid Credentials</h3>
         <p>Email or password is incorrect.</p>
 
         <button
           className="popup-btn"
-          onClick={() => navigate("/signup")}
+          onClick={() =>
+            navigate(`/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`)
+          }
         >
           Go to Sign Up
         </button>
@@ -84,7 +86,6 @@ export default function Login() {
           Close
         </button>
       </div>
-
     </div>
   );
 }

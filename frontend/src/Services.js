@@ -1,9 +1,7 @@
-// Services.js (filters removed)
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Services.css";
 
-/* icons */
 import {
   FaDog,
   FaCat,
@@ -13,10 +11,8 @@ import {
   FaBone,
 } from "react-icons/fa";
 
-/* banner image */
 const BANNER_IMAGE = "/dogbanner.jpg";
 
-/* all services */
 const ALL_SERVICES = [
   {
     id: "daycare",
@@ -83,13 +79,13 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
-const isLoggedIn =
+  const isLoggedIn =
     localStorage.getItem("token") || document.cookie.includes("session=");
-React.useEffect(() => {
+
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const svcId = params.get("book");
     if (!svcId) return;
-
     const svc = ALL_SERVICES.find((x) => x.id === svcId);
     if (svc) setBookingService(svc);
   }, [location.search]);
@@ -98,8 +94,11 @@ React.useEffect(() => {
     if (!isLoggedIn) {
       const returnUrl = `/services?book=${svc.id}`;
       navigate(`/login?return=${encodeURIComponent(returnUrl)}`);
-      return; // stop here
+      return;
     }
+    setBookingService(svc);
+    setForm({ name: "", petName: "", date: "" });
+  };
 
   const closeBooking = () => setBookingService(null);
 
@@ -125,7 +124,6 @@ Date: ${form.date}`
   return (
     <div className="services-page">
 
-      {/* NAVBAR */}
       <nav className="services-navbar">
         <div className="nav-left">PetCare+</div>
         <div className="nav-links">
@@ -136,7 +134,6 @@ Date: ${form.date}`
         </div>
       </nav>
 
-      {/* BANNER */}
       <div className="small-banner">
         <img src={BANNER_IMAGE} alt="banner" />
         <div className="banner-overlay">
@@ -145,7 +142,6 @@ Date: ${form.date}`
         </div>
       </div>
 
-      {/* GRID */}
       <div className="services-grid">
         {ALL_SERVICES.map((svc) => (
           <div key={svc.id} className="service-card fade-up">
@@ -181,7 +177,6 @@ Date: ${form.date}`
         ))}
       </div>
 
-      {/* DETAILS SECTION */}
       {detailsService && (
         <section id="service-details" className="details-panel">
           <div className="details-inner">
@@ -202,7 +197,6 @@ Date: ${form.date}`
         </section>
       )}
 
-      {/* BOOKING MODAL */}
       {bookingService && (
         <div className="booking-overlay" onClick={closeBooking}>
           <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
