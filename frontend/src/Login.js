@@ -25,10 +25,11 @@ export default function Login() {
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
-        localStorage.setItem("token", data.token);
-        navigate(returnUrl);
-      } else {
+      if (res.ok && data.status === "success") {
+      localStorage.setItem("token", data.token);
+      navigate(returnUrl);
+      }
+ else {
         setShowPopup(true);
       }
     } catch (error) {
