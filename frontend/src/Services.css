@@ -143,3 +143,10 @@ html,body,#root { margin: 0; font-family: "Inter", system-ui; }
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.logout-btn {
+  cursor: pointer;
+  color: #ff4d4d;
+  font-weight: 700;
+  margin-left: 12px;
+}
+.logout-btn:hover { text-decoration: underline; }
