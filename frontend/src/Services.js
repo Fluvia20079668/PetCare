@@ -65,7 +65,12 @@ const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
   const closeDetails = () => setDetailsService(null);
 
   const confirmBooking = async () => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(localStorage.getItem("user"));
+if (!user) {
+  alert("You must be logged in to book.");
+  return;
+}
+
 
     if (!user.id) {
       alert("You must be logged in to book.");
