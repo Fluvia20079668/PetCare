@@ -23,7 +23,9 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isLoggedIn = !!localStorage.getItem("user");
+const savedUser = localStorage.getItem("user");
+const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
