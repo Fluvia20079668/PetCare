@@ -50,7 +50,7 @@ export default function Services() {
       return;
     }
     setBookingService(svc);
-    setForm((p) => ({ ...p, petName: "", date: "", petType: "", slot: "", day: "", description: "" }));
+    setForm((p) => ({ ...p, petName: "", petType: "", slot: "", day: "", description: "" }));
   };
 
   const closeBooking = () => setBookingService(null);
@@ -64,8 +64,13 @@ export default function Services() {
 
   const confirmBooking = async () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (!user.id) {
+      alert("You must be logged in to book.");
+      return;
+    }
+
     const payload = {
-      serviceId: bookingService.id,
       userId: user.id,
       name: form.name,
       petName: form.petName,
@@ -75,17 +80,35 @@ export default function Services() {
       description: form.description
     };
 
+    let endpoint = "";
+
+    if (bookingService.id === "daycare") {
+      endpoint = "http://localhost:8080/api/daycare/book";
+    } else if (bookingService.id === "hostel") {
+      endpoint = "http://localhost:8080/api/hostel/book";
+    } else {
+      alert(`Booking confirmed for ${bookingService.title}`);
+      closeBooking();
+      return;
+    }
+
     try {
-      await fetch("http://localhost:8080/api/bookings", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      alert(`Booking confirmed for ${bookingService.title}`);
-      closeBooking();
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("Booking saved successfully!");
+        closeBooking();
+      } else {
+        alert("Booking failed. Try again.");
+      }
     } catch (err) {
-      console.error(err);
-      alert("Failed to create booking. Try again.");
+      alert("Server error. Try again.");
     }
   };
 
@@ -103,7 +126,6 @@ export default function Services() {
           <Link to="/services" className="active">Services</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
-
           {isLoggedIn ? (
             <span className="logout-btn" onClick={handleLogout}>Logout</span>
           ) : (
@@ -127,9 +149,7 @@ export default function Services() {
               <div className="service-icon">{svc.icon}</div>
               <h3>{svc.title}</h3>
             </div>
-
             <p className="service-desc">{svc.short}</p>
-
             <div className="card-actions">
               <button
                 className="learn-btn"
@@ -140,10 +160,8 @@ export default function Services() {
               >
                 {expandedId === svc.id ? "Hide ▲" : "Learn More ▼"}
               </button>
-
               <button className="book-btn" onClick={() => openBooking(svc)}>Book</button>
             </div>
-
             {expandedId === svc.id && (
               <div className="service-more small">
                 <p>{svc.details}</p>
@@ -159,11 +177,9 @@ export default function Services() {
             <div className="details-image">
               <img src={detailsService.image} alt={detailsService.title} />
             </div>
-
             <div className="details-content">
               <h2>{detailsService.title}</h2>
               <p>{detailsService.details}</p>
-
               <div className="details-actions">
                 <button className="btn-primary" onClick={() => openBooking(detailsService)}>Book Now</button>
                 <button className="btn-outline" onClick={closeDetails}>Close</button>
@@ -178,26 +194,9 @@ export default function Services() {
           <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Book: {bookingService.title}</h2>
 
-            <input
-              className="booking-input"
-              placeholder="Your Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-
-            <input
-              className="booking-input"
-              placeholder="Pet Name"
-              value={form.petName}
-              onChange={(e) => setForm({ ...form, petName: e.target.value })}
-            />
-
-            <input
-              className="booking-input"
-              placeholder="Pet Type"
-              value={form.petType}
-              onChange={(e) => setForm({ ...form, petType: e.target.value })}
-            />
+            <input className="booking-input" placeholder="Your Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input className="booking-input" placeholder="Pet Name" value={form.petName} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
+            <input className="booking-input" placeholder="Pet Type" value={form.petType} onChange={(e) => setForm({ ...form, petType: e.target.value })} />
 
             <select className="booking-input" value={form.slot} onChange={(e) => setForm({ ...form, slot: e.target.value })}>
               <option value="">Select Slot</option>
