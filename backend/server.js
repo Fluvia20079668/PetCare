@@ -17,6 +17,8 @@ const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/daycare", daycareRoutes);
 app.use("/api/hostel", hostelRoutes);
+app.use("/api/admin", adminRoutes);
+
 
 // Test Root Endpoint
 app.get("/", (req, res) => {
