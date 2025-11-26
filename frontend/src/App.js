@@ -1,30 +1,38 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./Home";
+import Services from "./Services";              // ✅ ADD THIS
 import Login from "./Login";
 import Signup from "./Signup";
-import Home from "./Home";
-import About from "./About";
 import Contact from "./Contact";
-import AdminDashboard from "./AdminDashboard";
-import AdminProtected from "./AdminProtected";
+import About from "./About";
 
-
-
-
+import AdminDashboard from "./AdminDashboard";   // ✅ required
+import AdminProtected from "./AdminProtected";   // ✅ required
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/services" element={<Services />} />   {/* ✅ working now */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Home/>} />
-        <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/admin" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
-      
+        <Route path="/about" element={<About />} />
+
+        {/* ✅ Admin Protected Route */}
+        <Route
+          path="/admin"
+          element={
+            <AdminProtected>
+              <AdminDashboard />
+            </AdminProtected>
+          }
+        />
+
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
