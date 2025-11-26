@@ -10,6 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Read return URL from query string if user was redirected
   const params = new URLSearchParams(location.search);
   const returnUrl = params.get("return") || "/services";
 
@@ -26,9 +27,17 @@ export default function Login() {
       const data = await res.json();
 
       if (data.status === "success") {
+        // Save login session
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        navigate(returnUrl);
+
+        // Redirect depending on role
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate(returnUrl || "/services");
+        }
+
       } else {
         setShowPopup(true);
       }
@@ -65,6 +74,7 @@ export default function Login() {
         ← Back to Home
       </p>
 
+      {/* Popup for invalid login */}
       <div className={`popup-slide ${showPopup ? "show" : ""}`}>
         <h3>Invalid Credentials</h3>
         <p>Email or password is incorrect.</p>
