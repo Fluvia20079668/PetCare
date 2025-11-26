@@ -15,6 +15,7 @@ app.use(express.json());// allows parsing JSON in request body
 app.use("/api/users", userRoutes);
 app.use("/api/daycare", daycareRoutes);
 app.use("/api/hostel", hostelRoutes);
+app.use("/api/bookings", bookingsRoutes);
 
 const PORT = 8080;
 app.listen(PORT, () => {
