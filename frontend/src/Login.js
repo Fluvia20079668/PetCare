@@ -11,7 +11,7 @@ export default function Login() {
   const location = useLocation();
 
   const params = new URLSearchParams(location.search);
-  const returnUrl = params.get("return") || "/";
+  const returnUrl = params.get("return") || "/services";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,11 +26,10 @@ export default function Login() {
       const data = await res.json();
 
       if (data.status === "success") {
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user)); // <-- REQUIRED
-  navigate(returnPath || "/services");
-}
- else {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate(returnUrl);
+      } else {
         setShowPopup(true);
       }
     } catch (error) {
@@ -72,7 +71,9 @@ export default function Login() {
 
         <button
           className="popup-btn"
-          onClick={() => navigate(`/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`)}
+          onClick={() =>
+            navigate(`/signup?return=${encodeURIComponent(`/login?return=${returnUrl}`)}`)
+          }
         >
           Go to Sign Up
         </button>
