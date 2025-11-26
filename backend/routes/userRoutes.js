@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs"); // ✅ using bcryptjs
 const jwt = require("jsonwebtoken");
 const db = require("../db");
 
-// Signup Route
+// ✅ USER SIGNUP
 router.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
-  const cleanEmail = email.trim();
+
+  const cleanEmail = email.trim().toLowerCase();
 
   db.query("SELECT * FROM users WHERE email = ?", [cleanEmail], (err, results) => {
     if (err) return res.json({ status: "error" });
@@ -19,11 +20,10 @@ router.post("/signup", (req, res) => {
       if (err) return res.json({ status: "error" });
 
       db.query(
-        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-        [name, cleanEmail, hashedPassword, "user"],
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'user')",
+        [name, cleanEmail, hashedPassword],
         (err) => {
           if (err) return res.json({ status: "error" });
-
           res.json({ status: "success", message: "User created" });
         }
       );
@@ -31,25 +31,36 @@ router.post("/signup", (req, res) => {
   });
 });
 
-// Login Route
+// ✅ USER + ADMIN LOGIN
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const cleanEmail = email.trim();
 
-  db.query("SELECT * FROM users WHERE email = ?", [cleanEmail], async (err, results) => {
+  const cleanEmail = email.trim().toLowerCase();
+
+  const sql = "SELECT * FROM users WHERE LOWER(email) = ?";
+  db.query(sql, [cleanEmail], async (err, results) => {
     if (err) return res.json({ status: "error", error: err });
 
     if (results.length === 0) {
-      return res.json({ status: "fail", message: "Invalid credentials" });
+      console.log("LOGIN FAILED: USER NOT FOUND");
+      return res.json({ status: "fail", message: "User not found" });
     }
 
     const user = results[0];
 
+    console.log("Stored hash:", user.password);
+    console.log("Entered password:", password);
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
+    console.log("Password match result:", passwordMatch);
+
     if (!passwordMatch) {
-      return res.json({ status: "fail", message: "Invalid credentials" });
+      console.log("LOGIN FAILED: INCORRECT PASSWORD");
+      return res.json({ status: "fail", message: "Incorrect password" });
     }
+
+    console.log("LOGIN SUCCESS:", user.email);
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
