@@ -1,0 +1,29 @@
+const express = require("express");
+const router = express.Router();
+const db = require("../db");
+
+// Create hostel booking
+router.post("/book", (req, res) => {
+  const { userId, name, petName, petType, date, description } = req.body;
+
+  if (!userId || !name || !petName || !petType || !date) {
+    return res.json({ status: "fail", message: "Missing required fields" });
+  }
+
+  const sql = `
+    INSERT INTO hostel_booking 
+    (user_id, name, pet_name, pet_type, date, description)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [userId, name, petName, petType, date, description], (err, result) => {
+    if (err) return res.json({ status: "error", error: err });
+
+    res.json({
+      status: "success",
+      bookingId: result.insertId
+    });
+  });
+});
+
+module.exports = router;
