@@ -26,9 +26,11 @@ export default function Login() {
       const data = await res.json();
 
       if (data.status === "success") {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate(returnUrl);
-      } else {
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user)); // <-- REQUIRED
+  navigate(returnPath || "/services");
+}
+ else {
         setShowPopup(true);
       }
     } catch (error) {
