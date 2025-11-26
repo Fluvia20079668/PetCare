@@ -98,7 +98,7 @@ export default function Services() {
       const data = await res.json();
 
       if (data.status === "success") {
-        alert("Booking saved successfully!");
+        alert("Booking done successfully!");
         closeBooking();
       } else {
         alert("Booking failed. Try again.");

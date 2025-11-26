@@ -1,23 +1,29 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const db = require("./db");
 
-// Connect to MySQL
-require("./db.js");
+// Middleware
+app.use(cors());
+app.use(express.json());
 
+// Routes
 const userRoutes = require("./routes/userRoutes");
 const daycareRoutes = require("./routes/daycareRoutes");
 const hostelRoutes = require("./routes/hostelRoutes");
 
-app.use(cors());//enables CORS so frontend can access the API
-app.use(express.json());// allows parsing JSON in request body
-//// API routes
+// Use Routes
 app.use("/api/users", userRoutes);
 app.use("/api/daycare", daycareRoutes);
 app.use("/api/hostel", hostelRoutes);
-app.use("/api/bookings", bookingsRoutes);
 
+// Test Root Endpoint
+app.get("/", (req, res) => {
+  res.send("Backend is running...");
+});
+
+// Start Server
 const PORT = 8080;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
