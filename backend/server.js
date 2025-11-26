@@ -11,6 +11,7 @@ app.use(express.json());
 const userRoutes = require("./routes/userRoutes");
 const daycareRoutes = require("./routes/daycareRoutes");
 const hostelRoutes = require("./routes/hostelRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // Use Routes
 app.use("/api/users", userRoutes);
