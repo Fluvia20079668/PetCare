@@ -23,9 +23,9 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
-const savedUser = localStorage.getItem("user");
-const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
-
+  const savedUser = localStorage.getItem("user");
+  const user = savedUser ? JSON.parse(savedUser) : null;
+  const isLoggedIn = user && user.id;
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -36,14 +36,10 @@ const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
   }, [location.search]);
 
   useEffect(() => {
-    if (bookingService) {
-      const saved = localStorage.getItem("user");
-      if (saved) {
-        const u = JSON.parse(saved);
-        setForm((p) => ({ ...p, name: u.name || "" }));
-      }
+    if (bookingService && user) {
+      setForm((p) => ({ ...p, name: user.name || "" }));
     }
-  }, [bookingService]);
+  }, [bookingService, user]);
 
   const openBooking = (svc) => {
     if (!isLoggedIn) {
@@ -52,7 +48,7 @@ const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
       return;
     }
     setBookingService(svc);
-    setForm((p) => ({ ...p, petName: "", petType: "", slot: "", day: "", description: "" }));
+    setForm({ name: user.name, petName: "", petType: "", slot: "", day: "", description: "" });
   };
 
   const closeBooking = () => setBookingService(null);
@@ -65,14 +61,7 @@ const isLoggedIn = savedUser && JSON.parse(savedUser)?.id;
   const closeDetails = () => setDetailsService(null);
 
   const confirmBooking = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-if (!user) {
-  alert("You must be logged in to book.");
-  return;
-}
-
-
-    if (!user.id) {
+    if (!user || !user.id) {
       alert("You must be logged in to book.");
       return;
     }
@@ -121,6 +110,7 @@ if (!user) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -217,6 +207,9 @@ if (!user) {
               <option>Monday</option>
               <option>Tuesday</option>
               <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
             </select>
 
             <textarea className="booking-input" placeholder="Pet Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
