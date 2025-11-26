@@ -50,14 +50,16 @@ router.post("/login", (req, res) => {
       );
 
       res.json({
-        status: "success",
-        token: token,
-        user: {
-          id: results[0].id,
-          name: results[0].name,
-          email: results[0].email
-        }
-      });
+  status: "success",
+  token,
+  user: {
+    id: results[0].id,
+    name: results[0].name,
+    email: results[0].email,
+    role: results[0].role
+  }
+});
+
     });
   });
 });

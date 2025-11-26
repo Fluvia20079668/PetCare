@@ -1,0 +1,31 @@
+.admin-page {
+  padding: 20px;
+}
+
+h1, h2 {
+  color: #008c95;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+table th {
+  background: #eef6f7;
+}
+
+.back-btn {
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  background: gray;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
