@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// Create hostel booking
+/* -------------------------
+   CREATE HOSTEL BOOKING
+-------------------------- */
 router.post("/book", (req, res) => {
   const { userId, name, petName, petType, slot, day, description } = req.body;
 
@@ -22,6 +24,22 @@ router.post("/book", (req, res) => {
     res.json({
       status: "success",
       bookingId: result.insertId
+    });
+  });
+});
+
+/* -------------------------
+   GET ALL HOSTEL BOOKINGS
+-------------------------- */
+router.get("/all", (req, res) => {
+  const sql = "SELECT * FROM hostel_booking ORDER BY id DESC";
+
+  db.query(sql, (err, result) => {
+    if (err) return res.json({ status: "error", error: err });
+
+    res.json({
+      status: "success",
+      data: result
     });
   });
 });
