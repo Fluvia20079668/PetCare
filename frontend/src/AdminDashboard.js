@@ -1,164 +1,122 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AdminDashboard.css";
 
-const API_BASE = "http://localhost:8080/api/admin";
-const BOOKING_TYPES = ["daycare", "hostel"];
-
 export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // ==== DATA STATES ====
   const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  const [activeTab, setActiveTab] = useState("overview");
-  const [query, setQuery] = useState("");
-  const [bookingFilter, setBookingFilter] = useState("all");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ==== LOADING STATES ====
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingBookings, setLoadingBookings] = useState(true);
 
-  const [confirmData, setConfirmData] = useState(null);
-  const [savedMsg, setSavedMsg] = useState("");
+  const token = localStorage.getItem("token");
 
-  // DARK MODE
-  const [dark, setDark] = useState(
-    () => localStorage.getItem("admin_dark") === "1"
-  );
+  // -------------------------------
+  //  FETCH USERS
+  // -------------------------------
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch("http://localhost:8080/api/admin/users", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.status === "success") setUsers(data.users);
+    } catch (err) {
+      console.log("Users load error:", err);
+    }
+    setLoadingUsers(false);
+  };
 
+  // -------------------------------
+  //  FETCH BOOKINGS
+  // -------------------------------
+  const fetchBookings = async () => {
+    setLoadingBookings(true);
+    try {
+      const res = await fetch("http://localhost:8080/api/admin/bookings", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.status === "success") setBookings(data.bookings);
+    } catch (err) {
+      console.log("Bookings load error:", err);
+    }
+    setLoadingBookings(false);
+  };
+
+  // -------------------------------
+  //  DELETE USER
+  // -------------------------------
+  const deleteUser = async (id) => {
+    if (!window.confirm("Delete this user?")) return;
+
+    await fetch(`http://localhost:8080/api/admin/users/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    fetchUsers();
+  };
+
+  // -------------------------------
+  //  DELETE BOOKING
+  // -------------------------------
+  const deleteBooking = async (type, id) => {
+    if (!window.confirm("Delete this booking?")) return;
+
+    await fetch(`http://localhost:8080/api/admin/bookings/${type}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    fetchBookings();
+  };
+
+  // -------------------------------
+  //  UPDATE BOOKING STATUS
+  // -------------------------------
+  const updateStatus = async (type, id, status) => {
+    await fetch(`http://localhost:8080/api/admin/bookings/${type}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    fetchBookings();
+  };
+
+  // -------------------------------
+  //  Load data on mount
+  // -------------------------------
   useEffect(() => {
-    document.documentElement.dataset.theme = dark ? "dark" : "light";
-    localStorage.setItem("admin_dark", dark ? "1" : "0");
-  }, [dark]);
-
-  useEffect(() => {
-    loadAll();
+    fetchUsers();
+    fetchBookings();
   }, []);
 
-  async function loadAll() {
-    setLoading(true);
-    try {
-      const usersRes = await fetch(`${API_BASE}/users`).then((r) => r.json());
-      setUsers(usersRes.status === "success" ? usersRes.users : []);
+  // -------------------------------
+  //  FILTER SEARCH
+  // -------------------------------
+  const filteredUsers = users.filter((u) =>
+    u.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-      const bookingResults = await Promise.all(
-        BOOKING_TYPES.map((type) =>
-          fetch(`${API_BASE}/bookings/${type}`).then((r) =>
-            r.json().catch(() => ({ status: "error" }))
-          )
-        )
-      );
-
-      let allBookings = [];
-      bookingResults.forEach((res, index) => {
-        const type = BOOKING_TYPES[index];
-        if (res.status === "success" && Array.isArray(res.bookings)) {
-          res.bookings.forEach((b) => allBookings.push({ ...b, type }));
-        }
-      });
-
-      setBookings(allBookings);
-    } catch {
-      alert("Failed to load admin data. Check server.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // SEARCH — USERS
-  const filteredUsers = useMemo(() => {
-    if (!query.trim()) return users;
-    const q = query.toLowerCase();
-    return users.filter((u) =>
-      `${u.name} ${u.email}`.toLowerCase().includes(q)
-    );
-  }, [users, query]);
-
-  // SEARCH — BOOKINGS
-  const filteredBookings = useMemo(() => {
-    const q = query.toLowerCase();
-    return bookings
-      .filter((b) => (bookingFilter === "all" ? true : b.status === bookingFilter))
-      .filter((b) => {
-        if (!q) return true;
-        return (
-          (b.user_name || "").toLowerCase().includes(q) ||
-          (b.pet_name || "").toLowerCase().includes(q) ||
-          (b.pet_type || "").toLowerCase().includes(q) ||
-          (b.type || "").toLowerCase().includes(q)
-        );
-      });
-  }, [bookings, bookingFilter, query]);
-
-  function showSaved(msg) {
-    setSavedMsg(msg);
-    setTimeout(() => setSavedMsg(""), 2500);
-  }
-
-  function askConfirm(text, onConfirm) {
-    setConfirmData({ text, onConfirm });
-  }
-
-  // DELETE USER
-  async function doDeleteUser(id) {
-    try {
-      const res = await fetch(`${API_BASE}/users/${id}`, {
-        method: "DELETE",
-      }).then((r) => r.json());
-
-      if (res.status === "success") {
-        setUsers((u) => u.filter((x) => x.id !== id));
-        showSaved("User removed");
-      } else alert(res.message);
-    } catch {
-      alert("Server error");
-    }
-  }
-
-  // DELETE BOOKING
-  async function doDeleteBooking(type, id) {
-    try {
-      const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, {
-        method: "DELETE",
-      }).then((r) => r.json());
-
-      if (res.status === "success") {
-        setBookings((b) => b.filter((x) => !(x.id === id && x.type === type)));
-        showSaved("Booking removed");
-      } else alert(res.message);
-    } catch {
-      alert("Server error");
-    }
-  }
-
-  // UPDATE BOOKING STATUS
-  async function handleUpdateBookingStatus(type, id, status) {
-    try {
-      const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      }).then((r) => r.json());
-
-      if (res.status === "success") {
-        setBookings((b) =>
-          b.map((x) => (x.id === id && x.type === type ? { ...x, status } : x))
-        );
-        showSaved("Status updated");
-      } else alert(res.message);
-    } catch {
-      alert("Server error");
-    }
-  }
+  const filteredBookings = bookings.filter((b) =>
+    b.user_name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="adm-wrap">
-      {/* MOBILE TOGGLE */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setSidebarOpen((s) => !s)}
-      >
-        ☰
-      </button>
 
       {/* SIDEBAR */}
-      <aside className={`adm-sidebar ${sidebarOpen ? "open" : ""}`}>
+      <aside className="adm-sidebar">
         <div className="brand">
           <div className="logo">🐾</div>
           <div>
@@ -167,279 +125,184 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="nav">
+        <nav className="nav">
           <button
-            className={activeTab === "overview" ? "nav-btn active" : "nav-btn"}
-            onClick={() => {
-              setActiveTab("overview");
-              setSidebarOpen(false);
-            }}
+            className={`nav-btn ${activeTab === "dashboard" ? "active" : ""}`}
+            onClick={() => setActiveTab("dashboard")}
           >
-            Overview
+            Dashboard
           </button>
 
           <button
-            className={activeTab === "users" ? "nav-btn active" : "nav-btn"}
-            onClick={() => {
-              setActiveTab("users");
-              setSidebarOpen(false);
-            }}
+            className={`nav-btn ${activeTab === "users" ? "active" : ""}`}
+            onClick={() => setActiveTab("users")}
           >
             Users
           </button>
 
           <button
-            className={activeTab === "bookings" ? "nav-btn active" : "nav-btn"}
-            onClick={() => {
-              setActiveTab("bookings");
-              setSidebarOpen(false);
-            }}
+            className={`nav-btn ${activeTab === "bookings" ? "active" : ""}`}
+            onClick={() => setActiveTab("bookings")}
           >
             Bookings
           </button>
-        </div>
+        </nav>
 
         <div className="sidebar-footer">
-          <label className="switch-row">
-            <input
-              type="checkbox"
-              checked={dark}
-              onChange={(e) => setDark(e.target.checked)}
-            />
-            <span>Dark Mode</span>
-          </label>
-
-          <button
-            className="logout-btn"
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = "/";
-            }}
-          >
-            Sign out
+          <button className="logout-btn" onClick={() => {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+          }}>
+            Logout
           </button>
         </div>
       </aside>
 
-      {/* MAIN PANEL */}
+      {/* MAIN */}
       <main className="adm-main">
-        <header className="adm-header">
+        <div className="adm-header">
+          <h1 className="page-title">
+            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+          </h1>
+
           <div className="adm-search">
             <input
-              placeholder="Search users, bookings, pets..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              type="text"
+              placeholder="Search…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            <select
-              value={bookingFilter}
-              onChange={(e) => setBookingFilter(e.target.value)}
-            >
-              <option value="all">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-
-          <div className="status-msg">{savedMsg}</div>
-        </header>
-
-        {/* LOADING */}
-        {loading ? (
-          <div className="loading">Loading data…</div>
-        ) : (
-          <>
-            {/* OVERVIEW */}
-            {activeTab === "overview" && (
-              <section className="cards">
-                <div className="card">
-                  <div className="card-title">Total Users</div>
-                  <div className="card-value">{users.length}</div>
-                </div>
-
-                <div className="card">
-                  <div className="card-title">Total Bookings</div>
-                  <div className="card-value">{bookings.length}</div>
-                </div>
-
-                <div className="card">
-                  <div className="card-title">Pending</div>
-                  <div className="card-value">
-                    {bookings.filter((b) => b.status === "pending").length}
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* USERS TABLE */}
-            {activeTab === "users" && (
-              <section className="table-section">
-                <h2>Users ({filteredUsers.length})</h2>
-
-                <div className="table-wrap">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {filteredUsers.map((u) => (
-                        <tr key={u.id}>
-                          <td>{u.id}</td>
-                          <td>{u.name}</td>
-                          <td>{u.email}</td>
-                          <td>
-                            <span className={`role ${u.role}`}>{u.role}</span>
-                          </td>
-                          <td>{u.created_at}</td>
-
-                          <td className="actions">
-                            <button className="btn">Edit</button>
-                            <button
-                              className="btn danger"
-                              onClick={() =>
-                                askConfirm("Delete this user?", () =>
-                                  doDeleteUser(u.id)
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            )}
-
-            {/* BOOKINGS TABLE */}
-            {activeTab === "bookings" && (
-              <section className="table-section">
-                <h2>Bookings ({filteredBookings.length})</h2>
-
-                <div className="table-wrap">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>User</th>
-                        <th>Pet</th>
-                        <th>Pet Type</th>
-                        <th>Slot</th>
-                        <th>Day</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {filteredBookings.map((b) => (
-                        <tr key={`${b.type}-${b.id}`}>
-                          <td>{b.id}</td>
-                          <td>{b.type}</td>
-                          <td>{b.user_name}</td>
-                          <td>{b.pet_name}</td>
-                          <td>{b.pet_type}</td>
-                          <td>{b.slot}</td>
-                          <td>{b.day}</td>
-
-                          <td>
-                            <span className={`status-badge ${b.status}`}>
-                              {b.status}
-                            </span>
-                          </td>
-
-                          <td>{b.created_at}</td>
-
-                          <td className="actions">
-                            <button className="btn">Edit</button>
-
-                            <button
-                              className="btn"
-                              onClick={() =>
-                                handleUpdateBookingStatus(
-                                  b.type,
-                                  b.id,
-                                  "approved"
-                                )
-                              }
-                            >
-                              Approve
-                            </button>
-
-                            <button
-                              className="btn"
-                              onClick={() =>
-                                handleUpdateBookingStatus(
-                                  b.type,
-                                  b.id,
-                                  "rejected"
-                                )
-                              }
-                            >
-                              Reject
-                            </button>
-
-                            <button
-                              className="btn danger"
-                              onClick={() =>
-                                askConfirm("Delete booking?", () =>
-                                  doDeleteBooking(b.type, b.id)
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            )}
-          </>
-        )}
-      </main>
-
-      {/* CONFIRM MODAL */}
-      {confirmData && (
-        <div className="modal-backdrop" onClick={() => setConfirmData(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Confirm</h3>
-            <p>{confirmData.text}</p>
-
-            <div className="modal-actions">
-              <button
-                className="btn danger"
-                onClick={() => {
-                  confirmData.onConfirm();
-                  setConfirmData(null);
-                }}
-              >
-                Yes
-              </button>
-
-              <button className="btn" onClick={() => setConfirmData(null)}>
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
-      )}
+
+        {/* DASHBOARD */}
+        {activeTab === "dashboard" && (
+          <div className="cards">
+            <div className="card">
+              <div className="card-title">Total Users</div>
+              <div className="card-value">{users.length}</div>
+            </div>
+
+            <div className="card">
+              <div className="card-title">Total Bookings</div>
+              <div className="card-value">{bookings.length}</div>
+            </div>
+
+            <div className="card">
+              <div className="card-title">Pending</div>
+              <div className="card-value">
+                {bookings.filter((b) => b.status === "pending").length}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* USERS TABLE */}
+        {activeTab === "users" && (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {loadingUsers ? (
+                  <tr><td colSpan="6">Loading users…</td></tr>
+                ) : filteredUsers.length === 0 ? (
+                  <tr><td colSpan="6">No users found</td></tr>
+                ) : (
+                  filteredUsers.map((u) => (
+                    <tr key={u.id}>
+                      <td>{u.id}</td>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>{u.role}</td>
+                      <td>{u.created_at?.slice(0, 10)}</td>
+                      <td>
+                        <button
+                          className="btn danger"
+                          onClick={() => deleteUser(u.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* BOOKINGS TABLE */}
+        {activeTab === "bookings" && (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Pet</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Day</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {loadingBookings ? (
+                  <tr><td colSpan="7">Loading bookings…</td></tr>
+                ) : filteredBookings.length === 0 ? (
+                  <tr><td colSpan="7">No bookings found</td></tr>
+                ) : (
+                  filteredBookings.map((b) => (
+                    <tr key={b.id}>
+                      <td>{b.id}</td>
+                      <td>{b.user_name}</td>
+                      <td>{b.pet_name}</td>
+                      <td>{b.type}</td>
+
+                      <td>
+                        <select
+                          value={b.status}
+                          onChange={(e) =>
+                            updateStatus(b.type, b.id, e.target.value)
+                          }
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </td>
+
+                      <td>{b.day}</td>
+
+                      <td>
+                        <button
+                          className="btn danger"
+                          onClick={() => deleteBooking(b.type, b.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }
