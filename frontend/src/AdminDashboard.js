@@ -2,43 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./AdminDashboard.css";
 
 const API_BASE = "http://localhost:8080/api/admin";
-
-function TinyBar({ values = [], color = "#ff6a00", height = 40, width = 120 }) {
-  if (!values.length) return null;
-  const max = Math.max(...values, 1);
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} className="tiny-chart">
-      {values.map((v, i) => {
-        const barW = width / values.length;
-        const h = (v / max) * (height - 6);
-        return (
-          <rect
-            key={i}
-            x={i * barW + barW * 0.12}
-            y={height - h - 2}
-            width={barW * 0.76}
-            height={h}
-            rx="2"
-            fill={color}
-            opacity={0.95}
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
-function useDarkMode() {
-  const [dark, setDark] = useState(() => {
-    const v = localStorage.getItem("admin_dark");
-    return v === "1" ? true : false;
-  });
-  useEffect(() => {
-    document.documentElement.dataset.theme = dark ? "dark" : "light";
-    localStorage.setItem("admin_dark", dark ? "1" : "0");
-  }, [dark]);
-  return [dark, setDark];
-}
+const BOOKING_TYPES = ["daycare", "hostel"]; // add other booking table types here if you have them
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -49,24 +13,43 @@ export default function AdminDashboard() {
   const [bookingFilter, setBookingFilter] = useState("all"); // all / pending / approved / rejected / completed
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [confirmData, setConfirmData] = useState(null);
   const [savedMsg, setSavedMsg] = useState("");
-  const [dark, setDark] = useDarkMode();
+  const [dark, setDark] = useState(() => localStorage.getItem("admin_dark") === "1");
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    localStorage.setItem("admin_dark", dark ? "1" : "0");
+  }, [dark]);
 
   useEffect(() => {
     loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadAll() {
     setLoading(true);
     try {
-      const [uRes, bRes] = await Promise.all([
-        fetch(`${API_BASE}/users`).then((r) => r.json()),
-        fetch(`${API_BASE}/bookings`).then((r) => r.json()),
-      ]);
-      if (uRes.status === "success") setUsers(uRes.users || []);
+      const usersRes = await fetch(`${API_BASE}/users`).then((r) => r.json());
+      if (usersRes.status === "success") setUsers(usersRes.users || []);
       else setUsers([]);
-      if (bRes.status === "success") setBookings(bRes.bookings || []);
-      else setBookings([]);
+
+      // Fetch bookings from multiple tables and unify them
+      const bookingPromises = BOOKING_TYPES.map((type) =>
+        fetch(`${API_BASE}/bookings/${type}`).then((r) => r.json().catch(() => ({ status: "error" })))
+      );
+
+      const bookingResults = await Promise.all(bookingPromises);
+      const allBookings = [];
+
+      bookingResults.forEach((res, idx) => {
+        const type = BOOKING_TYPES[idx];
+        if (res && res.status === "success" && Array.isArray(res.bookings)) {
+          res.bookings.forEach((b) => allBookings.push({ ...b, type }));
+        }
+      });
+
+      setBookings(allBookings);
     } catch (err) {
       console.error("Failed to load admin data", err);
       alert("Failed to load admin data. Check server.");
@@ -75,7 +58,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Derived analytics: bookings per last 6 months (simple rollup by month)
   const analytics = useMemo(() => {
     const now = new Date();
     const months = [];
@@ -83,7 +65,7 @@ export default function AdminDashboard() {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       months.push({ label: d.toLocaleString("default", { month: "short" }), key: `${d.getFullYear()}-${d.getMonth()}` });
     }
-    const counts = months.map((m) => 0);
+    const counts = months.map(() => 0);
     bookings.forEach((b) => {
       if (!b.created_at) return;
       const d = new Date(b.created_at);
@@ -94,7 +76,6 @@ export default function AdminDashboard() {
     return { months: months.map((m) => m.label), counts };
   }, [bookings]);
 
-  // Search + filter
   const filteredUsers = useMemo(() => {
     if (!query.trim()) return users;
     const q = query.toLowerCase();
@@ -115,43 +96,75 @@ export default function AdminDashboard() {
       });
   }, [bookings, bookingFilter, query]);
 
-  // CRUD & status updates
-  async function handleDeleteUser(id) {
-    if (!confirm("Delete user? This is irreversible.")) return;
-    const res = await fetch(`${API_BASE}/users/${id}`, { method: "DELETE" }).then((r) => r.json());
-    if (res.status === "success") {
-      setUsers((u) => u.filter((x) => x.id !== id));
-      setSavedMsg("User deleted");
-      setTimeout(() => setSavedMsg(""), 2500);
-    } else alert("Failed to delete user");
+  function showSaved(msg) {
+    setSavedMsg(msg);
+    setTimeout(() => setSavedMsg(""), 2500);
   }
 
-  async function handleDeleteBooking(type, id) {
-    if (!confirm("Delete booking?")) return;
-    const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, { method: "DELETE" }).then((r) => r.json());
-    if (res.status === "success") {
-      setBookings((b) => b.filter((x) => !(x.type === type && x.id === id)));
-      setSavedMsg("Booking deleted");
-      setTimeout(() => setSavedMsg(""), 2500);
-    } else alert("Failed to delete booking");
+  // Confirm helpers (replaces window.confirm)
+  function askConfirm(text, onConfirm) {
+    setConfirmData({ text, onConfirm });
+  }
+
+  async function doDeleteUser(id) {
+    try {
+      const res = await fetch(`${API_BASE}/users/${id}`, { method: "DELETE" }).then((r) => r.json());
+      if (res.status === "success") {
+        setUsers((u) => u.filter((x) => x.id !== id));
+        showSaved("User deleted");
+      } else {
+        alert(res.message || "Failed to delete user");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  }
+
+  async function doDeleteBooking(type, id) {
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, { method: "DELETE" }).then((r) => r.json());
+      if (res.status === "success") {
+        setBookings((b) => b.filter((x) => !(x.type === type && x.id === id)));
+        showSaved("Booking deleted");
+      } else {
+        alert(res.message || "Failed to delete booking");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  }
+
+  function handleDeleteUser(id) {
+    askConfirm("Delete this user? This will remove their bookings if cascade is enabled.", () => doDeleteUser(id));
+  }
+
+  function handleDeleteBooking(type, id) {
+    askConfirm("Delete this booking?", () => doDeleteBooking(type, id));
   }
 
   async function handleUpdateBookingStatus(type, id, status) {
-    const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    }).then((r) => r.json());
-    if (res.status === "success") {
-      setBookings((b) => b.map((x) => (x.type === type && x.id === id ? { ...x, status } : x)));
-      setSavedMsg("Status updated");
-      setTimeout(() => setSavedMsg(""), 2000);
-    } else alert("Failed to update");
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${type}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      }).then((r) => r.json());
+      if (res.status === "success") {
+        setBookings((b) => b.map((x) => (x.type === type && x.id === id ? { ...x, status } : x)));
+        showSaved("Status updated");
+      } else {
+        alert(res.message || "Failed to update");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
   }
 
-  // Edit handlers (open modal)
   function openEditUser(u) {
-    setSelectedUser({ ...u }); // copy
+    setSelectedUser({ ...u });
   }
   function closeEditUser() {
     setSelectedUser(null);
@@ -160,7 +173,6 @@ export default function AdminDashboard() {
   async function saveUserEdits() {
     if (!selectedUser) return;
     try {
-      // assumes backend supports PUT /api/admin/users/:id with { name, role }
       const res = await fetch(`${API_BASE}/users/${selectedUser.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -168,8 +180,7 @@ export default function AdminDashboard() {
       }).then((r) => r.json());
       if (res.status === "success") {
         setUsers((u) => u.map((x) => (x.id === selectedUser.id ? { ...x, name: selectedUser.name, role: selectedUser.role } : x)));
-        setSavedMsg("User updated");
-        setTimeout(() => setSavedMsg(""), 2000);
+        showSaved("User updated");
         closeEditUser();
       } else {
         alert(res.message || "Failed to update");
@@ -190,7 +201,6 @@ export default function AdminDashboard() {
   async function saveBookingEdits() {
     if (!selectedBooking) return;
     try {
-      // assumes backend supports PUT /api/admin/bookings/:type/:id to update booking fields
       const res = await fetch(`${API_BASE}/bookings/${selectedBooking.type}/${selectedBooking.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -205,8 +215,7 @@ export default function AdminDashboard() {
       }).then((r) => r.json());
       if (res.status === "success") {
         setBookings((b) => b.map((x) => (x.type === selectedBooking.type && x.id === selectedBooking.id ? { ...x, ...selectedBooking } : x)));
-        setSavedMsg("Booking updated");
-        setTimeout(() => setSavedMsg(""), 2000);
+        showSaved("Booking updated");
         closeEditBooking();
       } else {
         alert(res.message || "Failed to update booking");
@@ -217,14 +226,39 @@ export default function AdminDashboard() {
     }
   }
 
+  function TinyBar({ values = [], color = "#ff6a00", height = 40, width = 120 }) {
+    if (!values.length) return null;
+    const max = Math.max(...values, 1);
+    return (
+      <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} className="tiny-chart">
+        {values.map((v, i) => {
+          const barW = width / values.length;
+          const h = (v / max) * (height - 6);
+          return (
+            <rect
+              key={i}
+              x={i * barW + barW * 0.12}
+              y={height - h - 2}
+              width={barW * 0.76}
+              height={h}
+              rx="2"
+              fill={color}
+              opacity={0.95}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+
   return (
     <div className="adm-wrap">
       <aside className="adm-sidebar">
         <div className="brand">
           <div className="logo">🐾</div>
           <div>
-            <div className="brand-name">PetCare Admin</div>
-            <div className="brand-sub">Management</div>
+            <div className="brand-name">PetCare+</div>
+            <div className="brand-sub">AdminDashboard</div>
           </div>
         </div>
 
@@ -239,7 +273,14 @@ export default function AdminDashboard() {
             <input type="checkbox" checked={dark} onChange={(e) => setDark(e.target.checked)} />
             <span>Dark mode</span>
           </label>
-          <button className="signout" onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "/"; }}>
+          <button
+            className="signout"
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              window.location.href = "/";
+            }}
+          >
             Sign out
           </button>
         </div>
@@ -421,6 +462,31 @@ export default function AdminDashboard() {
             <div className="modal-actions">
               <button className="btn" onClick={saveBookingEdits}>Save</button>
               <button className="btn" onClick={closeEditBooking}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Modal */}
+      {confirmData && (
+        <div className="modal-backdrop" onClick={() => setConfirmData(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm</h3>
+            <p>{confirmData.text}</p>
+            <div className="modal-actions">
+              <button
+                className="btn danger"
+                onClick={() => {
+                  try {
+                    confirmData.onConfirm();
+                  } finally {
+                    setConfirmData(null);
+                  }
+                }}
+              >
+                Yes
+              </button>
+              <button className="btn" onClick={() => setConfirmData(null)}>Cancel</button>
             </div>
           </div>
         </div>
