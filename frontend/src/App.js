@@ -7,9 +7,10 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Contact from "./Contact";
 import About from "./About";
+import AdminLogin from "./AdminLogin";
+import AdminDashboard from "./AdminDashboard";
+import AdminProtected from "./AdminProtected";
 
-import AdminDashboard from "./AdminDashboard";   // ✅ required
-import AdminProtected from "./AdminProtected";   // ✅ required
 
 export default function App() {
   return (
@@ -21,6 +22,8 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
 
         {/* ✅ Admin Protected Route */}
         <Route
