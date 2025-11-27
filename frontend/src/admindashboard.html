@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admindashboard.css">
+</head>
+
+<body>
+
+<div class="adm-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="adm-sidebar">
+    <div class="brand">
+      <div class="logo">⚡</div>
+      <div>
+        <div class="brand-name">Admin Panel</div>
+        <div class="brand-sub">Dashboard</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+      <button class="nav-btn" data-page="orders">Orders</button>
+      <button class="nav-btn" data-page="users">Users</button>
+      <button class="nav-btn" data-page="settings">Settings</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="switch-row">
+        <label>Dark Mode</label>
+        <input type="checkbox" id="themeToggle">
+      </div>
+      <button class="logout-btn">Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="adm-main">
+
+    <div class="adm-header">
+      <div class="adm-search">
+        <input type="text" placeholder="Search...">
+      </div>
+      <button id="openModalBtn" class="btn">Open Modal</button>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Total Users</div>
+        <div class="card-value">1,562</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Orders</div>
+        <div class="card-value">842</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Revenue</div>
+        <div class="card-value">$12,410</div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap" style="margin-top:20px;">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Joined</th>
+        </tr>
+        </thead>
+
+        <tbody id="userTable">
+        <tr>
+          <td>Alice</td>
+          <td>alice@mail.com</td>
+          <td><span class="status-badge approved">approved</span></td>
+          <td>2024-01-13</td>
+        </tr>
+        <tr>
+          <td>Bob</td>
+          <td>bob@mail.com</td>
+          <td><span class="status-badge pending">pending</span></td>
+          <td>2024-01-10</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-backdrop" style="display:none;">
+  <div class="modal">
+    <h3>Modal Title</h3>
+    <p>This is a modal dialog example.</p>
+
+    <div class="modal-actions">
+      <button class="btn" id="closeModal">Close</button>
+      <button class="btn danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="admindashboard.js"></script>
+</body>
+</html>
