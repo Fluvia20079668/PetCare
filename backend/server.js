@@ -14,10 +14,10 @@ const hostelRoutes = require("./routes/hostelRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
 // Use Routes
-app.use("/api/users", userRoutes);
-app.use("/api/daycare", require("./routes/daycarebooking"));
-app.use("/api/hostel", require("./routes/hostelbooking"));
-app.use("/api/admin", adminRoutes);
+app.use("/users", userRoutes);
+app.use("/daycare", daycareRoutes);
+app.use("/hostel", hostelRoutes);
+app.use("/admin", adminRoutes);
 
 
 // Test Root Endpoint
@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 // Start Server
-const PORT = 8080;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });

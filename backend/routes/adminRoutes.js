@@ -1,6 +1,9 @@
-// -----------------------------
-// ADMIN LOGIN
-// -----------------------------
+const express = require("express");
+const router = express.Router();
+const db = require("../db");           // <-- make sure this path is correct
+const jwt = require("jsonwebtoken");
+
+// Admin Login Route
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -21,7 +24,7 @@ router.post("/login", (req, res) => {
       if (user.role !== "admin")
         return res.json({ status: "fail", message: "Not an admin" });
 
-      // Simple password check (you can replace with bcrypt)
+      // Simple password check (no hashing yet)
       if (user.password !== password)
         return res.json({ status: "fail", message: "Wrong password" });
 
@@ -44,3 +47,5 @@ router.post("/login", (req, res) => {
     }
   );
 });
+
+module.exports = router;
