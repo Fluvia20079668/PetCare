@@ -15,8 +15,8 @@ const adminRoutes = require("./routes/adminRoutes");
 
 // Use Routes
 app.use("/api/users", userRoutes);
-app.use("/api/daycare", daycareRoutes);
-app.use("/api/hostel", hostelRoutes);
+app.use("/api/daycare", require("./routes/daycarebooking"));
+app.use("/api/hostel", require("./routes/hostelbooking"));
 app.use("/api/admin", adminRoutes);
 
 
