@@ -151,8 +151,10 @@ export default function AdminDashboard() {
 
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+            localStorage.removeItem("admin_token");
+            localStorage.removeItem("admin_info");
+            window.location.href = "/admin-login";
+
           }}>
             Logout
           </button>
