@@ -19,7 +19,7 @@ export default function Signup() {
     setMsg("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/signup", {
+      const res = await fetch("http://localhost:8080/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password })

@@ -1,123 +1,150 @@
+// backend/routes/adminRoutes.js
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const authAdmin = require("../middleware/authAdmin");
 
-// ADMIN LOGIN
-router.post("/login", (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || "SECRET_KEY";
+
+// --- TEST ROUTE
+router.get("/test", (req, res) => res.send("Admin route is working"));
+
+// --- LOGIN (already had this) ---
+router.post("/login", async (req, res) => {
+  console.log("📌 /admin/login HIT");
   const { email, password } = req.body;
+  console.log("📌 Body received:", req.body);
 
-  db.query("SELECT * FROM users WHERE email=? LIMIT 1", [email], async (err, rows) => {
-    if (err) return res.json({ status:"error", error:err });
-    if (rows.length === 0) return res.json({ status:"fail", message:"User not found" });
+  if (!email || !password) {
+    return res.json({ status: "fail", message: "Missing fields" });
+  }
 
-    const admin = rows[0];
+  db.query("SELECT * FROM users WHERE email = ? LIMIT 1", [email], async (err, users) => {
+    console.log("📌 DB Response:", { err, users });
+    if (err) return res.json({ status: "error", error: err });
+    if (!users || users.length === 0) return res.json({ status: "fail", message: "User not found" });
 
-    if (admin.role !== "admin") {
-      return res.json({ status: "fail", message: "Not an admin" });
-    }
+    const user = users[0];
+    if (user.role !== "admin") return res.json({ status: "fail", message: "Not an admin" });
 
-    const match = await bcrypt.compare(password, admin.password);
-    if (!match) return res.json({ status:"fail", message:"Wrong password" });
+    const isMatch = await bcrypt.compare(password, user.password || "");
+    if (!isMatch) return res.json({ status: "fail", message: "Wrong password" });
 
-    const token = jwt.sign({ id: admin.id, role: "admin" }, "SECRET_KEY", { expiresIn: "7d" });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
+      expiresIn: "7d"
+    });
 
     return res.json({
       status: "success",
-      message: "Logged in",
+      message: "Admin logged in",
       token,
-      admin: { id: admin.id, email: admin.email, name: admin.name }
+      admin: { id: user.id, name: user.name, email: user.email }
     });
   });
 });
 
-// GET ALL USERS
-router.get("/users", (req, res) => {
-  db.query("SELECT * FROM users ORDER BY id DESC", (err, users) => {
-    if (err) return res.json({ status:"error", error:err });
-    res.json({ status:"success", users });
+// --- GET ALL USERS (protected) ---
+router.get("/users", authAdmin, (req, res) => {
+  db.query("SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC", (err, rows) => {
+    if (err) return res.status(500).json({ status: "error", error: err });
+    return res.json({ status: "success", users: rows });
   });
 });
 
-// DELETE USER
-router.delete("/users/:id", (req, res) => {
-  db.query("DELETE FROM users WHERE id=?", [req.params.id], (err) => {
-    if (err) return res.json({ status:"error", error:err });
-    res.json({ status:"success" });
+// --- DELETE USER (protected) ---
+router.delete("/users/:id", authAdmin, (req, res) => {
+  const id = req.params.id;
+  db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {
+    if (err) return res.status(500).json({ status: "error", error: err });
+    return res.json({ status: "success", message: "User deleted" });
   });
 });
 
-// ----------- UNIVERSAL SERVICE FETCH ------------
-router.get("/bookings", (req, res) => {
-  const queries = {
-    daycare: "SELECT d.*, u.name AS user_name FROM daycare_bookings d LEFT JOIN users u ON u.id=d.user_id",
-    hostel: "SELECT h.*, u.name AS user_name FROM hostel_bookings h LEFT JOIN users u ON u.id=h.user_id",
-    grooming: "SELECT g.*, u.name AS user_name FROM grooming_bookings g LEFT JOIN users u ON u.id=g.user_id",
-    walking: "SELECT w.*, u.name AS user_name FROM walking_bookings w LEFT JOIN users u ON u.id=w.user_id",
-    vet: "SELECT v.*, u.name AS user_name FROM vet_checkup_bookings v LEFT JOIN users u ON u.id=v.user_id",
-    food: "SELECT f.*, u.name AS user_name FROM food_delivery_orders f LEFT JOIN users u ON u.id=f.user_id"
-  };
+/*
+  BOOKINGS aggregation:
+  We support types: daycare, hostel, grooming, walking, vet, food
+  Each booking table should have at least:
+    id, user_id, user_name, pet_name, status, day (or date), created_at
+*/
 
-  let data = {};
+// Helper to build union query
+function bookingsUnionQuery() {
+  // SELECTs must return same columns: id, user_id, user_name, pet_name, type, status, day, created_at
+  const selects = [
+    `SELECT id, user_id, user_name, pet_name, 'daycare' as type, status, day, created_at FROM daycare_bookings`,
+    `SELECT id, user_id, user_name, pet_name, 'hostel' as type, status, day, created_at FROM hostel_bookings`,
+    `SELECT id, user_id, user_name, pet_name, 'grooming' as type, status, day, created_at FROM grooming_bookings`,
+    `SELECT id, user_id, user_name, pet_name, 'walking' as type, status, day, created_at FROM walking_bookings`,
+    `SELECT id, user_id, user_name, pet_name, 'vet' as type, status, day, created_at FROM vet_bookings`,
+    `SELECT id, user_id, user_name, pet_name, 'food' as type, status, day, created_at FROM food_bookings`
+  ];
+  return selects.join(" UNION ALL ");
+}
 
-  let completed = 0;
-  const total = Object.keys(queries).length;
-
-  Object.entries(queries).forEach(([key, sql]) => {
-    db.query(sql, (err, rows) => {
-      data[key] = rows || [];
-
-      completed++;
-      if (completed === total) {
-        res.json({ status: "success", data });
-      }
+// --- GET ALL BOOKINGS (protected) ---
+router.get("/bookings", authAdmin, (req, res) => {
+  // optional ?type=daycare|hostel|grooming|walking|vet|food
+  const type = req.query.type;
+  if (type) {
+    // simple whitelist
+    const allowed = ["daycare", "hostel", "grooming", "walking", "vet", "food"];
+    if (!allowed.includes(type)) {
+      return res.status(400).json({ status: "fail", message: "Invalid booking type" });
+    }
+    const table = `${type}_bookings`;
+    const q = `SELECT id, user_id, user_name, pet_name, '${type}' as type, status, day, created_at FROM ${table} ORDER BY created_at DESC`;
+    return db.query(q, (err, rows) => {
+      if (err) return res.status(500).json({ status: "error", error: err });
+      return res.json({ status: "success", bookings: rows });
     });
+  }
+
+  // aggregate all
+  const q = `${bookingsUnionQuery()} ORDER BY created_at DESC`;
+  db.query(q, (err, rows) => {
+    if (err) return res.status(500).json({ status: "error", error: err });
+    return res.json({ status: "success", bookings: rows });
   });
 });
 
-// ----------- STATUS UPDATE -----------
-router.put("/bookings/:service/:id", (req, res) => {
-  const { service, id } = req.params;
-  const { status } = req.body;
-
-  const tableMap = {
-    daycare: "daycare_bookings",
-    hostel: "hostel_bookings",
-    grooming: "grooming_bookings",
-    walking: "walking_bookings",
-    vet: "vet_checkup_bookings",
-    food: "food_delivery_orders"
-  };
-
-  const table = tableMap[service];
-  if (!table) return res.json({ status:"error", message:"Invalid service" });
-
-  db.query(`UPDATE ${table} SET status=? WHERE id=?`, [status, id], (err) => {
-    if (err) return res.json({ status:"error", error:err });
-    res.json({ status:"success" });
+// --- DELETE booking by type & id (protected) ---
+router.delete("/bookings/:type/:id", authAdmin, (req, res) => {
+  const { type, id } = req.params;
+  const allowed = ["daycare", "hostel", "grooming", "walking", "vet", "food"];
+  if (!allowed.includes(type)) return res.status(400).json({ status: "fail", message: "Invalid type" });
+  const table = `${type}_bookings`;
+  db.query(`DELETE FROM ${table} WHERE id = ?`, [id], (err) => {
+    if (err) return res.status(500).json({ status: "error", error: err });
+    return res.json({ status: "success", message: "Booking deleted" });
   });
 });
 
-// ----------- DELETE BOOKING -----------
-router.delete("/bookings/:service/:id", (req, res) => {
-  const { service, id } = req.params;
+// --- UPDATE booking (status etc) (protected) ---
+router.put("/bookings/:type/:id", authAdmin, (req, res) => {
+  const { type, id } = req.params;
+  const allowed = ["daycare", "hostel", "grooming", "walking", "vet", "food"];
+  if (!allowed.includes(type)) return res.status(400).json({ status: "fail", message: "Invalid type" });
 
-  const tableMap = {
-    daycare: "daycare_bookings",
-    hostel: "hostel_bookings",
-    grooming: "grooming_bookings",
-    walking: "walking_bookings",
-    vet: "vet_checkup_bookings",
-    food: "food_delivery_orders"
-  };
+  // only allow status update for simplicity; you can expand to other fields
+  const { status, day, pet_name } = req.body;
+  const fields = [];
+  const params = [];
 
-  const table = tableMap[service];
-  if (!table) return res.json({ status:"error", message:"Invalid service" });
+  if (status) { fields.push("status = ?"); params.push(status); }
+  if (day) { fields.push("day = ?"); params.push(day); }
+  if (pet_name) { fields.push("pet_name = ?"); params.push(pet_name); }
 
-  db.query(`DELETE FROM ${table} WHERE id=?`, [id], (err) => {
-    if (err) return res.json({ status:"error", error:err });
-    res.json({ status:"success" });
+  if (fields.length === 0) return res.status(400).json({ status: "fail", message: "No fields to update" });
+
+  const table = `${type}_bookings`;
+  const sql = `UPDATE ${table} SET ${fields.join(", ")} WHERE id = ?`;
+  params.push(id);
+
+  db.query(sql, params, (err, result) => {
+    if (err) return res.status(500).json({ status: "error", error: err });
+    return res.json({ status: "success", message: "Booking updated", changed: result.changedRows || 0 });
   });
 });
 

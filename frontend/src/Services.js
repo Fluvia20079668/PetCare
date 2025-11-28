@@ -79,9 +79,9 @@ export default function Services() {
     let endpoint = "";
 
     if (bookingService.id === "daycare") {
-      endpoint = "http://localhost:8080/api/daycare/book";
+      endpoint = "http://localhost:8080/daycare/book";
     } else if (bookingService.id === "hostel") {
-      endpoint = "http://localhost:8080/api/hostel/book";
+      endpoint = "http://localhost:8080/hostel/book";
     } else {
       alert(`Booking confirmed for ${bookingService.title}`);
       closeBooking();
