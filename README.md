@@ -2,4 +2,4 @@
 
 # Admin Email: admin@petcare.com
 
-#Password: Admin@123
+#Password: Admin123!
