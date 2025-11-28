@@ -1,31 +1,29 @@
+// backend/server.js (adjusted)
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const db = require("./db");
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization"
+}));
 app.use(express.json());
 
-// Routes
+// routes (unchanged)
 const userRoutes = require("./routes/userRoutes");
 const daycareRoutes = require("./routes/daycareRoutes");
 const hostelRoutes = require("./routes/hostelRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// Use Routes
 app.use("/users", userRoutes);
 app.use("/daycare", daycareRoutes);
 app.use("/hostel", hostelRoutes);
 app.use("/admin", adminRoutes);
 
-// Test Root
-app.get("/", (req, res) => {
-  res.send("Backend is running...");
-});
+app.get("/", (req, res) => res.send("Backend is running..."));
 
-// Start Server
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
