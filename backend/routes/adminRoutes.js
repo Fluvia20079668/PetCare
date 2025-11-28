@@ -1,32 +1,58 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db");           // <-- make sure this path is correct
+const db = require("../db");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
-// Admin Login Route
-router.post("/login", (req, res) => {
+// TEST ROUTE
+router.get("/test", (req, res) => {
+  res.send("Admin route is working");
+});
+
+// ADMIN LOGIN
+router.post("/login", async (req, res) => {
+  console.log("📌 /admin/login HIT");  // Log 1
+  
   const { email, password } = req.body;
+  console.log("📌 Body received:", req.body);  // Log 2
 
-  if (!email || !password)
+  if (!email || !password) {
+    console.log("❌ Missing fields");
     return res.json({ status: "fail", message: "Missing fields" });
+  }
 
   db.query(
     "SELECT * FROM users WHERE email = ? LIMIT 1",
     [email],
-    (err, users) => {
-      if (err) return res.json({ status: "error", error: err });
-      if (users.length === 0)
+    async (err, users) => {
+      console.log("📌 DB Response:", { err, users });  // Log 3
+
+      if (err) {
+        console.log("❌ DB Error:", err);
+        return res.json({ status: "error", error: err });
+      }
+
+      if (users.length === 0) {
+        console.log("❌ User not found");
         return res.json({ status: "fail", message: "User not found" });
+      }
 
       const user = users[0];
+      console.log("📌 User Found:", user);  // Log 4
 
-      // Only admin can login!
-      if (user.role !== "admin")
+      if (user.role !== "admin") {
+        console.log("❌ Not an admin");
         return res.json({ status: "fail", message: "Not an admin" });
+      }
 
-      // Simple password check (no hashing yet)
-      if (user.password !== password)
+      console.log("📌 Comparing passwords...");
+      const isMatch = await bcrypt.compare(password, user.password);
+      console.log("📌 Password match:", isMatch);  // Log 5
+
+      if (!isMatch) {
+        console.log("❌ Wrong password");
         return res.json({ status: "fail", message: "Wrong password" });
+      }
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
@@ -34,6 +60,7 @@ router.post("/login", (req, res) => {
         { expiresIn: "7d" }
       );
 
+      console.log("✅ LOGIN SUCCESS");
       res.json({
         status: "success",
         message: "Admin logged in",

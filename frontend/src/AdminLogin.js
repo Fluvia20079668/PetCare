@@ -13,7 +13,7 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/login", {
+      const res = await fetch("http://localhost:8080/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -48,7 +48,7 @@ export default function AdminLogin() {
           <label>Email</label>
           <input
             type="email"
-            placeholder="admin@gmail.com"
+            placeholder="admin@petcare.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />

@@ -19,14 +19,13 @@ app.use("/daycare", daycareRoutes);
 app.use("/hostel", hostelRoutes);
 app.use("/admin", adminRoutes);
 
-
-// Test Root Endpoint
+// Test Root
 app.get("/", (req, res) => {
   res.send("Backend is running...");
 });
 
 // Start Server
-const PORT = 3000;
+const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
