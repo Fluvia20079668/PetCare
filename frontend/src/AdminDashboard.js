@@ -13,7 +13,8 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [loadingBookings, setLoadingBookings] = useState(true);
 
-  const token = localStorage.getItem("token");
+ const token = localStorage.getItem("admin_token");
+
 
   // -------------------------------
   //  FETCH USERS
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const res = await fetch("http://localhost:8080/api/admin/users", {
+      const res = await fetch("http://localhost:8080/admin/users", {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
   const fetchBookings = async () => {
     setLoadingBookings(true);
     try {
-      const res = await fetch("http://localhost:8080/api/admin/bookings", {
+      const res = await fetch("http://localhost:8080/admin/bookings", {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -55,7 +56,7 @@ export default function AdminDashboard() {
   const deleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
 
-    await fetch(`http://localhost:8080/api/admin/users/${id}`, {
+    await fetch(`http://localhost:8080/admin/users/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -69,7 +70,7 @@ export default function AdminDashboard() {
   const deleteBooking = async (type, id) => {
     if (!window.confirm("Delete this booking?")) return;
 
-    await fetch(`http://localhost:8080/api/admin/bookings/${type}/${id}`, {
+    await fetch(`http://localhost:8080/admin/bookings/${type}/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -81,7 +82,7 @@ export default function AdminDashboard() {
   //  UPDATE BOOKING STATUS
   // -------------------------------
   const updateStatus = async (type, id, status) => {
-    await fetch(`http://localhost:8080/api/admin/bookings/${type}/${id}`, {
+    await fetch(`http://localhost:8080/admin/bookings/${type}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
