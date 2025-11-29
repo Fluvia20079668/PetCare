@@ -210,6 +210,11 @@ export default function AdminDashboard() {
               <div className="card-value">{bookings.filter((b) => b.status === "pending").length}</div>
             </div>
 
+            <div className="card glass">
+              <div className="card-title">cancelled</div>
+              <div className="card-value">{bookings.filter((b) => b.status === "pending").length}</div>
+            </div>
+
             <div className="big-graphs">
               <div className="graph-card glass">
                 <h3>Bookings by Service</h3>
@@ -236,7 +241,7 @@ export default function AdminDashboard() {
             <div className="glass-table-wrap">
               <table className="glass-table">
                 <thead>
-                  <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr>
+                  <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Action</th></tr>
                 </thead>
                 <tbody>
                   {filteredUsers.map((u) => (
@@ -245,7 +250,6 @@ export default function AdminDashboard() {
                       <td>{u.name}</td>
                       <td>{u.email}</td>
                       <td>{u.phone || "-"}</td>
-                      <td>{u.role || "user"}</td>
                       <td>{u.created_at ? u.created_at.slice(0,10) : "-"}</td>
                       <td><button className="btn danger" onClick={() => deleteUser(u.id)}>Delete</button></td>
                     </tr>
