@@ -40,6 +40,25 @@ router.get("/bookings", async (req, res) => {
     }
 });
 
+// ========== FETCH ALL USERS ==========
+router.get("/users", async (req, res) => {
+    try {
+        const [users] = await db.query("SELECT id, name, email, phone FROM users");
+
+        return res.json({
+            status: "success",
+            users: users
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to load users"
+        });
+    }
+});
+
+
 // ========== CANCEL BOOKING (ANY SERVICE) ==========
 router.delete("/cancel/:service/:id", async (req, res) => {
     const { service, id } = req.params;

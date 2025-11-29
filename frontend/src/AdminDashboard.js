@@ -98,9 +98,12 @@ export default function AdminDashboard() {
   //  Load data on mount
   // -------------------------------
   useEffect(() => {
-    fetchUsers();
-    fetchBookings();
-  }, []);
+  fetch("http://localhost:8080/admin/bookings")
+    .then(res => res.json())
+    .then(data => {
+      setBookings(data.bookings);
+    });
+}, []);
 
   // -------------------------------
   //  FILTER SEARCH
