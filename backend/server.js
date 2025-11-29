@@ -1,10 +1,9 @@
-// backend/server.js
 const express = require("express");
 const cors = require("cors");
 const app = express();
 
 // -----------------------------
-// CORS (VERY IMPORTANT)
+// CORS
 // -----------------------------
 app.use(
   cors({
@@ -15,12 +14,11 @@ app.use(
   })
 );
 
-// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -----------------------------
-// ROUTES
+// ROUTES 
 // -----------------------------
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -29,12 +27,23 @@ const userBookingRoutes = require("./routes/userBookingRoutes");
 const cancelBookingRoutes = require("./routes/cancelBookingRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 
-app.use("/bookings", cancelBookingRoutes);
-app.use("/book", bookingRoutes);
-app.use("/bookings", userBookingRoutes);
-app.use("/admin", adminBookingRoutes);
+// USER ACCOUNT routes
 app.use("/users", userRoutes);
+
+// USER bookings (create + view)
+app.use("/bookings", userBookingRoutes);
+
+// Create booking
+app.use("/book", bookingRoutes);
+
+// Cancel a booking
+app.use("/bookings/cancel", cancelBookingRoutes);
+
+// ADMIN routes
 app.use("/admin", adminRoutes);
+
+// ADMIN booking routes — clean and isolated
+app.use("/admin/bookings", adminBookingRoutes); 
 
 
 // -----------------------------
@@ -43,9 +52,7 @@ app.get("/", (req, res) => {
 });
 
 // -----------------------------
-// SERVER
-// -----------------------------
-const PORT = process.env.PORT || 8080; 
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
   console.log(`✅ Server running on http://localhost:${PORT}`)
 );

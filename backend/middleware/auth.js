@@ -1,24 +1,21 @@
-const jwt = require('jsonwebtoken');
+// middleware/adminAuth.js
+const jwt = require("jsonwebtoken");
 
-const SECRET = process.env.JWT_SECRET || 'SECRET_KEY';
+module.exports = function (req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return res.status(401).json({ status: "error", error: "No token provided" });
 
-function adminAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(401).json({ status: 'fail', message: 'Unauthorized' });
-  }
-  const token = auth.split(' ')[1];
+  const secret = process.env.JWT_SECRET || "change_this_secret";
   try {
-    const payload = jwt.verify(token, SECRET);
-    // ensure role admin
-    if (payload.role !== 'admin') {
-      return res.status(403).json({ status: 'fail', message: 'Forbidden' });
+    const payload = jwt.verify(token, secret);
+    // optional: check role
+    if (!payload || !payload.isAdmin) {
+      return res.status(403).json({ status: "error", error: "Not authorized" });
     }
     req.admin = payload;
     next();
   } catch (err) {
-    return res.status(401).json({ status: 'fail', message: 'Invalid token' });
+    return res.status(401).json({ status: "error", error: "Invalid token" });
   }
-}
-
-module.exports = adminAuth;
+};

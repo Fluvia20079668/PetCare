@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../db");
 
 // Get bookings by user
-router.get("/:userId", (req, res) => {
+router.get("/user/:userId", (req, res) => {
   const { userId } = req.params;
 
   const sql = "SELECT * FROM bookings WHERE userId = ? ORDER BY created_at DESC";

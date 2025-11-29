@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// Universal booking route
+// Create booking
 router.post("/", (req, res) => {
   const { userId, serviceType, name, petName, petType, slot, day, description } = req.body;
 
@@ -15,11 +15,8 @@ router.post("/", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [userId, serviceType, name, petName, petType, slot, day, description], (err, result) => {
-    if (err) {
-      console.error("❌ DB Error:", err);
-      return res.json({ status: "error", message: "Database error" });
-    }
+  db.query(sql, [userId, serviceType, name, petName, petType, slot, day, description], (err) => {
+    if (err) return res.json({ status: "error", message: "Database error" });
     return res.json({ status: "success", message: "Booking successful!" });
   });
 });
