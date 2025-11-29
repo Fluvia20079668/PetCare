@@ -1,88 +1,68 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db"); // MySQL POOL
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const db = require("../db");
 
-// -----------------------------
-// TEST ROUTE
-// -----------------------------
-router.get("/test", (req, res) => {
-  res.send("Admin route is working");
+// ========== ADMIN LOGIN ==========
+router.post("/login", (req, res) => {
+    const { email, password } = req.body;
+
+    if (email === "admin@gmail.com" && password === "admin123") {
+        return res.json({ status: "success", message: "Admin login success" });
+    } else {
+        return res.json({ status: "error", message: "Invalid admin credentials" });
+    }
 });
 
+// ========== FETCH ALL BOOKINGS ==========
+router.get("/bookings", async (req, res) => {
+    try {
+        const daycare = await db.query("SELECT * FROM daycare_bookings");
+        const hostel = await db.query("SELECT * FROM hostel_bookings");
+        const grooming = await db.query("SELECT * FROM grooming_bookings");
+        const walking = await db.query("SELECT * FROM walking_bookings");
+        const vet = await db.query("SELECT * FROM vetcheck_bookings");
+        const food = await db.query("SELECT * FROM food_orders");
 
-// -----------------------------
-// ADMIN LOGIN
-// -----------------------------
-router.post("/login", async (req, res) => {
-  console.log("📌 /admin/login HIT");
-  const { email, password } = req.body;
-  console.log("📌 Body received:", req.body);
+        return res.json({
+            status: "success",
+            bookings: {
+                daycare: daycare[0],
+                hostel: hostel[0],
+                grooming: grooming[0],
+                walking: walking[0],
+                vetcheck: vet[0],
+                food: food[0],
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: "error", message: "Failed to load bookings" });
+    }
+});
 
-  // Validate fields
-  if (!email || !password) {
-    console.log("❌ Missing fields");
-    return res.json({ status: "fail", message: "Missing fields" });
-  }
+// ========== CANCEL BOOKING (ANY SERVICE) ==========
+router.delete("/cancel/:service/:id", async (req, res) => {
+    const { service, id } = req.params;
 
-  try {
-    // Run MySQL Query
-    const [rows] = await db.promise().query(
-      "SELECT * FROM users WHERE email = ? LIMIT 1",
-      [email]
-    );
+    const tables = {
+        daycare: "daycare_bookings",
+        hostel: "hostel_bookings",
+        grooming: "grooming_bookings",
+        walking: "walking_bookings",
+        vetcheck: "vetcheck_bookings",
+        food: "food_orders"
+    };
 
-    console.log("📌 DB Response:", rows);
-
-    if (rows.length === 0) {
-      console.log("❌ User not found");
-      return res.json({ status: "fail", message: "User not found" });
+    if (!tables[service]) {
+        return res.status(400).json({ status: "error", message: "Invalid service" });
     }
 
-    const user = rows[0];
-    console.log("📌 User Found:", user);
-
-    // Check admin role
-    if (user.role !== "admin") {
-      console.log("❌ Not an admin");
-      return res.json({ status: "fail", message: "Not an admin" });
+    try {
+        await db.query(`DELETE FROM ${tables[service]} WHERE id = ?`, [id]);
+        return res.json({ status: "success", message: "Booking cancelled" });
+    } catch (err) {
+        return res.status(500).json({ status: "error", message: "Cancellation failed" });
     }
-
-    // Compare passwords
-    console.log("📌 Comparing passwords...");
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log("📌 Password match:", isMatch);
-
-    if (!isMatch) {
-      console.log("❌ Wrong password");
-      return res.json({ status: "fail", message: "Wrong password" });
-    }
-
-    // Generate JWT Token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      "SECRET_KEY",
-      { expiresIn: "7d" }
-    );
-
-    console.log("✅ LOGIN SUCCESS");
-
-    return res.json({
-      status: "success",
-      message: "Admin logged in",
-      token,
-      admin: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-
-  } catch (err) {
-    console.error("❌ DB Error:", err);
-    return res.json({ status: "error", message: "Database error", error: err });
-  }
 });
 
 module.exports = router;

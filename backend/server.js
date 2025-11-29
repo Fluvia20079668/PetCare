@@ -34,6 +34,7 @@ app.use("/book", bookingRoutes);
 app.use("/bookings", userBookingRoutes);
 app.use("/admin", adminBookingRoutes);
 app.use("/users", userRoutes);
+app.use("/admin", adminRoutes);
 
 
 // -----------------------------
