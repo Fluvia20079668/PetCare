@@ -1,314 +1,132 @@
-import React, { useState, useEffect } from "react";
-import "./AdminDashboard.css";
+const express = require("express");
+const router = express.Router();
+const db = require("../db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+// ======================
+// TEST
+// ======================
+router.get("/test", (req, res) => {
+  res.send("Admin route OK");
+});
 
-  // ==== DATA STATES ====
-  const [users, setUsers] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [search, setSearch] = useState("");
+// ======================
+// ADMIN LOGIN
+// ======================
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
 
-  // ==== LOADING STATES ====
-  const [loadingUsers, setLoadingUsers] = useState(true);
-  const [loadingBookings, setLoadingBookings] = useState(true);
+  db.query("SELECT * FROM users WHERE email=?", [email], async (err, result) => {
+    if (err) return res.json({ status: "error", error: err });
 
- const token = localStorage.getItem("admin_token");
-
-
-  // -------------------------------
-  //  FETCH USERS
-  // -------------------------------
-  const fetchUsers = async () => {
-    setLoadingUsers(true);
-    try {
-      const res = await fetch("http://localhost:8080/admin/users", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.status === "success") setUsers(data.users);
-    } catch (err) {
-      console.log("Users load error:", err);
+    if (result.length === 0) {
+      return res.json({ status: "fail", message: "User not found" });
     }
-    setLoadingUsers(false);
-  };
 
-  // -------------------------------
-  //  FETCH BOOKINGS
-  // -------------------------------
-  const fetchBookings = async () => {
-    setLoadingBookings(true);
-    try {
-      const res = await fetch("http://localhost:8080/admin/bookings", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.status === "success") setBookings(data.bookings);
-    } catch (err) {
-      console.log("Bookings load error:", err);
+    const admin = result[0];
+
+    if (admin.role !== "admin") {
+      return res.json({ status: "fail", message: "Not an admin" });
     }
-    setLoadingBookings(false);
-  };
 
-  // -------------------------------
-  //  DELETE USER
-  // -------------------------------
-  const deleteUser = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
+    const match = await bcrypt.compare(password, admin.password);
+    if (!match) return res.json({ status: "fail", message: "Wrong password" });
 
-    await fetch(`http://localhost:8080/admin/users/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
+    const token = jwt.sign(
+      { id: admin.id, email: admin.email, role: admin.role },
+      "SECRET_KEY",
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      status: "success",
+      token,
+      admin: { id: admin.id, name: admin.name, email: admin.email }
     });
+  });
+});
 
-    fetchUsers();
-  };
+// ======================
+// GET ALL USERS
+// ======================
+router.get("/users", (req, res) => {
+  db.query(
+    "SELECT id, name, email, role, created_at FROM users",
+    (err, result) => {
+      if (err) return res.json({ status: "error", error: err });
 
-  // -------------------------------
-  //  DELETE BOOKING
-  // -------------------------------
-  const deleteBooking = async (type, id) => {
-    if (!window.confirm("Delete this booking?")) return;
-
-    await fetch(`http://localhost:8080/admin/bookings/${type}/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    fetchBookings();
-  };
-
-  // -------------------------------
-  //  UPDATE BOOKING STATUS
-  // -------------------------------
-  const updateStatus = async (type, id, status) => {
-    await fetch(`http://localhost:8080/admin/bookings/${type}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ status })
-    });
-
-    fetchBookings();
-  };
-
-  // -------------------------------
-  //  Load data on mount
-  // -------------------------------
-  useEffect(() => {
-  fetch("http://localhost:8080/admin/bookings")
-    .then(res => res.json())
-    .then(data => {
-      setBookings(data.bookings);
-    });
-}, []);
-
-  // -------------------------------
-  //  FILTER SEARCH
-  // -------------------------------
-  const filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase())
+      res.json({
+        status: "success",
+        users: result
+      });
+    }
   );
+});
 
-  const filteredBookings = bookings.filter((b) =>
-    b.user_name.toLowerCase().includes(search.toLowerCase())
-  );
+// ======================
+// DELETE USER
+// ======================
+router.delete("/users/:id", (req, res) => {
+  db.query("DELETE FROM users WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.json({ status: "error", error: err });
 
-  return (
-    <div className="adm-wrap">
+    res.json({ status: "success", message: "User deleted" });
+  });
+});
 
-      {/* SIDEBAR */}
-      <aside className="adm-sidebar">
-        <div className="brand">
-          <div className="logo">🐾</div>
-          <div>
-            <div className="brand-name">PetCare+</div>
-            <div className="brand-sub">Admin Panel</div>
-          </div>
-        </div>
+// ======================
+// GET ALL BOOKINGS
+// ======================
+router.get("/bookings", (req, res) => {
+  const sql = `
+    SELECT 
+      bookings.id,
+      bookings.userId,
+      bookings.name AS user_name,
+      bookings.petName AS pet_name,
+      bookings.petType,
+      bookings.slot,
+      bookings.day,
+      bookings.serviceType AS type,
+      bookings.description,
+      bookings.status
+    FROM bookings
+    ORDER BY bookings.id DESC
+  `;
 
-        <nav className="nav">
-          <button
-            className={`nav-btn ${activeTab === "dashboard" ? "active" : ""}`}
-            onClick={() => setActiveTab("dashboard")}
-          >
-            Dashboard
-          </button>
+  db.query(sql, (err, result) => {
+    if (err) return res.json({ status: "error", error: err });
 
-          <button
-            className={`nav-btn ${activeTab === "users" ? "active" : ""}`}
-            onClick={() => setActiveTab("users")}
-          >
-            Users
-          </button>
+    res.json({
+      status: "success",
+      bookings: result
+    });
+  });
+});
 
-          <button
-            className={`nav-btn ${activeTab === "bookings" ? "active" : ""}`}
-            onClick={() => setActiveTab("bookings")}
-          >
-            Bookings
-          </button>
-        </nav>
+// ======================
+// UPDATE BOOKING STATUS
+// ======================
+router.put("/bookings/:type/:id", (req, res) => {
+  const { status } = req.body;
 
-        <div className="sidebar-footer">
-          <button className="logout-btn" onClick={() => {
-            localStorage.removeItem("admin_token");
-            localStorage.removeItem("admin_info");
-            window.location.href = "/admin-login";
+  db.query("UPDATE bookings SET status=? WHERE id=?", [status, req.params.id], (err) => {
+    if (err) return res.json({ status: "error", error: err });
 
-          }}>
-            Logout
-          </button>
-        </div>
-      </aside>
+    res.json({ status: "success", message: "Status updated" });
+  });
+});
 
-      {/* MAIN */}
-      <main className="adm-main">
-        <div className="adm-header">
-          <h1 className="page-title">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-          </h1>
+// ======================
+// DELETE BOOKING
+// ======================
+router.delete("/bookings/:type/:id", (req, res) => {
+  db.query("DELETE FROM bookings WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.json({ status: "error", error: err });
 
-          <div className="adm-search">
-            <input
-              type="text"
-              placeholder="Search…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
+    res.json({ status: "success", message: "Booking deleted" });
+  });
+});
 
-        {/* DASHBOARD */}
-        {activeTab === "dashboard" && (
-          <div className="cards">
-            <div className="card">
-              <div className="card-title">Total Users</div>
-              <div className="card-value">{users.length}</div>
-            </div>
-
-            <div className="card">
-              <div className="card-title">Total Bookings</div>
-              <div className="card-value">{bookings.length}</div>
-            </div>
-
-            <div className="card">
-              <div className="card-title">Pending</div>
-              <div className="card-value">
-                {bookings.filter((b) => b.status === "pending").length}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* USERS TABLE */}
-        {activeTab === "users" && (
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {loadingUsers ? (
-                  <tr><td colSpan="6">Loading users…</td></tr>
-                ) : filteredUsers.length === 0 ? (
-                  <tr><td colSpan="6">No users found</td></tr>
-                ) : (
-                  filteredUsers.map((u) => (
-                    <tr key={u.id}>
-                      <td>{u.id}</td>
-                      <td>{u.name}</td>
-                      <td>{u.email}</td>
-                      <td>{u.role}</td>
-                      <td>{u.created_at?.slice(0, 10)}</td>
-                      <td>
-                        <button
-                          className="btn danger"
-                          onClick={() => deleteUser(u.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* BOOKINGS TABLE */}
-        {activeTab === "bookings" && (
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Pet</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Day</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {loadingBookings ? (
-                  <tr><td colSpan="7">Loading bookings…</td></tr>
-                ) : filteredBookings.length === 0 ? (
-                  <tr><td colSpan="7">No bookings found</td></tr>
-                ) : (
-                  filteredBookings.map((b) => (
-                    <tr key={b.id}>
-                      <td>{b.id}</td>
-                      <td>{b.user_name}</td>
-                      <td>{b.pet_name}</td>
-                      <td>{b.type}</td>
-
-                      <td>
-                        <select
-                          value={b.status}
-                          onChange={(e) =>
-                            updateStatus(b.type, b.id, e.target.value)
-                          }
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="approved">Approved</option>
-                          <option value="completed">Completed</option>
-                        </select>
-                      </td>
-
-                      <td>{b.day}</td>
-
-                      <td>
-                        <button
-                          className="btn danger"
-                          onClick={() => deleteBooking(b.type, b.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-      </main>
-    </div>
-  );
-}
+module.exports = router;
