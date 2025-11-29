@@ -23,28 +23,17 @@ app.use(express.urlencoded({ extended: true }));
 // ROUTES
 // -----------------------------
 const userRoutes = require("./routes/userRoutes");
-const daycareRoutes = require("./routes/daycareRoutes");
-const hostelRoutes = require("./routes/hostelRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const groomingRoutes = require("./routes/groomingRoutes");
-const walkingRoutes = require("./routes/walkingRoutes");
-const vetcheckRoutes = require("./routes/vetcheckRoutes");
-const foodRoutes = require("./routes/foodRoutes");
 const adminBookingRoutes = require("./routes/adminBookingRoutes");
 const userBookingRoutes = require("./routes/userBookingRoutes");
 const cancelBookingRoutes = require("./routes/cancelBookingRoutes");
-app.use("/bookings", cancelBookingRoutes);
+const bookingRoutes = require("./routes/bookingRoutes");
 
+app.use("/bookings", cancelBookingRoutes);
+app.use("/book", bookingRoutes);
 app.use("/bookings", userBookingRoutes);
 app.use("/admin", adminBookingRoutes);
 app.use("/users", userRoutes);
-app.use("/daycare", daycareRoutes);
-app.use("/hostel", hostelRoutes);
-app.use("/admin", adminRoutes);
-app.use("/grooming", groomingRoutes);
-app.use("/walking", walkingRoutes);
-app.use("/vetcheck", vetcheckRoutes);
-app.use("/food", foodRoutes);
 
 
 // -----------------------------
