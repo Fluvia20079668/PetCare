@@ -68,7 +68,14 @@ export default function Signup() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
+        <input
+          className="auth-input"
+          type="Phone"
+          placeholder="Phone"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         <button className="auth-btn" type="submit">Sign Up</button>
       </form>
 
