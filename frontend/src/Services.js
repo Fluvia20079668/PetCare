@@ -27,6 +27,7 @@ export default function Services() {
   const user = savedUser ? JSON.parse(savedUser) : null;
   const isLoggedIn = user && user.id;
 
+  // Restore service from URL (?book=xxx)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const svcId = params.get("book");
@@ -47,19 +48,26 @@ export default function Services() {
       navigate(`/login?return=${encodeURIComponent(returnUrl)}`);
       return;
     }
+
     setBookingService(svc);
-    setForm({ name: user.name, petName: "", petType: "", slot: "", day: "", description: "" });
+    setForm({
+      name: user.name,
+      petName: "",
+      petType: "",
+      slot: "",
+      day: "",
+      description: ""
+    });
   };
 
   const closeBooking = () => setBookingService(null);
-
   const openDetails = (svc) => {
     setDetailsService(svc);
     document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
   };
-
   const closeDetails = () => setDetailsService(null);
 
+  // ⭐ Universal Booking API
   const confirmBooking = async () => {
     if (!user || !user.id) {
       alert("You must be logged in to book.");
@@ -68,6 +76,7 @@ export default function Services() {
 
     const payload = {
       userId: user.id,
+      serviceType: bookingService.id,
       name: form.name,
       petName: form.petName,
       petType: form.petType,
@@ -76,20 +85,8 @@ export default function Services() {
       description: form.description
     };
 
-    let endpoint = "";
-
-    if (bookingService.id === "daycare") {
-      endpoint = "http://localhost:8080/daycare/book";
-    } else if (bookingService.id === "hostel") {
-      endpoint = "http://localhost:8080/hostel/book";
-    } else {
-      alert(`Booking confirmed for ${bookingService.title}`);
-      closeBooking();
-      return;
-    }
-
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch("http://localhost:8080/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -101,7 +98,7 @@ export default function Services() {
         alert("Booking done successfully!");
         closeBooking();
       } else {
-        alert("Booking failed. Try again.");
+        alert(data.message || "Booking failed. Try again.");
       }
     } catch (err) {
       alert("Server error. Try again.");
@@ -146,7 +143,9 @@ export default function Services() {
               <div className="service-icon">{svc.icon}</div>
               <h3>{svc.title}</h3>
             </div>
+
             <p className="service-desc">{svc.short}</p>
+
             <div className="card-actions">
               <button
                 className="learn-btn"
@@ -157,8 +156,10 @@ export default function Services() {
               >
                 {expandedId === svc.id ? "Hide ▲" : "Learn More ▼"}
               </button>
+
               <button className="book-btn" onClick={() => openBooking(svc)}>Book</button>
             </div>
+
             {expandedId === svc.id && (
               <div className="service-more small">
                 <p>{svc.details}</p>
@@ -168,6 +169,7 @@ export default function Services() {
         ))}
       </div>
 
+      {/* SERVICE DETAILS PANEL */}
       {detailsService && (
         <section id="service-details" className="details-panel">
           <div className="details-inner">
@@ -177,8 +179,11 @@ export default function Services() {
             <div className="details-content">
               <h2>{detailsService.title}</h2>
               <p>{detailsService.details}</p>
+
               <div className="details-actions">
-                <button className="btn-primary" onClick={() => openBooking(detailsService)}>Book Now</button>
+                <button className="btn-primary" onClick={() => openBooking(detailsService)}>
+                  Book Now
+                </button>
                 <button className="btn-outline" onClick={closeDetails}>Close</button>
               </div>
             </div>
@@ -186,6 +191,7 @@ export default function Services() {
         </section>
       )}
 
+      {/* BOOKING MODAL */}
       {bookingService && (
         <div className="booking-overlay" onClick={closeBooking}>
           <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
