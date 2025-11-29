@@ -1,132 +1,330 @@
-const express = require("express");
-const router = express.Router();
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./AdminDashboard.css";
 
-// ======================
-// TEST
-// ======================
-router.get("/test", (req, res) => {
-  res.send("Admin route OK");
-});
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+import { Line, Pie } from "react-chartjs-2";
 
-// ======================
-// ADMIN LOGIN
-// ======================
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-  db.query("SELECT * FROM users WHERE email=?", [email], async (err, result) => {
-    if (err) return res.json({ status: "error", error: err });
+export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [users, setUsers] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-    if (result.length === 0) {
-      return res.json({ status: "fail", message: "User not found" });
-    }
+  // popup
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailBooking, setDetailBooking] = useState(null);
 
-    const admin = result[0];
+  const token = localStorage.getItem("admin_token") || "";
 
-    if (admin.role !== "admin") {
-      return res.json({ status: "fail", message: "Not an admin" });
-    }
-
-    const match = await bcrypt.compare(password, admin.password);
-    if (!match) return res.json({ status: "fail", message: "Wrong password" });
-
-    const token = jwt.sign(
-      { id: admin.id, email: admin.email, role: admin.role },
-      "SECRET_KEY",
-      { expiresIn: "7d" }
-    );
-
-    res.json({
-      status: "success",
-      token,
-      admin: { id: admin.id, name: admin.name, email: admin.email }
-    });
-  });
-});
-
-// ======================
-// GET ALL USERS
-// ======================
-router.get("/users", (req, res) => {
-  db.query(
-    "SELECT id, name, email, role, created_at FROM users",
-    (err, result) => {
-      if (err) return res.json({ status: "error", error: err });
-
-      res.json({
-        status: "success",
-        users: result
+  // Fetchers
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.data.status === "success") setUsers(res.data.users);
+    } catch (err) {
+      console.error("fetchUsers:", err);
     }
+  };
+
+  const fetchBookings = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("http://localhost:8080/admin/bookings", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.status === "success") setBookings(res.data.bookings);
+    } catch (err) {
+      console.error("fetchBookings:", err);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchBookings();
+    // eslint-disable-next-line
+  }, []);
+
+  // actions
+  const deleteUser = async (id) => {
+    if (!window.confirm("Delete this user?")) return;
+    try {
+      await axios.delete(`http://localhost:8080/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
+    }
+  };
+
+  const deleteBooking = async (type, id) => {
+    if (!window.confirm("Delete this booking?")) return;
+    try {
+      await axios.delete(`http://localhost:8080/admin/bookings/${type}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchBookings();
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
+    }
+  };
+
+  const updateStatus = async (type, id, status) => {
+    try {
+      await axios.put(
+        `http://localhost:8080/admin/bookings/${type}/${id}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchBookings();
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    }
+  };
+
+  const openDetails = (b) => {
+    setDetailBooking(b);
+    setDetailsOpen(true);
+  };
+
+  const closeDetails = () => {
+    setDetailBooking(null);
+    setDetailsOpen(false);
+  };
+
+  // SEARCH FILTERS
+  const filteredUsers = users.filter((u) =>
+    (u.name || "").toLowerCase().includes(search.toLowerCase())
   );
-});
 
-// ======================
-// DELETE USER
-// ======================
-router.delete("/users/:id", (req, res) => {
-  db.query("DELETE FROM users WHERE id=?", [req.params.id], (err) => {
-    if (err) return res.json({ status: "error", error: err });
+  const filteredBookings = bookings.filter((b) =>
+    ((b.user_name || "") + " " + (b.pet_name || "") + " " + (b.type || ""))
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
-    res.json({ status: "success", message: "User deleted" });
-  });
-});
-
-// ======================
-// GET ALL BOOKINGS
-// ======================
-router.get("/bookings", (req, res) => {
-  const sql = `
-    SELECT 
-      bookings.id,
-      bookings.userId,
-      bookings.name AS user_name,
-      bookings.petName AS pet_name,
-      bookings.petType,
-      bookings.slot,
-      bookings.day,
-      bookings.serviceType AS type,
-      bookings.description,
-      bookings.status
-    FROM bookings
-    ORDER BY bookings.id DESC
-  `;
-
-  db.query(sql, (err, result) => {
-    if (err) return res.json({ status: "error", error: err });
-
-    res.json({
-      status: "success",
-      bookings: result
+  // CHART DATA
+  const bookingsByService = (() => {
+    const counts = {};
+    bookings.forEach((b) => {
+      const t = b.type || b.serviceType || "unknown";
+      counts[t] = (counts[t] || 0) + 1;
     });
-  });
-});
+    const labels = Object.keys(counts);
+    const data = Object.values(counts);
+    return { labels, data };
+  })();
 
-// ======================
-// UPDATE BOOKING STATUS
-// ======================
-router.put("/bookings/:type/:id", (req, res) => {
-  const { status } = req.body;
+  const bookingsOverTime = (() => {
+    // group by created_at date (YYYY-MM-DD) or day field fallback
+    const counts = {};
+    bookings.forEach((b) => {
+      const dt = (b.created_at && b.created_at.slice(0, 10)) || b.day || "unknown";
+      counts[dt] = (counts[dt] || 0) + 1;
+    });
+    const labels = Object.keys(counts).sort();
+    const data = labels.map((l) => counts[l]);
+    return { labels, data };
+  })();
 
-  db.query("UPDATE bookings SET status=? WHERE id=?", [status, req.params.id], (err) => {
-    if (err) return res.json({ status: "error", error: err });
+  return (
+    <div className="glass-admin">
+      {/* SIDEBAR */}
+      <aside className="glass-sidebar">
+        <div className="glass-brand">
+          <div className="brand-logo">🐾</div>
+          <div>
+            <div className="brand-title">PetCare+</div>
+            <div className="brand-sub">Admin</div>
+          </div>
+        </div>
 
-    res.json({ status: "success", message: "Status updated" });
-  });
-});
+        <nav className="glass-nav">
+          <button className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</button>
+          <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Users</button>
+          <button className={activeTab === "bookings" ? "active" : ""} onClick={() => setActiveTab("bookings")}>Bookings</button>
+        </nav>
 
-// ======================
-// DELETE BOOKING
-// ======================
-router.delete("/bookings/:type/:id", (req, res) => {
-  db.query("DELETE FROM bookings WHERE id=?", [req.params.id], (err) => {
-    if (err) return res.json({ status: "error", error: err });
+        <div className="glass-footer">
+          <button className="logout" onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin-login"; }}>
+            Logout
+          </button>
+        </div>
+      </aside>
 
-    res.json({ status: "success", message: "Booking deleted" });
-  });
-});
+      <main className="glass-main">
+        <header className="glass-header">
+          <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
+          <input className="glass-search" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </header>
 
-module.exports = router;
+        {/* DASHBOARD */}
+        {activeTab === "dashboard" && (
+          <section className="glass-cards">
+            <div className="card glass">
+              <div className="card-title">Total Users</div>
+              <div className="card-value">{users.length}</div>
+            </div>
+
+            <div className="card glass">
+              <div className="card-title">Total Bookings</div>
+              <div className="card-value">{bookings.length}</div>
+            </div>
+
+            <div className="card glass">
+              <div className="card-title">Pending</div>
+              <div className="card-value">{bookings.filter((b) => b.status === "pending").length}</div>
+            </div>
+
+            <div className="card glass">
+              <div className="card-title">Approved</div>
+              <div className="card-value">{bookings.filter((b) => b.status === "pending").length}</div>
+            </div>
+
+            <div className="big-graphs">
+              <div className="graph-card glass">
+                <h3>Bookings by Service</h3>
+                <Pie data={{
+                  labels: bookingsByService.labels,
+                  datasets: [{ data: bookingsByService.data, backgroundColor: ['#4c84ff','#6ee7b7','#f59e0b','#fb7185','#a78bfa','#60a5fa'] }]
+                }} />
+              </div>
+
+              <div className="graph-card glass">
+                <h3>Bookings over Time</h3>
+                <Line data={{
+                  labels: bookingsOverTime.labels,
+                  datasets: [{ label: 'Bookings', data: bookingsOverTime.data, fill: true, tension: 0.3 }]
+                }} />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* USERS */}
+        {activeTab === "users" && (
+          <section>
+            <div className="glass-table-wrap">
+              <table className="glass-table">
+                <thead>
+                  <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((u) => (
+                    <tr key={u.id}>
+                      <td>{u.id}</td>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>{u.phone || "-"}</td>
+                      <td>{u.role || "user"}</td>
+                      <td>{u.created_at ? u.created_at.slice(0,10) : "-"}</td>
+                      <td><button className="btn danger" onClick={() => deleteUser(u.id)}>Delete</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* BOOKINGS */}
+        {activeTab === "bookings" && (
+          <section>
+            <div className="glass-table-wrap">
+              <table className="glass-table">
+                <thead>
+                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Service</th><th>Status</th><th>Day</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan="7">Loading…</td></tr>
+                  ) : filteredBookings.length === 0 ? (
+                    <tr><td colSpan="7">No bookings found</td></tr>
+                  ) : filteredBookings.map((b) => (
+                    <tr key={b.id}>
+                      <td>{b.id}</td>
+                      <td>{b.user_name}</td>
+                      <td>{b.pet_name}</td>
+                      <td>{b.type}</td>
+                      <td>
+                        <select className="status" value={b.status} onChange={(e) => updateStatus(b.type, b.id, e.target.value)}>
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                      </td>
+                      <td>{b.day}</td>
+                      <td className="actions">
+                        <button className="btn view" onClick={() => openDetails(b)}>View</button>
+                        <button className="btn danger" onClick={() => deleteBooking(b.type, b.id)}>Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+      </main>
+
+      {/* DETAILS POPUP */}
+      {detailsOpen && detailBooking && (
+        <div className="modal-backdrop" onClick={closeDetails}>
+          <div className="modal glass" onClick={(e) => e.stopPropagation()}>
+            <header className="modal-header">
+              <h3>Booking Details</h3>
+              <button className="close" onClick={closeDetails}>✕</button>
+            </header>
+
+            <div className="modal-body">
+              <p><strong>ID:</strong> {detailBooking.id}</p>
+              <p><strong>User:</strong> {detailBooking.user_name} (#{detailBooking.userId})</p>
+              <p><strong>Service:</strong> {detailBooking.type}</p>
+              <p><strong>Pet:</strong> {detailBooking.pet_name} — {detailBooking.petType}</p>
+              <p><strong>Slot & Day:</strong> {detailBooking.slot} • {detailBooking.day}</p>
+              <p><strong>Description:</strong><br/>{detailBooking.description || "-"}</p>
+              <p><strong>Status:</strong> {detailBooking.status}</p>
+              <p><strong>Created:</strong> {detailBooking.created_at || "-"}</p>
+            </div>
+
+            <footer className="modal-footer">
+              <button className="btn" onClick={() => { updateStatus(detailBooking.type, detailBooking.id, "approved"); closeDetails(); }}>Approve</button>
+              <button className="btn danger" onClick={() => { updateStatus(detailBooking.type, detailBooking.id, "cancelled"); closeDetails(); }}>Cancel Booking</button>
+            </footer>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
