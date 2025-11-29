@@ -30,8 +30,13 @@ const groomingRoutes = require("./routes/groomingRoutes");
 const walkingRoutes = require("./routes/walkingRoutes");
 const vetcheckRoutes = require("./routes/vetcheckRoutes");
 const foodRoutes = require("./routes/foodRoutes");
+const adminBookingRoutes = require("./routes/adminBookingRoutes");
+const userBookingRoutes = require("./routes/userBookingRoutes");
+const cancelBookingRoutes = require("./routes/cancelBookingRoutes");
+app.use("/bookings", cancelBookingRoutes);
 
-
+app.use("/bookings", userBookingRoutes);
+app.use("/admin", adminBookingRoutes);
 app.use("/users", userRoutes);
 app.use("/daycare", daycareRoutes);
 app.use("/hostel", hostelRoutes);
