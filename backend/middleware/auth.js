@@ -1,26 +1,24 @@
-// backend/middleware/authAdmin.js
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-const SECRET = process.env.JWT_SECRET || "SECRET_KEY";
+const SECRET = process.env.JWT_SECRET || 'SECRET_KEY';
 
-function authAdmin(req, res, next) {
+function adminAuth(req, res, next) {
   const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ status: "fail", message: "No token" });
-
-  const token = auth.split(" ")[1];
-  if (!token) return res.status(401).json({ status: "fail", message: "Invalid token" });
-
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ status: 'fail', message: 'Unauthorized' });
+  }
+  const token = auth.split(' ')[1];
   try {
     const payload = jwt.verify(token, SECRET);
-    if (payload.role !== "admin") {
-      return res.status(403).json({ status: "fail", message: "Forbidden" });
+    // ensure role admin
+    if (payload.role !== 'admin') {
+      return res.status(403).json({ status: 'fail', message: 'Forbidden' });
     }
-    // attach user info for convenience
     req.admin = payload;
     next();
   } catch (err) {
-    return res.status(401).json({ status: "fail", message: "Token invalid" });
+    return res.status(401).json({ status: 'fail', message: 'Invalid token' });
   }
 }
 
-module.exports = authAdmin;
+module.exports = adminAuth;

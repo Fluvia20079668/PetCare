@@ -37,16 +37,18 @@ export default function AdminDashboard() {
   //  FETCH BOOKINGS
   // -------------------------------
   const fetchBookings = async () => {
-  try {
-    const res = await fetch("http://localhost:8080/admin/bookings");
-    const data = await res.json();
-    if (data.status === "success") {
-      setBookings(data.bookings);
+    setLoadingBookings(true);
+    try {
+      const res = await fetch("http://localhost:8080/admin/bookings", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.status === "success") setBookings(data.bookings);
+    } catch (err) {
+      console.log("Bookings load error:", err);
     }
-  } catch (err) {
-    console.log("Error loading bookings", err);
-  }
-};
+    setLoadingBookings(false);
+  };
 
   // -------------------------------
   //  DELETE USER
