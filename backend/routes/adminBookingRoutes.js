@@ -9,9 +9,9 @@ router.get("/", (req, res) => {
       b.id,
       b.userId,
       u.name AS user_name,
-      b.service AS type,
+      b.serviceType AS type,
       b.petName AS pet_name,
-      b.date AS day,
+      b.day,
       b.slot,
       b.status,
       b.created_at,
@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
     FROM bookings b
     LEFT JOIN users u ON b.userId = u.id
     ORDER BY b.id DESC
-  `;
+`;
 
   db.query(sql, (err, result) => {
     if (err) return res.json({ status: "error", error: err.message });
