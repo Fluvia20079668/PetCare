@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
       b.status,
       b.created_at,
       b.description
-    FROM all_bookings b
+    FROM bookings b
     LEFT JOIN users u ON b.userId = u.id
     ORDER BY b.id DESC
   `;
@@ -46,7 +46,7 @@ router.put("/:id", (req, res) => {
     return res.json({ status: "error", error: "No fields provided" });
   }
 
-  const sql = `UPDATE all_bookings SET ${fields.join(", ")} WHERE id = ?`;
+  const sql = `UPDATE bookings SET ${fields.join(", ")} WHERE id = ?`;
   values.push(id);
 
   db.query(sql, values, (err) => {
@@ -57,7 +57,7 @@ router.put("/:id", (req, res) => {
 
 // DELETE BOOKING
 router.delete("/:id", (req, res) => {
-  db.query("DELETE FROM all_bookings WHERE id = ?", [req.params.id], (err) => {
+  db.query("DELETE FROM bookings WHERE id = ?", [req.params.id], (err) => {
     if (err) return res.json({ status: "error", error: err.message });
     res.json({ status: "success", message: "Booking deleted" });
   });
