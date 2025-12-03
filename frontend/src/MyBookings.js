@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { getUser } from "../utils/auth";
-import "./MyBookings.css"; 
+import { getUser } from "./utils/auth";
+
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -16,7 +16,7 @@ export default function MyBookings() {
     const fetchBookings = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/bookings/user/${userId}`
+          `http://localhost:3000/api/bookings/user/${userId}`
         );
         setBookings(response.data);
       } catch (error) {

@@ -75,6 +75,7 @@ export default function Home() {
         backgroundRepeat: "no-repeat",
       }}
     >
+      const user = getUser();
       {/* NAVBAR */}
       <nav className="pc-nav">
         <div className="pc-logo">🐾 PetCare+</div>
@@ -124,40 +125,37 @@ export default function Home() {
         </div>
       </nav>
       
+  {isLoggedIn() && user && (
   <div className="user-dropdown">
-  <img
-    src={user.avatar || "/default-avatar.png"}
-    alt="avatar"
-    className="user-avatar"
-  />
-<div className="dropdown-menu">
-    <p className="dropdown-name">{user.name}</p>
-    <hr />
+    <img
+      src={user.avatar || "/default-avatar.png"}
+      alt="avatar"
+      className="user-avatar"
+    />
+    <div className="dropdown-menu">
+      <p className="dropdown-name">{user.name}</p>
+      <hr />
 
-<button
-      className="dropdown-item"
-      onClick={() => navigate("/profile")}
-    >
-      Profile
-    </button>
-    <button
-      className="dropdown-item"
-      onClick={() => navigate("/profile")}
-    >
-      Profile
-    </button>
+      <button
+        className="dropdown-item"
+        onClick={() => navigate("/profile")}
+      >
+        Profile
+      </button>
 
-    <button
-      className="dropdown-item logout"
-      onClick={() => {
-        logoutUser();
-        window.location.reload();
-      }}
-    >
-      Logout
-    </button>
+      <button
+        className="dropdown-item logout"
+        onClick={() => {
+          logoutUser();
+          window.location.reload();
+        }}
+      >
+        Logout
+      </button>
+    </div>
   </div>
-</div>
+)}
+
 
       {/* HERO SECTION */}
       <header id="home" className="hero">
