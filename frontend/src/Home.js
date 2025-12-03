@@ -114,7 +114,7 @@ export default function Home() {
                 className="btn-outline"
                 onClick={() => {
                   logoutUser();
-                  window.location.reload(); // refresh navbar
+                  window.location.reload();
                 }}
               >
                 Logout
@@ -123,6 +123,17 @@ export default function Home() {
           )}
         </div>
       </nav>
+      
+  <div className="user-dropdown">
+  <img
+    src={user.avatar || "/default-avatar.png"}
+    alt="avatar"
+    className="user-avatar"
+  />
+<div className="dropdown-menu">
+    <p className="dropdown-name">{user.name}</p>
+    <hr />
+</div>
 
 
       {/* HERO SECTION */}
