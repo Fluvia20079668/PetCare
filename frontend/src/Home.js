@@ -133,8 +133,31 @@ export default function Home() {
 <div className="dropdown-menu">
     <p className="dropdown-name">{user.name}</p>
     <hr />
-</div>
 
+<button
+      className="dropdown-item"
+      onClick={() => navigate("/profile")}
+    >
+      Profile
+    </button>
+    <button
+      className="dropdown-item"
+      onClick={() => navigate("/profile")}
+    >
+      Profile
+    </button>
+
+    <button
+      className="dropdown-item logout"
+      onClick={() => {
+        logoutUser();
+        window.location.reload();
+      }}
+    >
+      Logout
+    </button>
+  </div>
+</div>
 
       {/* HERO SECTION */}
       <header id="home" className="hero">
