@@ -1,17 +1,14 @@
-// simple auth helpers using localStorage
-export function setUser(user) {
-  localStorage.setItem("petcare_user", JSON.stringify(user));
-}
+export const isLoggedIn = () => !!localStorage.getItem("user");
 
-export function getUser() {
-  const s = localStorage.getItem("petcare_user");
-  return s ? JSON.parse(s) : null;
-}
+export const getUser = () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
 
-export function clearUser() {
-  localStorage.removeItem("petcare_user");
-}
+export const loginUser = (userData) => {
+  localStorage.setItem("user", JSON.stringify(userData));
+};
 
-export function isLoggedIn() {
-  return Boolean(getUser());
-}
+export const logoutUser = () => {
+  localStorage.removeItem("user");
+};
