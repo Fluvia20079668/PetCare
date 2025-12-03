@@ -85,6 +85,18 @@ router.get("/me", authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });
 
+//booking details in avatar
+
+router.get("/user/:userId", (req, res) => {
+  const { userId } = req.params;
+
+  const query = "SELECT * FROM bookings WHERE userId = ?";
+  db.query(query, [userId], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+});
+
 module.exports = router;
 
 

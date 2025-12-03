@@ -208,10 +208,70 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   color: #fff;
   font-weight: 600;
 }
+/* Avatar container */
 .user-dropdown {
   position: relative;
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+
+/* Circular avatar */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+/* Dropdown box */
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 160px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 20;
+}
+
+/* Show dropdown on hover */
+.user-dropdown:hover .dropdown-menu {
+  display: flex;
+}
+
+/* Text name on top */
+.dropdown-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+/* Items */
+.dropdown-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+  border-radius: 6px;
+}
+
+.dropdown-item:hover {
+  background: #f0f0f0;
+}
+
+/* Logout in red */
+.logout {
+  color: red;
 }
 
