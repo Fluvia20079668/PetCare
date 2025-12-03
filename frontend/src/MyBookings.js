@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { getUser } from "../utils/auth";
+import "./MyBookings.css"; 
 
-function MyBookings() {
+export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Assuming you save logged-in user ID in localStorage
-  const userId = localStorage.getItem("userId");
+  
+  // Get logged-in user details
+  const user = getUser();
+  const userId = user?._id;
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/bookings/user/${userId}`
+          `http://localhost:8080/api/bookings/user/${userId}`
         );
         setBookings(response.data);
       } catch (error) {
@@ -23,10 +27,17 @@ function MyBookings() {
     };
 
     if (userId) fetchBookings();
+    else setLoading(false);
   }, [userId]);
 
-  if (loading) return <p>Loading...</p>;
-
+  if (!userId)
+    return (
+      <div className="my-bookings">
+        <h2>My Bookings</h2>
+        <p>You must be logged in to view your bookings.</p>
+      </div>
+    );
+if (loading) return <p className="loading-text">Loading bookings...</p>;
   return (
     <div className="my-bookings">
       <h2>My Bookings</h2>
@@ -48,5 +59,3 @@ function MyBookings() {
     </div>
   );
 }
-
-export default MyBookings;

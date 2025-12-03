@@ -10,6 +10,8 @@ import About from "./About";
 import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import AdminProtected from "./AdminProtected";
+import MyBookings from "./MyBookings";
+
 
 
 export default function App() {
