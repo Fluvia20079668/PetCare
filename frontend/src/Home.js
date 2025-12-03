@@ -51,6 +51,7 @@ const SERVICES = [
 
 export default function Home() {
   const [modalService, setModalService] = useState(null);
+  const [showMenu, setShowMenu] = useState(false); // 👈 Dropdown state
   const navigate = useNavigate();
 
   const openService = (svc) => setModalService(svc);
@@ -62,6 +63,11 @@ export default function Home() {
       return;
     }
     navigate(`/booking?service=${encodeURIComponent(svc.id)}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Clear login
+    window.location.reload(); // Refresh UI
   };
 
   return (
@@ -77,15 +83,73 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="pc-nav">
         <div className="pc-logo">🐾 PetCare+</div>
+
         <ul className="pc-links">
           <li><a href="/">Home</a></li>
           <li><a href="/about">About</a></li>
           <li><a href="/services">Services</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
-        <div className="pc-auth">
-          <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
-          <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
+
+        {/* AUTH / AVATAR SECTION */}
+        <div className="pc-auth" style={{ position: "relative" }}>
+          {!isLoggedIn() ? (
+            <>
+              <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
+              <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
+            </>
+          ) : (
+            <>
+              {/* Avatar */}
+              <img
+                src="https://i.pravatar.cc/40"
+                alt="avatar"
+                onClick={() => setShowMenu(!showMenu)}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+              />
+
+              {/* Dropdown */}
+              {showMenu && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50px",
+                    right: 0,
+                    width: "150px",
+                    background: "white",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                    zIndex: 10,
+                  }}
+                >
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      border: "none",
+                      background: "none",
+                      textAlign: "left",
+                      cursor: "pointer",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.target.style.background = "#f5f5f5")
+                    }
+                    onMouseOut={(e) =>
+                      (e.target.style.background = "transparent")
+                    }
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </nav>
 
@@ -97,14 +161,11 @@ export default function Home() {
             Professional daycare, safe hostels, grooming and premium services —
             everything your pet needs.
           </p>
-          <div className="hero-ctas">
-          </div>
+          <div className="hero-ctas"></div>
         </div>
 
-        <div className="hero-right slide-in-right">
-        </div>
+        <div className="hero-right slide-in-right"></div>
       </header>
-
 
       {/* MODAL */}
       {modalService && (
