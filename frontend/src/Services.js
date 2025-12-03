@@ -27,7 +27,7 @@ export default function Services() {
   const user = savedUser ? JSON.parse(savedUser) : null;
   const isLoggedIn = user && user.id;
 
-  // Restore service from URL (?book=xxx)
+ 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const svcId = params.get("book");
@@ -39,6 +39,14 @@ export default function Services() {
   useEffect(() => {
     if (bookingService && user) {
       setForm((p) => ({ ...p, name: user.name || "" }));
+    }
+  }, [bookingService, user]);
+
+  useEffect(() => {
+    if (detailsService) {
+       document.getElementById("service-details")?.scrollIntoView({
+        behavior: "smooth"
+      });
     }
   }, [bookingService, user]);
 
