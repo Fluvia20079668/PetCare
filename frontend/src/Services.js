@@ -14,6 +14,9 @@ const ALL_SERVICES = [
   { id: "food", title: "Pet Food Delivery", short: "Healthy food delivered to your doorstep.", details: "Premium diet plans, fast delivery & monthly subscription options.", icon: <FaBone size={36} color="#008c95" />, image: BANNER_IMAGE }
 ];
 
+// below code  is for when you cilick on booking button it shows all the booking feild and 
+// when you click on learn more it shows the details 
+
 export default function Services() {
   const [bookingService, setBookingService] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
@@ -23,7 +26,7 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const savedUser = localStorage.getItem("user");
+  const savedUser = localStorage.getItem("user");//get user from local storage
   const user = savedUser ? JSON.parse(savedUser) : null;
   const isLoggedIn = user && user.id;
 
@@ -33,12 +36,12 @@ export default function Services() {
     const svcId = params.get("book");
     if (!svcId) return;
     const svc = ALL_SERVICES.find((x) => x.id === svcId);
-    if (svc) setBookingService(svc);
+    if (svc) setBookingService(svc); // gives the booking popup 
   }, [location.search]);
 
   useEffect(() => {
     if (bookingService && user) {
-      setForm((p) => ({ ...p, name: user.name || "" }));
+      setForm((p) => ({ ...p, name: user.name || "" }));// shows the name of loged user
     }
   }, [bookingService, user]);
 
@@ -48,8 +51,8 @@ export default function Services() {
         behavior: "smooth"
       });
     }
-  }, [bookingService, user]);
-
+  }, [detailsService]);
+// if iser is not loged in sed to login page
   const openBooking = (svc) => {
     if (!isLoggedIn) {
       const returnUrl = `/services?book=${svc.id}`;
@@ -69,18 +72,20 @@ export default function Services() {
   };
 
   const closeBooking = () => setBookingService(null);
-  const openDetails = (svc) => {
-    setDetailsService(svc);
+  
+  
     useEffect(() => {
   if (detailsService) {
     document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
   }
 }, [detailsService]);
+    const openDetails = (svc) => {
+    setDetailsService(svc);
 
   };
   const closeDetails = () => setDetailsService(null);
 
-  // ⭐ Universal Booking API
+  //  Universal Booking API
   const confirmBooking = async () => {
     if (!user || !user.id) {
       alert("You must be logged in to book.");
