@@ -208,4 +208,10 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   color: #fff;
   font-weight: 600;
 }
+.user-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
 
