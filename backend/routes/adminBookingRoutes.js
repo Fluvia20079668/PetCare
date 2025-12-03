@@ -35,12 +35,12 @@ router.put("/:id", (req, res) => {
   const fields = [];
   const values = [];
 
-  if (status !== undefined) { fields.push("status = ?"); values.push(status); }
-  if (service !== undefined) { fields.push("service = ?"); values.push(service); }
-  if (petName !== undefined) { fields.push("petName = ?"); values.push(petName); }
-  if (date !== undefined) { fields.push("date = ?"); values.push(date); }
-  if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
-  if (description !== undefined) { fields.push("description = ?"); values.push(description); }
+if (status !== undefined) { fields.push("status = ?"); values.push(status); }
+if (serviceType !== undefined) { fields.push("serviceType = ?"); values.push(serviceType); }
+if (petName !== undefined) { fields.push("petName = ?"); values.push(petName); }
+if (day !== undefined) { fields.push("day = ?"); values.push(day); }
+if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
+if (description !== undefined) { fields.push("description = ?"); values.push(description); }
 
   if (fields.length === 0) {
     return res.json({ status: "error", error: "No fields provided" });

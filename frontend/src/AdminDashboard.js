@@ -11,10 +11,10 @@ import {
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -23,7 +23,8 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 // set axios default baseURL if your server runs at a specific host
@@ -128,7 +129,7 @@ export default function AdminDashboard() {
   };
 
   // SEARCH FILTERS
-  const lowerSearch = search.toLowerCase();
+  const lower = search.toLowerCase();
   const filteredUsers = users.filter(
     (u) =>
       (u.name || "").toLowerCase().includes(lower) ||
@@ -177,7 +178,7 @@ return { labels, data: labels.map((l) => map[l]) };
   const totalUsers = users.length;
   const totalBookings = bookings.length;
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
-  const approvedCount = bookings.filter((b) => b.status === "approved").length;
+  const approved  = bookings.filter((b) => b.status === "approved").length;
   const cancelledCount = bookings.filter((b) => b.status === "cancelled").length;
 
   return (

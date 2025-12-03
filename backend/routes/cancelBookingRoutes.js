@@ -10,7 +10,7 @@ router.put("/cancel/:id", (req, res) => {
 
   db.query(sql, [id], (err, result) => {
     if (err) {
-      console.error("❌ DB Error:", err);
+      console.error("DB Error:", err);
       return res.json({ status: "error", message: "Database error" });
     }
 
