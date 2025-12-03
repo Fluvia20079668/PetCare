@@ -11,7 +11,7 @@ router.post("/", (req, res) => {
   if (!userId || !serviceType || !petName || !day || !slot) {
     return res.json({
       status: "error",
-      message: "All required fields are not provided",
+      message: "Please fill the missing fields",
     });
   }
 
