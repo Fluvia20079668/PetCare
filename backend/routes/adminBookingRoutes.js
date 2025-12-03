@@ -28,29 +28,40 @@ router.get("/", (req, res) => {
 });
 
 // UPDATE BOOKING
-router.put("/:id", (req, res) => {
+router.put("/bookings/:id", (req, res) => {
   const id = req.params.id;
-  const { status, service, petName, date, slot, description } = req.body;
+  const {
+    status,
+    serviceType,
+    petName,
+    day,
+    slot,
+    description
+  } = req.body;
 
   const fields = [];
   const values = [];
 
-if (status !== undefined) { fields.push("status = ?"); values.push(status); }
-if (serviceType !== undefined) { fields.push("serviceType = ?"); values.push(serviceType); }
-if (petName !== undefined) { fields.push("petName = ?"); values.push(petName); }
-if (day !== undefined) { fields.push("day = ?"); values.push(day); }
-if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
-if (description !== undefined) { fields.push("description = ?"); values.push(description); }
+  if (status !== undefined) { fields.push("status = ?"); values.push(status); }
+  if (serviceType !== undefined) { fields.push("serviceType = ?"); values.push(serviceType); }
+  if (petName !== undefined) { fields.push("petName = ?"); values.push(petName); }
+  if (day !== undefined) { fields.push("day = ?"); values.push(day); }
+  if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
+  if (description !== undefined) { fields.push("description = ?"); values.push(description); }
 
   if (fields.length === 0) {
-    return res.json({ status: "error", error: "No fields provided" });
+    return res.status(400).json({ status: "error", error: "No valid fields provided" });
   }
 
-  const sql = `UPDATE bookings SET ${fields.join(", ")} WHERE id = ?`;
   values.push(id);
 
-  db.query(sql, values, (err) => {
-    if (err) return res.json({ status: "error", error: err.message });
+  const sql = `UPDATE bookings SET ${fields.join(", ")} WHERE id = ?`;
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Update failed:", err);
+      return res.status(500).json({ status: "error", error: err.message });
+    }
     res.json({ status: "success", message: "Booking updated" });
   });
 });
