@@ -8,7 +8,8 @@ const db = require("../db");
 router.post("/", (req, res) => {
   const { userId, serviceType, petName, day, slot, description } = req.body;
 
-  if (!userId || !serviceType || !petName || !day || !slot) {
+  if (!userId || !serviceType || !petName || !day || !slot) 
+    {
     return res.json({
       status: "error",
       message: "Please fill the missing fields",
@@ -25,7 +26,7 @@ router.post("/", (req, res) => {
     [userId, serviceType, petName, day, slot, description || ""],
     (err, result) => {
       if (err) {
-        console.error("❌ Insert Error:", err);
+        console.error("Insert Error:", err);
         return res.json({
           status: "error",
           message: "Failed to create booking",
@@ -72,23 +73,28 @@ router.get("/", (req, res) => {
    UPDATE BOOKING
 ====================================================== */
 router.put("/:id", (req, res) => {
-  const id = req.params.id;
-  const { status, serviceType, petName, day, slot, description } = req.body;
+  const { status } = req.body;
 
-  const sql = `
-    UPDATE bookings 
-    SET status=?, serviceType=?, petName=?, day=?, slot=?, description=?
-    WHERE id=?
-  `;
+  if (!status) {
+    return res.json({
+      status: "error",
+      message: "Status is required",
+    });
+  }
 
-  db.query(
-    sql,
-    [status, serviceType, petName, day, slot, description, id],
-    (err) => {
-      if (err) return res.json({ status: "error", error: err.message });
-      res.json({ status: "success", message: "Booking updated" });
+  const sql = "UPDATE bookings SET status=? WHERE id=?";
+
+  db.query(sql, [status, req.params.id], (err) => {
+    if (err) {
+      console.error("Update Error:", err);
+      return res.json({ status: "error", error: err.message });
     }
-  );
+
+    res.json({
+      status: "success",
+      message: "Booking status updated",
+    });
+  });
 });
 
 /* ======================================================
