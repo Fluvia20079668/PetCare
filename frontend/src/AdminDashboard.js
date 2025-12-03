@@ -1,4 +1,3 @@
-// src/components/AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminDashboard.css";
@@ -27,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-// optional: set axios default baseURL if your server runs at a specific host
+// set axios default baseURL if your server runs at a specific host
 axios.defaults.baseURL = process.env.REACT_APP_API_BASE || "http://localhost:8080";
 
 export default function AdminDashboard() {
@@ -39,15 +38,14 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [error, setError] = useState(null);
 
-  // popup
+  // model for viewing booking details
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailBooking, setDetailBooking] = useState(null);
 
+  //JWT token from localstor
   const token = localStorage.getItem("admin_token") || "";
-
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
-
-  // Fetchers
+  //  Fetch users
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
@@ -61,7 +59,7 @@ export default function AdminDashboard() {
       setLoadingUsers(false);
     }
   };
-
+//Fetch Bookings done by cosomers
   const fetchBookings = async () => {
     setLoadingBookings(true);
     try {
@@ -69,42 +67,42 @@ export default function AdminDashboard() {
       if (res.data.status === "success") setBookings(res.data.bookings || []);
       else setError(res.data.error || "Failed to fetch bookings");
     } catch (err) {
-      console.error("fetchBookings:", err);
-      setError(err.message || "fetchBookings error");
-    } finally {
+      setError("fetchBookings error");
+    } 
       setLoadingBookings(false);
-    }
+    
   };
 
   useEffect(() => {
     fetchUsers();
     fetchBookings();
-    // eslint-disable-next-line
+   
   }, []);
 
-  // actions
+  // Delete users from admin  
   const deleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
     try {
       await axios.delete(`/admin/users/${id}`, { headers: authHeaders });
       await fetchUsers();
-    } catch (err) {
-      console.error(err);
-      alert("Delete failed");
+    } catch  
+    {
+      alert("Failed to delete user");
     }
   };
-
+// Delete booking 
   const deleteBooking = async (id) => {
     if (!window.confirm("Delete this booking?")) return;
     try {
       await axios.delete(`/admin/bookings/${id}`, { headers: authHeaders });
       await fetchBookings();
-    } catch (err) {
-      console.error(err);
+    } catch 
+     {
+     
       alert("Delete failed");
     }
   };
-
+//Upadte the Booking status 
   const updateStatus = async (id, status) => {
     try {
       await axios.put(
@@ -112,9 +110,9 @@ export default function AdminDashboard() {
         { status },
         { headers: { ...authHeaders, "Content-Type": "application/json" } }
       );
-      await fetchBookings();
-    } catch (err) {
-      console.error(err);
+      fetchBookings();
+    } catch 
+    {
       alert("Update failed");
     }
   };
@@ -133,8 +131,8 @@ export default function AdminDashboard() {
   const lowerSearch = search.toLowerCase();
   const filteredUsers = users.filter(
     (u) =>
-      (u.name || "").toLowerCase().includes(lowerSearch) ||
-      (u.email || "").toLowerCase().includes(lowerSearch)
+      (u.name || "").toLowerCase().includes(lower) ||
+      (u.email || "").toLowerCase().includes(lower)
   );
 
   const filteredBookings = bookings.filter((b) =>
@@ -148,32 +146,32 @@ export default function AdminDashboard() {
       (b.day || "")
     )
       .toLowerCase()
-      .includes(lowerSearch)
+      .includes(lower)
   );
 
-  // CHART DATA
-  const bookingsByService = (() => {
-    const counts = {};
-    bookings.forEach((b) => {
-      const t = b.type || b.service || "unknown";
-      counts[t] = (counts[t] || 0) + 1;
-    });
-    const labels = Object.keys(counts);
-    const data = Object.values(counts);
-    return { labels, data };
-  })();
+  // chart data about  bookings
+const bookingsByService = (() => {
+const map = {};
+bookings.forEach((b) => {
+const service = b.type || "Unknown";
+map[service] = (map[service] || 0) + 1;
+});
+return { labels: Object.keys(map), data: Object.values(map) };
+})();
 
-  const bookingsOverTime = (() => {
-    // group by created_at date (YYYY-MM-DD) or day field fallback
-    const counts = {};
-    bookings.forEach((b) => {
-      const dt = (b.created_at && b.created_at.slice(0, 10)) || (b.day && ("" + b.day).slice(0, 10)) || "unknown";
-      counts[dt] = (counts[dt] || 0) + 1;
-    });
-    const labels = Object.keys(counts).sort();
-    const data = labels.map((l) => counts[l]);
-    return { labels, data };
-  })();
+
+const bookingsOverTime = (() => {
+const map = {};
+bookings.forEach((b) => {
+const date = (b.created_at || "").slice(0, 10);
+if (!date) return;
+map[date] = (map[date] || 0) + 1;
+});
+
+
+const labels = Object.keys(map).sort();
+return { labels, data: labels.map((l) => map[l]) };
+})();
 
   // dashboard counters
   const totalUsers = users.length;
@@ -195,9 +193,15 @@ export default function AdminDashboard() {
         </div>
 
         <nav className="glass-nav">
-          <button className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</button>
-          <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Users</button>
-          <button className={activeTab === "bookings" ? "active" : ""} onClick={() => setActiveTab("bookings")}>Bookings</button>
+        <button onClick={() => setActiveTab("dashboard")} className={activeTab === "dashboard" ? "active" : ""}>
+        Dashboard
+        </button>
+        <button onClick={() => setActiveTab("users")} className={activeTab === "users" ? "active" : ""}>
+        Users
+        </button>
+        <button onClick={() => setActiveTab("bookings")} className={activeTab === "bookings" ? "active" : ""}>
+        Bookings
+        </button>
         </nav>
 
         <div className="glass-footer">
@@ -234,8 +238,8 @@ export default function AdminDashboard() {
             </div>
 
             <div className="card glass">
-              <div className="card-title">Approved</div>
-              <div className="card-value">{loadingBookings ? "…" : approvedCount}</div>
+            <div className="card-title">Approved</div>
+            <div className="card-value">{approved}</div>
             </div>
 
             <div className="card glass">
