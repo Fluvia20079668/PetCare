@@ -63,7 +63,12 @@ export default function Services() {
   const closeBooking = () => setBookingService(null);
   const openDetails = (svc) => {
     setDetailsService(svc);
+    useEffect(() => {
+  if (detailsService) {
     document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
+  }
+}, [detailsService]);
+
   };
   const closeDetails = () => setDetailsService(null);
 
