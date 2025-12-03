@@ -1,4 +1,6 @@
-export const isLoggedIn = () => !!localStorage.getItem("user");
+export const isLoggedIn = () => {
+  return !!localStorage.getItem("user");
+};
 
 export const getUser = () => {
   const user = localStorage.getItem("user");

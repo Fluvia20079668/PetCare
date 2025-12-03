@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs"); // ✅ using bcryptjs
 const jwt = require("jsonwebtoken");
 const db = require("../db");
+const authMiddleware = require("../middleware/auth");
 
 // ✅ USER SIGNUP
 router.post("/signup", (req, res) => {
@@ -79,6 +80,9 @@ router.post("/login", (req, res) => {
       }
     });
   });
+});
+router.get("/me", authMiddleware, (req, res) => {
+  res.json({ user: req.user });
 });
 
 module.exports = router;

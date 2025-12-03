@@ -1,7 +1,6 @@
-// Home.js - Clean Vibrant Pet-Themed UI
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isLoggedIn } from "./utils/auth";
+import { isLoggedIn, getUser, logoutUser } from "./utils/auth";
 import "./Home.css";
 
 const SERVICES = [
@@ -53,6 +52,8 @@ export default function Home() {
   const [modalService, setModalService] = useState(null);
   const navigate = useNavigate();
 
+  const user = getUser(); // shows the current user who logged in
+
   const openService = (svc) => setModalService(svc);
   const closeModal = () => setModalService(null);
 
@@ -83,11 +84,46 @@ export default function Home() {
           <li><a href="/services">Services</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
-        <div className="pc-auth">
-          <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
-          <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
+
+         <div className="pc-auth">
+          {!isLoggedIn() ? (
+            <>
+              <button
+                className="btn-outline"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <div className="user-box">
+              <img
+                src={user.avatar || "/default-avatar.png"}
+                alt="avatar"
+                className="user-avatar"
+              />
+              <span className="user-name">{user.name}</span>
+
+              <button
+                className="btn-outline"
+                onClick={() => {
+                  logoutUser();
+                  window.location.reload(); // refresh navbar
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </nav>
+
 
       {/* HERO SECTION */}
       <header id="home" className="hero">

@@ -26,13 +26,24 @@ export default function Login() {
 
       const data = await res.json();
 
+      console.log("LOGIN RESPONSE:", data);
+
       if (data.status === "success") {
         // Save login session
         localStorage.setItem("token", data.token);
+        
+          const userWithAvatar = {
+          name: data.user.name || data.user.username || data.user.fullName || "User",
+          email: data.user.email,
+          role: data.user.role || "user",
+          avatar: data.user.avatar || "/default-avatar.png"
+        };
+
+        // Save user to localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Redirect depending on role
-        if (data.user.role === "admin") {
+        if (userWithAvatar.role === "admin") {
           navigate("/admin");
         } else {
           navigate(returnUrl || "/services");
@@ -42,6 +53,7 @@ export default function Login() {
         setShowPopup(true);
       }
     } catch (error) {
+      console.error("Login error:", error);
       setShowPopup(true);
     }
   };

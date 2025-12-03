@@ -190,3 +190,22 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
     display: none;
   }
 }
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+.user-name {
+  color: #fff;
+  font-weight: 600;
+}
+
