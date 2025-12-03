@@ -81,54 +81,104 @@ export default function Home() {
       }}
     >
       {/* NAVBAR */}
-      <nav className="pc-nav">
-        <div className="pc-logo">🐾 PetCare+</div>
+     {/* NAVBAR */}
+<nav className="pc-nav">
+  <div className="pc-logo">🐾 PetCare+</div>
 
-        <ul className="pc-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/services">Services</a></li>
-          <li><a href="/contact">Contact</a></li>
-        </ul>
+  <ul className="pc-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/services">Services</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
 
-        {/* AUTH / AVATAR SECTION */}
-        <div className="pc-auth" style={{ position: "relative" }}>
-          {!isLoggedIn() ? (
-            <>
-              <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
-              <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
-            </>
-          ) : (
-            <>
-              {/* Avatar */}
-              <img
-                src="https://i.pravatar.cc/40"
-                alt="avatar"
-                onClick={() => setShowMenu(!showMenu)}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                }}
-              />
+  {/* AUTH / AVATAR */}
+  <div className="pc-auth" style={{ position: "relative" }}>
+    {!isLoggedIn() ? (
+      <>
+        <button className="btn-outline" onClick={() => navigate("/login")}>
+          Login
+        </button>
+        <button className="btn-primary" onClick={() => navigate("/signup")}>
+          Sign Up
+        </button>
+      </>
+    ) : (
+      <>
+        {(() => {
+          const user = JSON.parse(localStorage.getItem("user"));
+          const avatar = user?.avatar;
+          const name = user?.name || "User";
+
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {/* Avatar or Initial */}
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="avatar"
+                  onClick={() => setShowMenu(!showMenu)}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                  }}
+                />
+              ) : (
+                <div
+                  onClick={() => setShowMenu(!showMenu)}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    background: "#ffb84c",
+                    color: "white",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
+                  {name.charAt(0).toUpperCase()}
+                </div>
+              )}
 
               {/* Dropdown */}
               {showMenu && (
                 <div
                   style={{
                     position: "absolute",
-                    top: "50px",
+                    top: "55px",
                     right: 0,
-                    width: "150px",
+                    width: "180px",
                     background: "white",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-                    zIndex: 10,
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+                    zIndex: 20,
+                    padding: "10px 0",
                   }}
                 >
+                  <div
+                    style={{
+                      padding: "10px 15px",
+                      borderBottom: "1px solid #eee",
+                      fontSize: "14px",
+                      color: "#555",
+                    }}
+                  >
+                    Signed in as <br />
+                    <strong>{name}</strong>
+                  </div>
+
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      localStorage.removeItem("user");
+                      window.location.reload();
+                    }}
                     style={{
                       width: "100%",
                       padding: "10px",
@@ -136,6 +186,7 @@ export default function Home() {
                       background: "none",
                       textAlign: "left",
                       cursor: "pointer",
+                      fontSize: "15px",
                     }}
                     onMouseOver={(e) =>
                       (e.target.style.background = "#f5f5f5")
@@ -148,10 +199,14 @@ export default function Home() {
                   </button>
                 </div>
               )}
-            </>
-          )}
-        </div>
-      </nav>
+            </div>
+          );
+        })()}
+      </>
+    )}
+  </div>
+</nav>
+
 
       {/* HERO SECTION */}
       <header id="home" className="hero">
