@@ -28,7 +28,7 @@ router.get("/", (req, res) => {
 });
 
 // UPDATE BOOKING
-router.put("/bookings/:id", (req, res) => {
+router.put("/:id", (req, res) => {
   const id = req.params.id;
   const {
     status,
@@ -57,7 +57,7 @@ router.put("/bookings/:id", (req, res) => {
 
   const sql = `UPDATE bookings SET ${fields.join(", ")} WHERE id = ?`;
 
-  db.query(sql, values, (err, result) => {
+  db.query(sql, values, (err)=> {
     if (err) {
       console.error("Update failed:", err);
       return res.status(500).json({ status: "error", error: err.message });

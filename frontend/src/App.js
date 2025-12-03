@@ -24,7 +24,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
-
+        
         {/* ✅ Admin Protected Route */}
         <Route
           path="/admin"
