@@ -1,0 +1,87 @@
+.my-bookings {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.my-bookings h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Booking list layout */
+.booking-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Individual booking card */
+.booking-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Booking title */
+.booking-card h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Booking text lines */
+.booking-card p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #555;
+}
+
+/* Status badge */
+.booking-card p strong {
+  color: #333;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+/* Status colors */
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Empty state */
+.no-bookings {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 18px;
+  color: #777;
+}

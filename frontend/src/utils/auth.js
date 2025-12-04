@@ -14,3 +14,14 @@ export const loginUser = (userData) => {
 export const logoutUser = () => {
   localStorage.removeItem("user");
 };
+// Save user to localStorage after login
+export function setUser(user) {
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  } else {
+    localStorage.removeItem("user");
+  }
+}
+export function logout() {
+  localStorage.removeItem("user");
+}
