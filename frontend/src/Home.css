@@ -208,7 +208,6 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   color: #fff;
   font-weight: 600;
 }
-/*dropdown container*/ 
 /* Position the whole dropdown container */
 .user-dropdown-container {
   position: relative;
@@ -217,8 +216,8 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   gap: 10px;
 }
 
-/* The user initial circle */
-.user-initial-circle {
+/* The user initial circle*/
+.user-initial-circle { 
   width: 40px;
   height: 40px;
   background: #ff6f61;
@@ -237,21 +236,21 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   transform: scale(1.1);
 }
 
-/* Dropdown menu style */
+/* Dropdown menu style- */
 .dropdown-menu {
   position: absolute;
-  top: 50px;              /* below the circle */
+  top: 50px;             
   right: 0;
   background: white;
   padding: 10px 0;
   width: 160px;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
-  display: block;         /* IMPORTANT: always block; visibility controlled by JSX */
-  z-index: 9999;          /* IMPORTANT: above everything else */
+  display: block;         
+  z-index: 9999;   
 }
 
-/* Dropdown items */
+/* Dropdown  shows the items */
 .dropdown-item {
   padding: 10px 15px;
   cursor: pointer;
