@@ -22,7 +22,7 @@ export default function Services() {
   const [detailsService, setDetailsService] = useState(null);
 
   const { user, logout } = useContext(AuthContext);
-  const isLoggedIn = !!user?._id;
+  const isLoggedIn = !!user?.id;
 
   const navigate = useNavigate();
   const location = useLocation();
