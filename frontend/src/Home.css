@@ -208,105 +208,58 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   color: #fff;
   font-weight: 600;
 }
-/* Avatar container */
-.user-dropdown {
+/*dropdown container*/ 
+/* Position the whole dropdown container */
+.user-dropdown-container {
   position: relative;
   display: flex;
   align-items: center;
-  cursor: pointer;
+  gap: 10px;
 }
 
-/* Circular avatar */
-.user-avatar {
+/* The user initial circle */
+.user-initial-circle {
   width: 40px;
   height: 40px;
+  background: #ff6f61;
+  color: white;
   border-radius: 50%;
-  border: 2px solid white;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-/* Dropdown box */
+.user-initial-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Dropdown menu style */
 .dropdown-menu {
   position: absolute;
-  top: 50px;
+  top: 50px;              /* below the circle */
   right: 0;
-  width: 160px;
   background: white;
+  padding: 10px 0;
+  width: 160px;
   border-radius: 10px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 20;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+  display: block;         /* IMPORTANT: always block; visibility controlled by JSX */
+  z-index: 9999;          /* IMPORTANT: above everything else */
 }
 
-/* Show dropdown on hover */
-.user-dropdown:hover .dropdown-menu {
-  display: flex;
-}
-
-/* Text name on top */
-.dropdown-name {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 5px;
-  color: #444;
-}
-
-/* Items */
+/* Dropdown items */
 .dropdown-item {
-  background: none;
-  border: none;
-  text-align: left;
-  padding: 8px;
-  width: 100%;
-  font-size: 14px;
+  padding: 10px 15px;
   cursor: pointer;
-  color: #333;
-  border-radius: 6px;
+  transition: 0.2s;
+  font-size: 15px;
 }
 
 .dropdown-item:hover {
   background: #f0f0f0;
-}
-
-/* Logout in red */
-.logout {
-  color: red;
-}
-/*To make the dropdown work beautifully:*--reference from W3 school a*/ 
-.dropbtn {
-  background-color: #3498DB;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-}
-
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #2980B9;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
 }
 
