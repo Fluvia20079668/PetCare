@@ -1,77 +1,121 @@
-import React, { useState } from "react";
+// Import React and hooks for component behavior
+import React, { useState, useRef, useEffect } from "react";
+
+// Used for programmatic navigation (redirects)
 import { useNavigate } from "react-router-dom";
+
+// Custom function to get logged-in user from localStorage
 import { getUser } from "./utils/auth";
+
+// Importing styles
 import "./Home.css";
 
+// Predefined service list for modal display
 const SERVICES = [
   {
     id: "daycare",
     title: "Daycare",
-    short: "Safe & playful day environment for pets.",
-    details:
-      "Full-day supervision, playtime, feeding, and short walks. Staffed by trained carers."
+    short: "Safe & playful environment.",
+    details: "Full-day supervision, playtime, feeding, and walks."
   },
   {
     id: "hostel",
     title: "Hostel",
-    short: "Comfortable overnight stays with supervision.",
-    details:
-      "Overnight accommodation, regular feeding, temperature-controlled rooms and nightly checks."
+    short: "Comfortable overnight stays.",
+    details: "Temperature-controlled rooms and nightly checks."
   },
   {
     id: "grooming",
     title: "Grooming",
-    short: "Professional grooming for cats & dogs.",
-    details:
-      "Bathing, brushing, nail trimming and coat styling performed by experienced groomers."
+    short: "Professional pet grooming.",
+    details: "Bathing, nail trimming and styling."
   },
   {
     id: "walking",
     title: "Pet Walking",
-    short: "Daily walks tailored to your pet’s needs.",
-    details:
-      "Short/long walks, solo or group, enrichment activities and GPS-tracked routes (optional)."
+    short: "Daily walks for your pet.",
+    details: "GPS-tracked routes and enrichment activities."
   },
   {
     id: "vetcheck",
     title: "Veterinary Checkup",
-    short: "Routine health check and vaccinations.",
-    details:
-      "Qualified vets for routine checkups, vaccination checks and basic medical advice."
+    short: "Routine health checks.",
+    details: "Vaccinations and general health assessment."
   },
   {
     id: "food",
     title: "Food Delivery",
-    short: "Healthy pet food delivered to your door.",
-    details:
-      "Premium food brands, subscription or one-off deliveries. Custom diet plans available."
+    short: "Healthy pet food delivered.",
+    details: "Premium brands, home delivery."
   }
 ];
 
 export default function Home() {
+  // Tracks which service modal is currently open
   const [modalService, setModalService] = useState(null);
+
+  // Tracks whether user dropdown (My Bookings, Logout) is visible
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // react-router navigation hook
   const navigate = useNavigate();
 
-  const user = getUser(); // current logged in user
+  // Get logged-in user (null if not logged in)
+  const user = getUser();
 
+  // Refs help detect clicks outside dropdown UI
+  const dropdownRef = useRef(null);
+  const circleRef = useRef(null);
+
+  // Close dropdown when user clicks outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      // Only act if dropdown is open
+      if (!showDropdown) return;
+
+      // If click is inside dropdown → ignore
+      if (dropdownRef.current && dropdownRef.current.contains(e.target)) return;
+
+      // If click is on the user circle → ignore (toggle handled separately)
+      if (circleRef.current && circleRef.current.contains(e.target)) return;
+
+      // Otherwise → close dropdown
+      setShowDropdown(false);
+    }
+
+    // Attach listener for outside click detection
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Remove listener when component unmounts
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDropdown]); // re-run when dropdown visibility changes
+
+  // Opens modal for selected service
   const openService = (svc) => setModalService(svc);
+
+  // Close modal
   const closeModal = () => setModalService(null);
 
+  // "Book Now" button handler
   const handleBookNow = (svc) => {
+    // If user not logged in → redirect to login
     if (!user) {
       navigate("/login", { state: { redirect: "/booking", service: svc.id } });
       return;
     }
+
+    // If logged in → go directly to booking page with service ID
     navigate(`/booking?service=${encodeURIComponent(svc.id)}`);
   };
 
+  // Logout: remove user + token, close dropdown, reload home screen
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    navigate("/");
-    window.location.reload();
+
+    setShowDropdown(false); // close menu
+    navigate("/");          // go home
+    window.location.reload(); // force refresh auth state
   };
 
   return (
@@ -84,10 +128,14 @@ export default function Home() {
         backgroundRepeat: "no-repeat"
       }}
     >
-      {/* NAVBAR */}
+
+      {/* --------------- NAVBAR SECTION --------------- */}
       <nav className="pc-nav">
+        
+        {/* Left side logo */}
         <div className="pc-logo">🐾 PetCare+</div>
 
+        {/* Middle navigation links */}
         <ul className="pc-links">
           <li><a href="/">Home</a></li>
           <li><a href="/about">About</a></li>
@@ -95,37 +143,55 @@ export default function Home() {
           <li><a href="/contact">Contact</a></li>
         </ul>
 
-        {/* RIGHT SIDE USER AREA */}
+        {/* Right side → login/signup OR user dropdown */}
         <div className="pc-auth">
+
+          {/* If user NOT logged in → show login + signup */}
           {!user ? (
             <>
-              <button className="btn-outline" onClick={() => navigate("/login")}>
-                Login
-              </button>
-
-              <button className="btn-primary" onClick={() => navigate("/signup")}>
-                Sign Up
-              </button>
+              <button className="btn-outline" onClick={() => navigate("/login")}>Login</button>
+              <button className="btn-primary" onClick={() => navigate("/signup")}>Sign Up</button>
             </>
           ) : (
+
+            /* If logged in → show user dropdown menu */
             <div className="user-dropdown-container">
-              
-              {/* CIRCLE WITH USER INITIAL */}
+
+              {/* Circle with first letter of user name */}
               <div
+                ref={circleRef}
                 className="user-initial-circle"
-                onClick={() => setShowDropdown(!showDropdown)}
+                onClick={() => setShowDropdown(prev => !prev)} // toggle dropdown
               >
                 {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
 
-              {/* Username next to circle */}
+              {/* Show username beside circle */}
               <span className="username">{user.name || "User"}</span>
 
-              {/* DROPDOWN MENU */}
+              {/* Actual dropdown menu */}
               {showDropdown && (
-                <div className="dropdown-menu">
-                  <p onClick={() => navigate("/mybookings")}>My Bookings</p>
-                  <p onClick={handleLogout}>Logout</p>
+                <div ref={dropdownRef} className="dropdown-menu">
+                  
+                  {/* "My Bookings" → go to bookings page */}
+                  <p
+                    className="dropdown-item"
+                    onClick={() => {
+                      setShowDropdown(false);
+                      navigate("/mybookings");
+                    }}
+                  >
+                    My Bookings
+                  </p>
+
+                  {/* Logout */}
+                  <p
+                    className="dropdown-item"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </p>
+
                 </div>
               )}
             </div>
@@ -133,29 +199,31 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO SECTION */}
+
+      {/* --------------- HERO SECTION --------------- */}
       <header id="home" className="hero">
         <div className="hero-left slide-in-left">
           <h1>Your Pet’s Health, Our Priority</h1>
-          <p>
-            Professional daycare, safe hostels, grooming and premium services —
-            everything your pet needs.
-          </p>
-          <div className="hero-ctas"></div>
+          <p>Professional daycare, grooming and premium services.</p>
         </div>
 
-        <div className="hero-right slide-in-right"></div>
+        <div className="hero-right slide-in-right" />
       </header>
 
-      {/* MODAL */}
+
+      {/* --------------- SERVICES MODAL --------------- */}
       {modalService && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal slide-up" onClick={(e) => e.stopPropagation()}>
+            
             <h3>{modalService.title}</h3>
             <p>{modalService.details}</p>
 
             <div className="modal-actions">
-              <button className="btn-primary" onClick={() => handleBookNow(modalService)}>
+              <button
+                className="btn-primary"
+                onClick={() => handleBookNow(modalService)}
+              >
                 Book Now
               </button>
 
@@ -163,10 +231,10 @@ export default function Home() {
                 Close
               </button>
             </div>
+
           </div>
         </div>
       )}
-
     </div>
   );
 }
