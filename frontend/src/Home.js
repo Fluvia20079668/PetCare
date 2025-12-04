@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isLoggedIn, getUser, logoutUser } from "./utils/auth";
+import { getUser} from "./utils/auth";
 import "./Home.css";
 
 const SERVICES = [
@@ -50,6 +50,7 @@ const SERVICES = [
 
 export default function Home() {
   const [modalService, setModalService] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);//Dropdown toggle state
   const navigate = useNavigate();
 
   const user = getUser(); // shows the current user who logged in
@@ -58,12 +59,21 @@ export default function Home() {
   const closeModal = () => setModalService(null);
 
   const handleBookNow = (svc) => {
-    if (!isLoggedIn()) {
+    if (!user) {
       navigate("/login", { state: { redirect: "/booking", service: svc.id } });
       return;
     }
     navigate(`/booking?service=${encodeURIComponent(svc.id)}`);
   };
+//when the user logout
+  const handleLogout = () => {
+    localStorage.removeItem("user");//Remove user details
+    localStorage.removeItem("token");//)Remove auth token
+
+    navigate("/");//Redirect to home
+    window.location.reload();//Force a full refresh to reset app state
+  };
+
 
   return (
     <div
@@ -75,7 +85,6 @@ export default function Home() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      const user = getUser();
       {/* NAVBAR */}
       <nav className="pc-nav">
         <div className="pc-logo">🐾 PetCare+</div>
@@ -87,7 +96,7 @@ export default function Home() {
         </ul>
 
          <div className="pc-auth">
-          {!isLoggedIn() ? (
+          {!user ?  (
             <>
               <button
                 className="btn-outline"
@@ -103,58 +112,31 @@ export default function Home() {
               </button>
             </>
           ) : (
-            <div className="user-box">
+<div
+              className="user-dropdown"
+              onMouseEnter={() => setShowDropdown(true)}
+              onMouseLeave={() => setShowDropdown(false)}
+            >
+              {/* CIRCULAR AVATAR */}
               <img
                 src={user.avatar || "/default-avatar.png"}
                 alt="avatar"
                 className="user-avatar"
               />
-              <span className="user-name">{user.name}</span>
 
-              <button
-                className="btn-outline"
-                onClick={() => {
-                  logoutUser();
-                  window.location.reload();
-                }}
-              >
-                Logout
-              </button>
+              <span className="username">{user.name || "User"}</span>
+
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <p onClick={() => navigate("/profile")}>Profile</p>
+                  <p onClick={() => navigate("/mybookings")}>My Bookings</p>
+                  <p onClick={handleLogout}>Logout</p>
+                </div>
+              )}
             </div>
           )}
         </div>
       </nav>
-      
-  {isLoggedIn() && user && (
-  <div className="user-dropdown">
-    <img
-      src={user.avatar || "/default-avatar.png"}
-      alt="avatar"
-      className="user-avatar"
-    />
-    <div className="dropdown-menu">
-      <p className="dropdown-name">{user.name}</p>
-      <hr />
-
-      <button
-        className="dropdown-item"
-        onClick={() => navigate("/profile")}
-      >
-        Profile
-      </button>
-
-      <button
-        className="dropdown-item logout"
-        onClick={() => {
-          logoutUser();
-          window.location.reload();
-        }}
-      >
-        Logout
-      </button>
-    </div>
-  </div>
-)}
 
 
       {/* HERO SECTION */}
