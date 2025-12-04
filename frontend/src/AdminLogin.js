@@ -12,7 +12,7 @@ export default function AdminLogin() {
     e.preventDefault();
     setError("");
 
-    try {
+    //try {
       const res = await fetch("http://localhost:8080/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -20,7 +20,7 @@ export default function AdminLogin() {
       });
 
       const data = await res.json();
-
+console.log(data);
       if (data.status !== "success") {
         setError(data.message || "Invalid details");
         return;
@@ -32,9 +32,9 @@ export default function AdminLogin() {
 
       navigate("/admin"); // redirect to dashboard
 
-    } catch (err) {
-      setError("Server not responding");
-    }
+    //} catch (err) {
+      //setError("Server not responding");
+   // }
   }
 
   return (

@@ -1,5 +1,3 @@
-// MyBookings.js
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./MyBookings.css";
@@ -11,7 +9,7 @@ export default function MyBookings() {
   const [error, setError] = useState(null);
 
   const user = getUser();
-  const userId = user?._id;
+  const userId = user?.id;
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -22,10 +20,10 @@ export default function MyBookings() {
 
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/bookings/user/${userId}`
+          `http://localhost:8080/users/user/${userId}`
         );
 
-        const data = res.data.bookings ?? res.data;
+       const data = res.data;
         setBookings(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error fetching bookings:", err);
