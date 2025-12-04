@@ -77,6 +77,11 @@ export default function Services() {
       day: form.day,
       description: form.description
     };
+    // Input validation
+    if (!payload.petName || !payload.day || !payload.slot) {
+        alert("Please ensure Pet Name, Day, and Time Slot are selected.");
+        return;
+    }
 
     try {
       const res = await fetch("http://localhost:8080/book", {
