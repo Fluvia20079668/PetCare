@@ -1,7 +1,9 @@
+// MyBookings.js
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { getUser } from "./utils/auth";
 import "./MyBookings.css";
+import { getUser } from "./utils/auth";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -13,19 +15,18 @@ export default function MyBookings() {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!userId) return; // Only fetch if logged in
+      if (!userId) return;
+
       setLoading(true);
       setError(null);
 
       try {
-        const response = await axios.get(
+        const res = await axios.get(
           `http://localhost:3000/api/bookings/user/${userId}`
         );
 
-        // Handle both response shapes: array or { bookings: [...] }
-        const data = response.data.bookings ?? response.data;
+        const data = res.data.bookings ?? res.data;
         setBookings(Array.isArray(data) ? data : []);
-        console.log("Bookings fetched:", data);
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings. Please try again later.");
@@ -37,12 +38,11 @@ export default function MyBookings() {
     fetchBookings();
   }, [userId]);
 
-  // If user is not logged in
   if (!userId) {
     return (
       <div className="my-bookings">
         <h2>My Bookings</h2>
-        <p>Login to view your bookings.</p>
+        <p className="no-bookings">Login to view your bookings.</p>
       </div>
     );
   }
@@ -52,20 +52,22 @@ export default function MyBookings() {
       <h2>My Bookings</h2>
 
       {loading && <p className="loading-text">Loading bookings...</p>}
-
       {error && <p className="error-text">{error}</p>}
-
-      {!loading && bookings.length === 0 && <p>No bookings found.</p>}
+      {!loading && bookings.length === 0 && (
+        <p className="no-bookings">No bookings found.</p>
+      )}
 
       {!loading && bookings.length > 0 && (
         <div className="booking-list">
           {bookings.map((b) => (
             <div key={b._id} className="booking-card">
               <h3>{b.serviceName}</h3>
+
               <p>
                 <strong>Date:</strong>{" "}
                 {new Date(b.date).toLocaleDateString()}
               </p>
+
               <p>
                 <strong>Time:</strong>{" "}
                 {new Date(b.date).toLocaleTimeString([], {
@@ -73,8 +75,12 @@ export default function MyBookings() {
                   minute: "2-digit",
                 })}
               </p>
+
               <p>
-                <strong>Status:</strong> {b.status}
+                <strong>Status:</strong>{" "}
+                <span className={`status ${b.status.toLowerCase()}`}>
+                  {b.status}
+                </span>
               </p>
             </div>
           ))}

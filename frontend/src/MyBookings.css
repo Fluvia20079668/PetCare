@@ -85,3 +85,53 @@
   font-size: 18px;
   color: #777;
 }
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+/* ...existing styles... */
+
+/* Status badge */
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+/* Status colors */
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Loading & empty states */
+.loading-text,
+.error-text,
+.no-bookings {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #555;
+}
+
+.error-text {
+  color: #d9534f;
+}

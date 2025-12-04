@@ -1,3 +1,5 @@
+// Login.js
+
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthForm.css";
@@ -10,7 +12,6 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Read return URL from query string if user was redirected
   const params = new URLSearchParams(location.search);
   const returnUrl = params.get("return") || "/services";
 
@@ -25,31 +26,31 @@ export default function Login() {
       });
 
       const data = await res.json();
-
       console.log("LOGIN RESPONSE:", data);
 
       if (data.status === "success") {
-        // Save login session
+        // Save token
         localStorage.setItem("token", data.token);
-        
-          const userWithAvatar = {
-          name: data.user.name || data.user.username || data.user.fullName || "User",
+
+        // Save full user (THIS WAS THE ISSUE!)
+        const userData = {
+          _id: data.user._id,          // REQUIRED FOR BOOKINGS
+          name: data.user.name,
           email: data.user.email,
           role: data.user.role || "user",
           avatar: data.user.avatar || "/default-avatar.png"
         };
 
-        // Save user to localStorage
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(userData));
 
-        // Redirect depending on role
-        if (userWithAvatar.role === "admin") {
+        // Redirect based on role
+        if (userData.role === "admin") {
           navigate("/admin");
         } else {
           navigate(returnUrl || "/services");
         }
-
-      } else {
+      } 
+      else {
         setShowPopup(true);
       }
     } catch (error) {
@@ -86,7 +87,6 @@ export default function Login() {
         ← Back to Home
       </p>
 
-      {/* Popup for invalid login */}
       <div className={`popup-slide ${showPopup ? "show" : ""}`}>
         <h3>Invalid Credentials</h3>
         <p>Email or password is incorrect.</p>
