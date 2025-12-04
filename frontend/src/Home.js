@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser} from "./utils/auth";
+import { getUser } from "./utils/auth";
 import "./Home.css";
 
 const SERVICES = [
@@ -50,10 +50,11 @@ const SERVICES = [
 
 export default function Home() {
   const [modalService, setModalService] = useState(null);
-  const [showDropdown, setShowDropdown] = useState(false);//Dropdown toggle state
+  const [showDropdown, setShowDropdown] = useState(false);
+
   const navigate = useNavigate();
 
-  const user = getUser(); // shows the current user who logged in
+  const user = getUser(); // current logged in user
 
   const openService = (svc) => setModalService(svc);
   const closeModal = () => setModalService(null);
@@ -65,15 +66,13 @@ export default function Home() {
     }
     navigate(`/booking?service=${encodeURIComponent(svc.id)}`);
   };
-//when the user logout
+
   const handleLogout = () => {
-    localStorage.removeItem("user");//Remove user details
-    localStorage.removeItem("token");//)Remove auth token
-
-    navigate("/");//Redirect to home
-    window.location.reload();//Force a full refresh to reset app state
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/");
+    window.location.reload();
   };
-
 
   return (
     <div
@@ -82,12 +81,13 @@ export default function Home() {
         backgroundImage: 'url("/pet-directory.jpg")',
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        backgroundRepeat: "no-repeat"
       }}
     >
       {/* NAVBAR */}
       <nav className="pc-nav">
         <div className="pc-logo">🐾 PetCare+</div>
+
         <ul className="pc-links">
           <li><a href="/">Home</a></li>
           <li><a href="/about">About</a></li>
@@ -95,40 +95,35 @@ export default function Home() {
           <li><a href="/contact">Contact</a></li>
         </ul>
 
-         <div className="pc-auth">
-          {!user ?  (
+        {/* RIGHT SIDE USER AREA */}
+        <div className="pc-auth">
+          {!user ? (
             <>
-              <button
-                className="btn-outline"
-                onClick={() => navigate("/login")}
-              >
+              <button className="btn-outline" onClick={() => navigate("/login")}>
                 Login
               </button>
-              <button
-                className="btn-primary"
-                onClick={() => navigate("/signup")}
-              >
+
+              <button className="btn-primary" onClick={() => navigate("/signup")}>
                 Sign Up
               </button>
             </>
           ) : (
-<div
-              className="user-dropdown"
-              onMouseEnter={() => setShowDropdown(true)}
-              onMouseLeave={() => setShowDropdown(false)}
-            >
-              {/* CIRCULAR AVATAR */}
-              <img
-                src={user.avatar || "/default-avatar.png"}
-                alt="avatar"
-                className="user-avatar"
-              />
+            <div className="user-dropdown-container">
+              
+              {/* CIRCLE WITH USER INITIAL */}
+              <div
+                className="user-initial-circle"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              </div>
 
+              {/* Username next to circle */}
               <span className="username">{user.name || "User"}</span>
 
+              {/* DROPDOWN MENU */}
               {showDropdown && (
                 <div className="dropdown-menu">
-                  <p onClick={() => navigate("/profile")}>Profile</p>
                   <p onClick={() => navigate("/mybookings")}>My Bookings</p>
                   <p onClick={handleLogout}>Logout</p>
                 </div>
@@ -138,7 +133,6 @@ export default function Home() {
         </div>
       </nav>
 
-
       {/* HERO SECTION */}
       <header id="home" className="hero">
         <div className="hero-left slide-in-left">
@@ -147,14 +141,11 @@ export default function Home() {
             Professional daycare, safe hostels, grooming and premium services —
             everything your pet needs.
           </p>
-          <div className="hero-ctas">
-          </div>
+          <div className="hero-ctas"></div>
         </div>
 
-        <div className="hero-right slide-in-right">
-        </div>
+        <div className="hero-right slide-in-right"></div>
       </header>
-
 
       {/* MODAL */}
       {modalService && (
@@ -162,13 +153,12 @@ export default function Home() {
           <div className="modal slide-up" onClick={(e) => e.stopPropagation()}>
             <h3>{modalService.title}</h3>
             <p>{modalService.details}</p>
+
             <div className="modal-actions">
-              <button
-                className="btn-primary"
-                onClick={() => handleBookNow(modalService)}
-              >
+              <button className="btn-primary" onClick={() => handleBookNow(modalService)}>
                 Book Now
               </button>
+
               <button className="btn-outline" onClick={closeModal}>
                 Close
               </button>
@@ -176,6 +166,7 @@ export default function Home() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

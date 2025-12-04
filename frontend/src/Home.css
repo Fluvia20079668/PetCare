@@ -320,40 +320,6 @@ html,body,#root { height: 100%; margin: 0; font-family: "Inter", system-ui; }
   background: #f7f7f7;
 }
 
-.user-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  gap: 10px;
-}
-
-.user-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid white;
-  object-fit: cover;
-}
-
-.username {
-  font-weight: 600;
-  color: #fff;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 55px;
-  right: 0;
-  background: white;
-  color: black;
-  border-radius: 10px;
-  padding: 10px 0;
-  width: 150px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  animation: fadeIn 0.2s ease;
-  z-index: 10;
-}
 
 .dropdown-menu p {
   padding: 10px 15px;
