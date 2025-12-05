@@ -62,13 +62,13 @@ export default function Services() {
   const closeDetails = () => setDetailsService(null);
 
   const confirmBooking = async () => {
-    if (!user || !user._id) {
+    if (!user || !user.id) {
       alert("You must be logged in to book.");
       return;
     }
 
     const payload = {
-      userId: user._id,
+      userId: user.id,
       serviceType: bookingService.id,
       name: form.name,
       petName: form.petName,

@@ -306,48 +306,66 @@ return { labels, data: labels.map((l) => map[l]) };
           </section>
         )}
 
-        {/* BOOKINGS */}
-        {activeTab === "bookings" && (
-          <section>
-            <div className="glass-table-wrap">
-              <table className="glass-table">
-                <thead>
-                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Service</th><th>Status</th><th>Day</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                  {loadingBookings ? (
-                    <tr><td colSpan="7">Loading…</td></tr>
-                  ) : filteredBookings.length === 0 ? (
-                    <tr><td colSpan="7">No bookings found</td></tr>
-                  ) : filteredBookings.map((b) => (
-                    <tr key={b.id}>
-                      <td>{b.id}</td>
-                      <td>{b.user_name || `#${b.userId}`}</td>
-                      <td>{b.pet_name || b.petName}</td>
-                      <td>{b.type || b.service}</td>
-                      <td>
-                        <select className="status" value={b.status} onChange={(e) => updateStatus(b.id, e.target.value)}>
-                          <option value="pending">Pending</option>
-                          <option value="approved">Approved</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td>{b.day || b.date}</td>
-                      <td className="actions">
-                        <button className="btn view" onClick={() => openDetails(b)}>View</button>
-                        <button className="btn danger" onClick={() => deleteBooking(b.id)}>Delete</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+     
+       {/* BOOKINGS */}
+{activeTab === "bookings" && (
+  <section>
+    <div className="glass-table-wrap">
+      <table className="glass-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Pet</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Day</th>
+            <th>Time</th>  {/* <-- Added */}
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      </main>
+        <tbody>
+          {loadingBookings ? (
+            <tr><td colSpan="8">Loading…</td></tr>
+          ) : filteredBookings.length === 0 ? (
+            <tr><td colSpan="8">No bookings found</td></tr>
+          ) : filteredBookings.map((b) => (
+            <tr key={b.id}>
+              <td>{b.id}</td>
+              <td>{b.user_name || `#${b.userId}`}</td>
+              <td>{b.pet_name || b.petName}</td>
+              <td>{b.type || b.service}</td>
 
+              <td>
+                <select
+                  className="status"
+                  value={b.status}
+                  onChange={(e) => updateStatus(b.id, e.target.value)}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </td>
+
+              <td>{b.day || b.date}</td>
+              <td>{b.time || b.appointment_time}</td> {/* <-- Added */}
+              
+              <td className="actions">
+                <button className="btn view" onClick={() => openDetails(b)}>View</button>
+                <button className="btn danger" onClick={() => deleteBooking(b.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
+
+</main>
       {/* DETAILS POPUP */}
       {detailsOpen && detailBooking && (
         <div className="modal-backdrop" onClick={closeDetails}>
