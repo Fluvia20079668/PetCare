@@ -45,7 +45,23 @@ const handleCancel = async (id) => {
     ));
   };
 
+//The user can edit Booking
+const saveEdit = async () => {
+    await axios.put(
+      `http://localhost:8080/bookings/user/${editBooking.id}`,
+      {
+        day: editBooking.day,
+        slot: editBooking.slot,
+        description: editBooking.description,
+      }
+    );
 
+    setBookings(bookings.map(b =>
+      b.id === editBooking.id ? editBooking : b
+    ));
+
+    setEditBooking(null);
+  };
 
   if (!userId) {
     return (
