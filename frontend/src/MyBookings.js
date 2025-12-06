@@ -38,7 +38,7 @@ export default function MyBookings() {
 const handleCancel = async (id) => {
     if (!window.confirm("Cancel this booking?")) return;
 
-    await axios.delete(`http://localhost:8080/bookings/user/${id}`);
+    await axios.delete(`http://localhost:8080/book/user/${id}`);
 
     setBookings(bookings.map(b =>
       b.id === id ? { ...b, status: "cancelled" } : b
@@ -47,14 +47,16 @@ const handleCancel = async (id) => {
 
 //The user can edit Booking
 const saveEdit = async () => {
-    await axios.put(
-      `http://localhost:8080/bookings/user/${editBooking.id}`,
-      {
-        day: editBooking.day,
-        slot: editBooking.slot,
-        description: editBooking.description,
-      }
-    );
+  console.log("EDIT ID:", editBooking.id);
+ 
+  await axios.put(
+  `http://localhost:8080/bookings/user/${editBooking.id}`,
+  {
+    day: editBooking.day,
+    slot: editBooking.slot,
+    description: editBooking.description,
+  }
+);
 
     setBookings(bookings.map(b =>
       b.id === editBooking.id ? editBooking : b
