@@ -122,6 +122,22 @@ router.put("/user/:id", (req, res) => {
   });
 });
 
+/* ======================================================
+   USER: CANCEL BOOKING
+====================================================== */
+router.delete("/user/:id", (req, res) => {
+  const sql = "UPDATE bookings SET status='cancelled' WHERE id=?";
+
+  db.query(sql, [req.params.id], (err) => {
+    if (err) return res.json({ status: "error", error: err.message });
+
+    res.json({
+      status: "success",
+      message: "Booking cancelled",
+    });
+  });
+});
+
 
 /* ======================================================
    DELETE BOOKING
