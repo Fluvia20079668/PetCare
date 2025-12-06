@@ -7,7 +7,7 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [editBooking, setEditBooking] = useState(null);//user can edit the Booking
   const user = getUser();
   const userId = user?.id;
 
@@ -22,9 +22,7 @@ export default function MyBookings() {
         const res = await axios.get(
           `http://localhost:8080/users/user/${userId}`
         );
-
-       const data = res.data;
-        setBookings(Array.isArray(data) ? data : []);
+        setBookings(res.data);
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings. Please try again later.");
