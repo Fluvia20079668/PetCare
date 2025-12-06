@@ -313,7 +313,7 @@ return { labels, data: labels.map((l) => map[l]) };
             <div className="glass-table-wrap">
               <table className="glass-table">
                 <thead>
-                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Service</th><th>Status</th><th>Day</th><th>Time</th><th>Actions</th></tr>
+                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Service</th><th>Status</th><th>Day</th><th>Slot</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                   {loadingBookings ? (
@@ -335,7 +335,7 @@ return { labels, data: labels.map((l) => map[l]) };
                         </select>
                       </td>
                       <td>{b.day || b.date}</td>
-                      <td>{b.time || b.appointment_time}</td>
+                      <td>{b.slot}</td>
                       <td className="actions">
                         <button className="btn view" onClick={() => openDetails(b)}>View</button>
                         <button className="btn danger" onClick={() => deleteBooking(b.id)}>Delete</button>

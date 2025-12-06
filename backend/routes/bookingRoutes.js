@@ -98,6 +98,32 @@ router.put("/:id", (req, res) => {
 });
 
 /* ======================================================
+   USER: EDIT BOOKING
+====================================================== */
+router.put("/user/:id", (req, res) => {
+  const { day, slot, description } = req.body;
+
+  const sql = `
+    UPDATE bookings
+    SET day=?, slot=?, description=?
+    WHERE id=?
+  `;
+
+  db.query(sql, [day, slot, description, req.params.id], (err) => {
+    if (err) {
+      console.error("User Update Error:", err);
+      return res.json({ status: "error", error: err.message });
+    }
+
+    res.json({
+      status: "success",
+      message: "Booking updated successfully",
+    });
+  });
+});
+
+
+/* ======================================================
    DELETE BOOKING
 ====================================================== */
 router.delete("/:id", (req, res) => {
