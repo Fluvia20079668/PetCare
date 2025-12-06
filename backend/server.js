@@ -45,6 +45,9 @@ app.use("/admin", adminRoutes);
 // ADMIN booking routes — clean and isolated
 app.use("/admin/bookings", adminBookingRoutes); 
 
+// USER bookings (create + view)
+app.use("/bookings", userBookingRoutes);
+
 
 // -----------------------------
 app.get("/", (req, res) => {

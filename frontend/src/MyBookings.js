@@ -8,21 +8,25 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editBooking, setEditBooking] = useState(null);//user can edit the Booking
+  
   const user = getUser();
-  const userId = user?.id;
+  const userId = user?._id || user?.id;
+
 //fetches a user's bookings details from API
   useEffect(() => {
-    const fetchBookings = async () => {
-      if (!userId) return;
+    if (!userId) return;
 
+    const fetchBookings = async () => {
       setLoading(true);
       setError(null);
 
       try {
         const res = await axios.get(
-          `http://localhost:8080/users/user/${userId}`
-        );
-        setBookings(res.data);
+          `http://localhost:8080/users/user/${userId}`);
+
+         // Map id → _id for frontend consistency
+        const bookingsData = res.data.map(b => ({ ...b, _id: b.id }));
+        setBookings(bookingsData);
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings. Please try again later.");
@@ -35,34 +39,50 @@ export default function MyBookings() {
   }, [userId]);
 
 //The user can cancel for Booking
+
 const handleCancel = async (id) => {
     if (!window.confirm("Cancel this booking?")) return;
 
+try{
     await axios.delete(`http://localhost:8080/book/user/${id}`);
 
-    setBookings(bookings.map(b =>
-      b.id === id ? { ...b, status: "cancelled" } : b
+    setBookings(
+      bookings.map(b =>
+      b._id === id ? { ...b, status: "cancelled" } : b
     ));
-  };
-
-//The user can edit Booking
-const saveEdit = async () => {
-  console.log("EDIT ID:", editBooking.id);
- 
-  await axios.put(
-  `http://localhost:8080/bookings/user/${editBooking.id}`,
-  {
-    day: editBooking.day,
-    slot: editBooking.slot,
-    description: editBooking.description,
   }
-);
+ catch (err) {
+      console.error("Cancel error:", err);
+      alert("Failed to cancel booking.");
+    }
+  };
+//The user saveEdit function
+const saveEdit = async () => {
+  if (!editBooking) return;
+
+   try {
+
+    console.log("Saving edit booking ID:", editBooking._id, editBooking);
+
+ await axios.put(
+      `http://localhost:8080/book/user/${editBooking._id}`,
+      {
+        day: editBooking.day,
+        slot: editBooking.slot,
+        description: editBooking.description,
+      }
+    );
+
 
     setBookings(bookings.map(b =>
-      b.id === editBooking.id ? editBooking : b
+      b._id === editBooking._id ? editBooking : b
     ));
 
     setEditBooking(null);
+  }catch (err) {
+      console.error("Edit error:", err);
+      alert("Failed to save changes.");
+    }
   };
 //---------------------------------------------------------------------//
 
@@ -82,7 +102,7 @@ if (!userId) {
         <div className="booking-list">
           {bookings.map((b) => (
             <div key={b._id} className="booking-card">
-              <h3>{b.serviceName}</h3>
+              <h3>{b.serviceName || b.type}</h3>
 
             <p><strong>Pet:</strong> {b.petName}</p>
             <p><strong>Date:</strong> {b.day}</p>
@@ -97,9 +117,10 @@ if (!userId) {
                 </span>
               </p>
               <button onClick={() => setEditBooking(b)}>Edit</button>
-            <button onClick={() => handleCancel(b.id)} className="cancel-btn">
-              Cancel
+            <button onClick={() => handleCancel(b._id)} className="cancel-btn">
+            Cancel
             </button>
+
             </div>
           ))}
           
