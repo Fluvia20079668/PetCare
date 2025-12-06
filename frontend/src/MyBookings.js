@@ -77,8 +77,6 @@ if (!userId) {
       {!loading && bookings.length === 0 && (
         <p className="no-bookings">No bookings found.</p>
       )}
-
-     
         <div className="booking-list">
           {bookings.map((b) => (
             <div key={b._id} className="booking-card">
@@ -88,6 +86,7 @@ if (!userId) {
             <p><strong>Date:</strong> {b.day}</p>
             <p><strong>Time:</strong> {b.slot}</p>
             <p><strong>ServiceType:</strong> {b.serviceType}</p>
+            <p><strong>Description</strong> {b.description}</p>
 
               <p>
                 <strong>Status:</strong>{" "}
@@ -104,14 +103,12 @@ if (!userId) {
           
         </div>
       
-    </div>
-  );
-}
+    
  {/* =====================================================
          EDIT MODAL
   ===================================================== */}
   {editBooking && (
-  <div className="edit-modal-overlay">
+  <div className="modal">
     <div className="edit-modal">
       <h3>Edit Booking</h3>
 
@@ -124,7 +121,7 @@ if (!userId) {
         }
       />
 
-      <label>Time Slot</label>
+      <label>Slot</label>
       <input
         type="time"
         value={editBooking.slot}
@@ -141,12 +138,13 @@ if (!userId) {
         }
       />
 
-      <div className="edit-buttons">
-        <button className="save-btn" onClick={saveEdit}>Save</button>
-        <button className="cancel-btn" onClick={() => setEditBooking(null)}>
-          Close
-        </button>
+      <button onClick={saveEdit}>Save</button>
+            <button onClick={() => setEditBooking(null)}>Close</button>
       </div>
     </div>
-  </div>
+  
 )}
+
+</div>
+  );
+}
