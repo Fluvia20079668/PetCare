@@ -63,7 +63,8 @@ const saveEdit = async () => {
     setEditBooking(null);
   };
 //---------------------------------------------------------------------//
-  if (!userId) {
+
+if (!userId) {
     return <p>Login to view your bookings.</p>;
   }
 
@@ -86,6 +87,7 @@ const saveEdit = async () => {
             <p><strong>Pet:</strong> {b.petName}</p>
             <p><strong>Date:</strong> {b.day}</p>
             <p><strong>Time:</strong> {b.slot}</p>
+            <p><strong>ServiceType:</strong> {b.serviceType}</p>
 
               <p>
                 <strong>Status:</strong>{" "}
@@ -99,6 +101,7 @@ const saveEdit = async () => {
             </button>
             </div>
           ))}
+          
         </div>
       
     </div>

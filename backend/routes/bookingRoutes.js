@@ -70,7 +70,7 @@ router.get("/", (req, res) => {
 });
 
 /* ======================================================
-   UPDATE BOOKING
+   UPDATE BOOKING (ADMIN SIDE)
 ====================================================== */
 router.put("/:id", (req, res) => {
   const { status } = req.body;
@@ -137,10 +137,8 @@ router.delete("/user/:id", (req, res) => {
     });
   });
 });
-
-
 /* ======================================================
-   DELETE BOOKING
+   DELETE BOOKING (ADMIN SIDE)
 ====================================================== */
 router.delete("/:id", (req, res) => {
   db.query("DELETE FROM bookings WHERE id = ?", [req.params.id], (err) => {
