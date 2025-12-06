@@ -10,7 +10,7 @@ export default function MyBookings() {
   const [editBooking, setEditBooking] = useState(null);//user can edit the Booking
   const user = getUser();
   const userId = user?.id;
-
+//fetches a user's bookings details from API
   useEffect(() => {
     const fetchBookings = async () => {
       if (!userId) return;
@@ -33,6 +33,19 @@ export default function MyBookings() {
 
     fetchBookings();
   }, [userId]);
+
+//The user can cancel for Booking
+const handleCancel = async (id) => {
+    if (!window.confirm("Cancel this booking?")) return;
+
+    await axios.delete(`http://localhost:8080/bookings/user/${id}`);
+
+    setBookings(bookings.map(b =>
+      b.id === id ? { ...b, status: "cancelled" } : b
+    ));
+  };
+
+
 
   if (!userId) {
     return (
