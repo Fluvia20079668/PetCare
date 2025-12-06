@@ -107,3 +107,46 @@ if (!userId) {
     </div>
   );
 }
+ {/* =====================================================
+         EDIT MODAL
+  ===================================================== */}
+  {editBooking && (
+  <div className="edit-modal-overlay">
+    <div className="edit-modal">
+      <h3>Edit Booking</h3>
+
+      <label>Date</label>
+      <input
+        type="date"
+        value={editBooking.day}
+        onChange={(e) =>
+          setEditBooking({ ...editBooking, day: e.target.value })
+        }
+      />
+
+      <label>Time Slot</label>
+      <input
+        type="time"
+        value={editBooking.slot}
+        onChange={(e) =>
+          setEditBooking({ ...editBooking, slot: e.target.value })
+        }
+      />
+
+      <label>Description</label>
+      <textarea
+        value={editBooking.description}
+        onChange={(e) =>
+          setEditBooking({ ...editBooking, description: e.target.value })
+        }
+      />
+
+      <div className="edit-buttons">
+        <button className="save-btn" onClick={saveEdit}>Save</button>
+        <button className="cancel-btn" onClick={() => setEditBooking(null)}>
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
