@@ -1,5 +1,10 @@
 # PetCare
 
+
+The Pet Care Management System is a comprehensive platform designed to streamline pet-related services for pet owners, veterinarians, and pet care providers. Inspired by leading pet care organizations such as Anicare Vet, the system facilitates efficient management of pet records and appointment scheduling for different services. It also promotes seamless communication between pet owners and veterinarians and incorporates additional services, including pet daycare and pet hostel management, ensuring a holistic approach to pet care.
+
+
+Admin Login:
 # Admin Email: admin@petcare.com
 
 #Password: Admin123!
