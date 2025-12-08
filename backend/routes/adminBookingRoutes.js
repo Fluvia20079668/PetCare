@@ -11,6 +11,7 @@ router.get("/", (req, res) => {
       u.name AS user_name,
       b.serviceType AS type,
       b.petName AS pet_name,
+      b.petType AS petType,
       b.day,
       b.slot,
       b.status,
@@ -34,6 +35,7 @@ router.put("/:id", (req, res) => {
     status,
     serviceType,
     petName,
+    petType,
     day,
     slot,
     description
@@ -45,6 +47,7 @@ router.put("/:id", (req, res) => {
   if (status !== undefined) { fields.push("status = ?"); values.push(status); }
   if (serviceType !== undefined) { fields.push("serviceType = ?"); values.push(serviceType); }
   if (petName !== undefined) { fields.push("petName = ?"); values.push(petName); }
+  if (petType !== undefined) { fields.push("petType = ?"); values.push(petType); }
   if (day !== undefined) { fields.push("day = ?"); values.push(day); }
   if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
   if (description !== undefined) { fields.push("description = ?"); values.push(description); }

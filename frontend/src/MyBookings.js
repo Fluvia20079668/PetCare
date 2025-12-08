@@ -27,6 +27,7 @@ export default function MyBookings() {
          // Map id → _id for frontend consistency
         const bookingsData = res.data.map(b => ({ ...b, _id: b.id }));
         setBookings(bookingsData);
+
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings. Please try again later.");

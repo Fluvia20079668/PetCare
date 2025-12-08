@@ -138,18 +138,23 @@ export default function AdminDashboard() {
   );
 
   const filteredBookings = bookings.filter((b) =>
-    (
-      (b.user_name || "") +
-      " " +
-      (b.pet_name || "") +
-      " " +
-      (b.type || "") +
-      " " +
-      (b.day || "")
-    )
-      .toLowerCase()
-      .includes(lower)
-  );
+  (
+    (b.user_name || "") +
+    " " +
+    (b.pet_name || "") +
+    " " +
+    (b.petType || "") +   
+    " " +
+    (b.type || "") +
+    " " +
+    (b.day || "") +
+    " " +
+    (b.description || "") 
+  )
+    .toLowerCase()
+    .includes(lower)
+);
+
 
   // chart data about  bookings
 const bookingsByService = (() => {
@@ -313,7 +318,7 @@ return { labels, data: labels.map((l) => map[l]) };
             <div className="glass-table-wrap">
               <table className="glass-table">
                 <thead>
-                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Service</th><th>Status</th><th>Day</th><th>Slot</th><th>Actions</th></tr>
+                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Pet Type</th><th>Service</th><th>Status</th><th>Day</th><th>Slot</th><th>Description</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                   {loadingBookings ? (
@@ -325,6 +330,7 @@ return { labels, data: labels.map((l) => map[l]) };
                       <td>{b.id}</td>
                       <td>{b.user_name || `#${b.userId}`}</td>
                       <td>{b.pet_name || b.petName}</td>
+                      <td>{b.petType || "-"}</td>  
                       <td>{b.type || b.service}</td>
                       <td>
                         <select className="status" value={b.status} onChange={(e) => updateStatus(b.id, e.target.value)}>
@@ -336,6 +342,7 @@ return { labels, data: labels.map((l) => map[l]) };
                       </td>
                       <td>{b.day || b.date}</td>
                       <td>{b.slot}</td>
+                      <td>{b.description || "-"}</td>
                       <td className="actions">
                         <button className="btn view" onClick={() => openDetails(b)}>View</button>
                         <button className="btn danger" onClick={() => deleteBooking(b.id)}>Delete</button>

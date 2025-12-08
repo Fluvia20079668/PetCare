@@ -6,7 +6,7 @@ const db = require("../db");
    CREATE BOOKING  (USER SIDE)
 ====================================================== */
 router.post("/", (req, res) => {
-  const { userId, serviceType, petName, day, slot, description } = req.body;
+  const { userId, serviceType, petName,petType, day, slot, description } = req.body;
 
   if (!userId || !serviceType || !petName || !day || !slot) 
     {
@@ -17,13 +17,14 @@ router.post("/", (req, res) => {
   }
 
   const sql = `
-    INSERT INTO bookings (userId, serviceType, petName, day, slot, status, description)
-    VALUES (?, ?, ?, ?, ?, 'pending', ?)
-  `;
+  INSERT INTO bookings (userId, serviceType, petName, petType, day, slot, status, description)
+  VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
+`;
+
 
   db.query(
     sql,
-    [userId, serviceType, petName, day, slot, description || ""],
+    [userId, serviceType, petName,petType, day, slot, description || ""],
     (err, result) => {
       if (err) {
         console.error("Insert Error:", err);
@@ -53,6 +54,7 @@ router.get("/", (req, res) => {
       u.name AS user_name,
       b.serviceType AS type,
       b.petName AS pet_name,
+      b.petType,
       b.day,
       b.slot,
       b.status,
