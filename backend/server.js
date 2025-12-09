@@ -5,9 +5,10 @@ const app = express();
 // -----------------------------
 // CORS
 // -----------------------------
+app.options("*", cors());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
     credentials: true,
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
@@ -16,7 +17,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.options("*", cors());
 // -----------------------------
 // ROUTES 
 // -----------------------------
@@ -45,8 +46,6 @@ app.use("/admin", adminRoutes);
 // ADMIN booking routes — clean and isolated
 app.use("/admin/bookings", adminBookingRoutes); 
 
-// USER bookings (create + view)
-app.use("/bookings", userBookingRoutes);
 
 
 // -----------------------------

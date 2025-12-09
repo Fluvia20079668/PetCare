@@ -1,12 +1,17 @@
-// middleware/adminAuth.js
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  
   if (!token) return res.status(401).json({ status: "error", error: "No token provided" });
 
-  const secret = process.env.JWT_SECRET || "change_this_secret";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error("Missing JWT_SECRET");
+    return res.status(500).json({ status: "error", error: "Server config error" });
+  }
+
   try {
     const payload = jwt.verify(token, secret);
     // optional: check role
@@ -18,4 +23,4 @@ module.exports = function (req, res, next) {
   } catch (err) {
     return res.status(401).json({ status: "error", error: "Invalid token" });
   }
-};
+};   

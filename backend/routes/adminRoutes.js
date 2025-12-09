@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // TEST
 router.get("/test", (req, res) => {
@@ -18,6 +19,9 @@ router.get("/users", (req, res) => {
     }
   );
 });
+
+
+//Admin Login
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -37,30 +41,43 @@ router.post("/login", (req, res) => {
     }
 
     const admin = results[0];
-    const storedHash = admin.password;
+  
     
     // Compare the plain-text password with the stored hash
     try {
-        const isMatch = await bcrypt.compare(password, storedHash);
+        const match = await bcrypt.compare(password, admin.password);
 
-        if (!isMatch) {
+        if (!match) {
             return res.json({ status: "fail", message: "Invalid admin credentials" });
         }
-        
-        // Success: passwords match
-        res.json({
-            status: "success",
-            admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role },
-            token: "dummy-admin-token"
-        });
+        // Generate REAL JWT
+    const token = jwt.sign(
+      {
+        id: admin.id,
+        email: admin.email,
+        role: admin.role,
+        isAdmin: true,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    } catch (compareError) {
-        console.error("Bcrypt compare failed:", compareError);
-        return res.status(500).json({ status: "error", error: "Authentication error" });
+    return res.json({
+      status: "success",
+      admin: {
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
+      token,
+    });
+  } catch (error) {
+      return res.status(500).json({ status: "error", message: "Server error during login" });
     }
   });
 });
-
+        
 // DELETE USER
 router.delete("/users/:id", (req, res) => {
   db.query("DELETE FROM users WHERE id = ?", [req.params.id], (err) => {
