@@ -3,8 +3,12 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./Services.css";
 import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-icons/fa";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import { format } from "date-fns";
 
 const BANNER_IMAGE = "/dogbanner.jpg";
+
 
 const ALL_SERVICES = [
   { id: "daycare", title: "Daycare", short: "Safe & playful environment.", details: "Full-day supervision, playtime, feeding and enrichment.", icon: <FaCat size={36} color="#008c95" />, image: BANNER_IMAGE },
@@ -20,6 +24,21 @@ export default function Services() {
   const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({ name: "", petName: "", petType: "", slot: "", day: "", description: "" });
   const [detailsService, setDetailsService] = useState(null);
+
+const [selectedDate, setSelectedDate] = useState(null);
+const [dayName, setDayName] = useState("");
+
+const handleDateChange = (date) => {
+  setSelectedDate(date);
+
+  if (date) {
+    const day = format(date, "EEEE"); // Monday, Tuesday...
+    setDayName(day);
+
+    setForm((prev) => ({ ...prev, day })); // Auto-fill day in form
+  }
+};
+
 
   const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user?.id;
@@ -190,15 +209,18 @@ export default function Services() {
               <option>11 AM - 1 PM</option>
               <option>3 PM - 5 PM</option>
             </select>
-            <select className="booking-input" value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })}>
-              <option value="">Select Day</option>
-              <option>Monday</option>
-              <option>Tuesday</option>
-              <option>Wednesday</option>
-              <option>Thursday</option>
-              <option>Friday</option>
-              <option>Saturday</option>
-            </select>
+            <div style={{ marginTop: "10px" }}>
+  <label>Select Date:</label>
+  <DatePicker
+    selected={selectedDate}
+    onChange={handleDateChange}
+    dateFormat="yyyy-MM-dd"
+    className="booking-input"
+  />
+</div>
+
+<p><strong>Day:</strong> {dayName || "-"}</p>
+
             <textarea className="booking-input" placeholder="Pet Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             <button className="booking-submit" onClick={confirmBooking}>Confirm</button>
             <button className="booking-close" onClick={closeBooking}>Close</button>
