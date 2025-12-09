@@ -210,14 +210,38 @@ const handleDateChange = (date) => {
               <option>3 PM - 5 PM</option>
             </select>
             <div style={{ marginTop: "10px" }}>
-  <label>Select Date:</label>
-  <DatePicker
-    selected={selectedDate}
-    onChange={handleDateChange}
-    dateFormat="yyyy-MM-dd"
-    className="booking-input"
-  />
-</div>
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Select Date for Service</h2>
+
+      <DatePicker
+        selected={date}
+        onChange={(date) => setDate(date)}
+        dateFormat="yyyy-MM-dd"
+        minDate={new Date()} // prevents selecting past dates
+        className="datepicker-input"
+        placeholderText="Choose a date"
+      />
+
+      <br /><br />
+
+      <button
+        onClick={() => console.log("Selected Date:", date)}
+        disabled={!date}
+        style={{
+          background: "#4CAF50",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          border: "none",
+          color: "white",
+          cursor: "pointer"
+        }}
+      >
+        Continue
+      </button>
+    </div>
+  );
+
 
 <p><strong>Day:</strong> {dayName || "-"}</p>
 
