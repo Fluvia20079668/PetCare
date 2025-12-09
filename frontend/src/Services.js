@@ -3,6 +3,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./Services.css";
 import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 const BANNER_IMAGE = "/dogbanner.jpg";
 
@@ -15,11 +18,15 @@ const ALL_SERVICES = [
   { id: "food", title: "Food Delivery", short: "Healthy food delivered.", details: "Premium diet plans, fast delivery.", icon: <FaBone size={36} color="#008c95" />, image: BANNER_IMAGE }
 ];
 
+
 export default function Services() {
   const [bookingService, setBookingService] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({ name: "", petName: "", petType: "", slot: "", day: "", description: "" });
   const [detailsService, setDetailsService] = useState(null);
+ // Added for calendar
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dayName, setDayName] = useState("");
 
   const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user?.id;
@@ -35,12 +42,13 @@ export default function Services() {
     if (svc) setBookingService(svc);
   }, [location.search]);
 
+  // Auto-fill user name when booking opens
   useEffect(() => {
     if (bookingService && user) {
       setForm((prev) => ({ ...prev, name: user.name || "" }));
     }
   }, [bookingService, user]);
-
+ // Auto-scroll details
   useEffect(() => {
     if (detailsService) {
       document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
@@ -57,9 +65,26 @@ export default function Services() {
     setForm({ name: user.name, petName: "", petType: "", slot: "", day: "", description: "" });
   };
 
-  const closeBooking = () => setBookingService(null);
+  const closeBooking = () => {
+    setBookingService(null);
+    setSelectedDate(null);
+    setDayName("");
+  };
   const openDetails = (svc) => setDetailsService(svc);
   const closeDetails = () => setDetailsService(null);
+
+  // Calendar date select handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    if (date) {
+      const day = format(date, "EEEE");
+      setDayName(day);
+
+      // auto-fill day
+      setForm((prev) => ({ ...prev, day }));
+    }
+  };
+  //Confirm Booking
 
   const confirmBooking = async () => {
     if (!user || !user.id) {
@@ -68,13 +93,14 @@ export default function Services() {
     }
 
     const payload = {
-      userId: user._id,
+      userId: user.id,
       serviceType: bookingService.id,
       name: form.name,
       petName: form.petName,
       petType: form.petType,
       slot: form.slot,
       day: form.day,
+      date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : null,
       description: form.description
     };
     // Input validation
@@ -184,24 +210,36 @@ export default function Services() {
             <input className="booking-input" placeholder="Your Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input className="booking-input" placeholder="Pet Name" value={form.petName} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
             <input className="booking-input" placeholder="Pet Type" value={form.petType} onChange={(e) => setForm({ ...form, petType: e.target.value })} />
+           <label className="booking-label">Select Date</label>
+            <DatePicker
+            selected={selectedDate}
+        onChange={handleDateChange}
+        minDate={new Date()}
+        placeholderText="Choose appointment date"
+        className="booking-input"
+        dateFormat="yyyy-MM-dd"
+      />
+          <input className="booking-input"value={dayName}placeholder="Day" disabled/>
+ 
             <select className="booking-input" value={form.slot} onChange={(e) => setForm({ ...form, slot: e.target.value })}>
               <option value="">Select Slot</option>
               <option>9 AM - 11 AM</option>
               <option>11 AM - 1 PM</option>
               <option>3 PM - 5 PM</option>
             </select>
-            <select className="booking-input" value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })}>
-              <option value="">Select Day</option>
-              <option>Monday</option>
-              <option>Tuesday</option>
-              <option>Wednesday</option>
-              <option>Thursday</option>
-              <option>Friday</option>
-              <option>Saturday</option>
-            </select>
-            <textarea className="booking-input" placeholder="Pet Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <button className="booking-submit" onClick={confirmBooking}>Confirm</button>
-            <button className="booking-close" onClick={closeBooking}>Close</button>
+            <textarea
+              className="booking-input"
+              placeholder="Pet Description"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+
+            <button className="booking-submit" onClick={confirmBooking}>
+              Confirm
+            </button>
+            <button className="booking-close" onClick={closeBooking}>
+              Close
+            </button>
           </div>
         </div>
       )}
