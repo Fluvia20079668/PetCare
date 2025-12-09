@@ -2,6 +2,7 @@
   "dependencies": {
     "date-fns": "^4.1.0",
     "lucide-react": "^0.555.0",
+    "railway": "^2.0.17",
     "react-datepicker": "^9.0.0"
   }
 }
