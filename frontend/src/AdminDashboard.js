@@ -1,4 +1,4 @@
-import React, { useEffect, useState,fetchBookings,fetchUsers }from "react";
+import React, { useEffect, useState }from "react";
 import axios from "axios";
 import "./AdminDashboard.css";
 
@@ -28,8 +28,8 @@ ChartJS.register(
   Filler
 );
 
-// set axios default baseURL if your server runs at a specific host
-axios.defaults.baseURL = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+axios.defaults.baseURL =
+  process.env.REACT_APP_API_BASE || "http://localhost:8080";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -40,11 +40,9 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [error, setError] = useState(null);
 
-  // model for viewing booking details
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailBooking, setDetailBooking] = useState(null);
 
-  //JWT token from localstor
   const token = localStorage.getItem("admin_token") || "";
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
   //  Fetch users
@@ -78,7 +76,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchUsers();
     fetchBookings();
-   
   }, []);
 
   // Delete users from admin  
