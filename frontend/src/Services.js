@@ -5,7 +5,6 @@ import "./Services.css";
 import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
 
 const BANNER_IMAGE = "/dogbanner.jpg";
 
@@ -24,9 +23,14 @@ export default function Services() {
   const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({ name: "", petName: "", petType: "", slot: "", day: "", description: "" });
   const [detailsService, setDetailsService] = useState(null);
- // Added for calendar
+
+ // Added for calendar -- CHECK-IN
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayName, setDayName] = useState("");
+
+  // CHECK-OUT (Hostel Only)
+  const [checkoutDate, setCheckoutDate] = useState(null);
+  const [checkoutDayName, setCheckoutDayName] = useState("");
 
   const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user?.id;
@@ -62,28 +66,32 @@ export default function Services() {
       return;
     }
     setBookingService(svc);
-    setForm({ name: user.name, petName: "", petType: "", slot: "", day: "", description: "" });
+    setForm({ name: user.name, petName: "", petType: "", slot: "",description: "" });
+  };
+
+  setSelectedDate(null);
+    setDayName("");
+    setCheckoutDate(null);
+    setCheckoutDayName("");
   };
 
   const closeBooking = () => {
     setBookingService(null);
-    setSelectedDate(null);
-    setDayName("");
-  };
-  const openDetails = (svc) => setDetailsService(svc);
-  const closeDetails = () => setDetailsService(null);
 
-  // Calendar date select handler
-  const handleDateChange = (date) => {
+const handleDateSelect = (date) => {
     setSelectedDate(date);
     if (date) {
-      const day = format(date, "EEEE");
-      setDayName(day);
-
-      // auto-fill day
-      setForm((prev) => ({ ...prev, day }));
+      setDayName(date.toLocaleDateString("en-US", { weekday: "long" }));
     }
   };
+
+const handleCheckoutSelect = (date) => {
+    setCheckoutDate(date);
+    if (date) {
+      setCheckoutDayName(date.toLocaleDateString("en-US", { weekday: "long" }));
+    }
+  };  
+
   //Confirm Booking
 
   const confirmBooking = async () => {
@@ -92,6 +100,17 @@ export default function Services() {
       return;
     }
 
+    if (!selectedDate) {
+      alert("Please select a check-in date!");
+      return;
+    }
+
+    if (bookingService.id === "hostel" && !checkoutDate) {
+      alert("Please select a check-out date for Pet Hostel!");
+      return;
+    }
+
+
     const payload = {
       userId: user.id,
       serviceType: bookingService.id,
@@ -99,15 +118,21 @@ export default function Services() {
       petName: form.petName,
       petType: form.petType,
       slot: form.slot,
-      day: form.day,
-      date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : null,
+      ddate: selectedDate.toISOString().split("T")[0],
+      day: dayName,
       description: form.description
     };
-    // Input validation
-    if (!payload.petName || !payload.day || !payload.slot) {
-        alert("Please ensure Pet Name, Day, and Time Slot are selected.");
-        return;
-    }
+
+
+    // Only send checkout fields for hostel
+      checkoutDate
+        bookingService.id === "hostel" && checkoutDate
+          ? checkoutDate.toISOString().split("T")[0]
+          : null,
+
+      checkoutDay
+        bookingService.id === "hostel" ? checkoutDayName : null
+    };
 
     try {
       const res = await fetch("http://localhost:8080/book", {
@@ -227,6 +252,24 @@ export default function Services() {
               <option>11 AM - 1 PM</option>
               <option>3 PM - 5 PM</option>
             </select>
+
+            {/* CHECK-IN CALENDAR */}
+            <h4>Check-In Date</h4>
+            <DayPicker mode="single" selected={selectedDate} onSelect={handleDateSelect} />
+
+            <p><strong>Check-In:</strong> {selectedDate ? selectedDate.toISOString().split("T")[0] : "-"}</p>
+            <p><strong>Day:</strong> {dayName || "-"}</p>
+
+            {/* CHECK-OUT DATE — ONLY FOR HOSTEL */}
+            {bookingService.id === "hostel" && (
+              <>
+                <h4>Check-Out Date</h4>
+                <DayPicker mode="single" selected={checkoutDate} onSelect={handleCheckoutSelect} />
+
+                <p><strong>Check-Out:</strong> {checkoutDate ? checkoutDate.toISOString().split("T")[0] : "-"}</p>
+                <p><strong>Day:</strong> {checkoutDayName || "-"}</p>
+              </>
+            )}
             <textarea
               className="booking-input"
               placeholder="Pet Description"
@@ -245,4 +288,3 @@ export default function Services() {
       )}
     </div>
   );
-}
