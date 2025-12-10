@@ -93,49 +93,39 @@ const saveEdit = async () => {
       alert("Failed to save changes.");
     }
   };
-/*--------------------Save Checkout Edit---------------------------*/
-{editCheckout && (
-        <div className="modal">
-          <div className="edit-modal">
-            <h3>Edit Check-Out</h3>
+  /*--------------------Save Checkout Edit---------------------------*/
+  const saveCheckoutEdit = async () => {
+    if (!editCheckout) return;
 
-            <label>Check-Out Date</label>
-            <input
-              type="date"
-              value={
-                editCheckout.checkoutDate
-                  ? editCheckout.checkoutDate.substring(0, 10)
-                  : ""
+    try {
+      await axios.put(
+        `http://localhost:8080/book/user/checkout/${editCheckout._id}`,
+        {
+          checkoutDate: editCheckout.checkoutDate,
+          description: editCheckout.description,
+        }
+      );
+
+      setBookings(
+        bookings.map((b) =>
+          b._id === editCheckout._id
+            ? {
+                ...b,
+                checkoutDate: editCheckout.checkoutDate,
+                description: editCheckout.description,
               }
-              onChange={(e) =>
-                setEditCheckout({
-                  ...editCheckout,
-                  checkoutDate: e.target.value,
-                })
-              }
-            />
+            : b
+        )
+      );
 
-            <label>Description</label>
-            <textarea
-              value={editCheckout.description}
-              onChange={(e) =>
-                setEditCheckout({
-                  ...editCheckout,
-                  description: e.target.value,
-                })
-              }
-            />
+      setEditCheckout(null);
+    } catch (err) {
+      console.error("Checkout edit error:", err);
+      alert("Failed to save checkout changes.");
+    }
+  };
 
-            <button onClick={saveCheckoutEdit}>Save</button>
-            <button onClick={() => setEditCheckout(null)}>Close</button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-//---------------------------------------------------------------------//
+//----------------------RENDER-----------------------------------------------//
 
 if (!userId) {
     return <p>Login to view your bookings.</p>;
@@ -180,10 +170,12 @@ if (!userId) {
                   {b.status}
                 </span>
               </p>
+            
               <button onClick={() => setEditBooking(b)}>Edit</button>
               {b.serviceType === "hostel" && (
               //ADDED CHECKOUT EDIT BUTTON ONLY FOR PETHOSTEL 
               <button
+                className="edit-checkout-btn"
                 onClick={() =>
                   setEditCheckout({
                     _id: b._id,
@@ -191,7 +183,7 @@ if (!userId) {
                     description: b.description,
                   })
                 }
-                className="edit-checkout-btn"
+               
               >
                 Edit Checkout
               </button>
@@ -250,3 +242,45 @@ if (!userId) {
 </div>
   );
 }
+
+
+{/* =====================================================
+      EDIT CHECKOUT MODAL
+===================================================== */}
+{editCheckout && (
+  <div className="modal">
+    <div className="edit-modal">
+      <h3>Edit Checkout</h3>
+
+      <label>Checkout Date</label>
+      <input
+        type="date"
+        value={
+          editCheckout.checkoutDate
+            ? editCheckout.checkoutDate.split("T")[0]
+            : ""
+        }
+        onChange={(e) =>
+          setEditCheckout({
+            ...editCheckout,
+            checkoutDate: e.target.value,
+          })
+        }
+      />
+
+      <label>Description</label>
+      <textarea
+        value={editCheckout.description || ""}
+        onChange={(e) =>
+          setEditCheckout({
+            ...editCheckout,
+            description: e.target.value,
+          })
+        }
+      />
+
+      <button onClick={saveCheckoutEdit}>Save</button>
+      <button onClick={() => setEditCheckout(null)}>Close</button>
+    </div>
+  </div>
+)}
