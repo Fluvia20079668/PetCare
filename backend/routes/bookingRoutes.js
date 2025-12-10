@@ -122,7 +122,7 @@ router.put("/:id", (req, res) => {
    USER: EDIT BOOKING
 ====================================================== */
 router.put("/user/:id", (req, res) => {
-  const { day, slot, description, ddate, checkoutDate, checkoutDay } = req.body;
+  const { day, slot, description} = req.body;
 
   const sql = `
     UPDATE bookings
@@ -134,10 +134,6 @@ router.put("/user/:id", (req, res) => {
   day,
   slot || null,
   description || "",
-  ddate || null,
-  checkoutDate || null,
-  checkoutDay || null,
-  req.params.id
 ], (err) => {
     if (err) {
       console.error("User Update Error:", err);
@@ -150,7 +146,34 @@ router.put("/user/:id", (req, res) => {
     });
   });
 });
+/* ======================================================
+   USER: EDIT HOSTEL CHECKOUT DATE
+====================================================== */
+router.put("/user/checkout/:id", (req, res) => {
+  const { checkoutDate, description } = req.body;
 
+  const sql = `
+    UPDATE bookings
+    SET checkoutDate=?, description=?
+    WHERE id=?
+  `;
+
+  db.query(sql, [
+  day,
+  slot || null,
+  description || "",
+], (err) => {
+    if (err) {
+      console.error("User Update Error:", err);
+      return res.json({ status: "error", error: err.message });
+    }
+      res.json({
+        status: "success",
+        message: "Checkout updated successfully",
+      });
+    }
+  );
+});
 /* ======================================================
    USER: CANCEL BOOKING
 ====================================================== */
