@@ -3,34 +3,32 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./Services.css";
 import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-icons/fa";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+
 
 const BANNER_IMAGE = "/dogbanner.jpg";
 
 const ALL_SERVICES = [
-  { id: "daycare", title: "Daycare", short: "Safe & playful environment.", details: "Full-day supervision, playtime, feeding and enrichment.", icon: <FaCat size={36} color="#008c95" />, image: BANNER_IMAGE },
-  { id: "hostel", title: "Pet Hostel", short: "Comfortable overnight stay.", details: "Temperature-controlled rooms, 24/7 supervision, feeding schedules.", icon: <FaDog size={36} color="#008c95" />, image: BANNER_IMAGE },
-  { id: "grooming", title: "Grooming", short: "Bathing, nail trimming & coat styling.", details: "Professional groomers providing spa treatments.", icon: <FaBath size={36} color="#008c95" />, image: BANNER_IMAGE },
-  { id: "walking", title: "Pet Walking", short: "Daily walks for exercise.", details: "GPS tracking, solo or group walking.", icon: <FaWalking size={36} color="#008c95" />, image: BANNER_IMAGE },
-  { id: "vetcheck", title: "Vet Checkup", short: "Routine health check.", details: "Vaccinations, minor treatments, advice.", icon: <FaClinicMedical size={36} color="#008c95" />, image: BANNER_IMAGE },
-  { id: "food", title: "Food Delivery", short: "Healthy food delivered.", details: "Premium diet plans, fast delivery.", icon: <FaBone size={36} color="#008c95" />, image: BANNER_IMAGE }
+  { id: "daycare", title: "Daycare", short: "Safe & playful environment.", details: "Full-day supervision, playtime, feeding and enrichment.", icon: <FaCat size={36} color="#008c95" />, image: BANNER_IMAGE,showCheckout: false },
+  { id: "hostel", title: "Pet Hostel", short: "Comfortable overnight stay.", details: "Temperature-controlled rooms, 24/7 supervision, feeding schedules.", icon: <FaDog size={36} color="#008c95" />, image: BANNER_IMAGE,showCheckout: true },
+  { id: "grooming", title: "Grooming", short: "Bathing, nail trimming & coat styling.", details: "Professional groomers providing spa treatments.", icon: <FaBath size={36} color="#008c95" />, image: BANNER_IMAGE, showCheckout: false },
+  { id: "walking", title: "Pet Walking", short: "Daily walks for exercise.", details: "GPS tracking, solo or group walking.", icon: <FaWalking size={36} color="#008c95" />, image: BANNER_IMAGE, showCheckout: false },
+  { id: "vetcheck", title: "Vet Checkup", short: "Routine health check.", details: "Vaccinations, minor treatments, advice.", icon: <FaClinicMedical size={36} color="#008c95" />, image: BANNER_IMAGE, showCheckout: false },
+  { id: "food", title: "Food Delivery", short: "Healthy food delivered.", details: "Premium diet plans, fast delivery.", icon: <FaBone size={36} color="#008c95" />, image: BANNER_IMAGE,showCheckout: false }
 ];
-
 
 export default function Services() {
   const [bookingService, setBookingService] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
-  const [form, setForm] = useState({ name: "", petName: "", petType: "", slot: "", day: "", description: "" });
+  const [form, setForm] = useState({ name: "", petName: "", petType: "", slot: "", description: "" });
   const [detailsService, setDetailsService] = useState(null);
 
- // Added for calendar -- CHECK-IN
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [dayName, setDayName] = useState("");
-
-  // CHECK-OUT (Hostel Only)
+  // Check-in & Check-out
+  const [checkinDate, setCheckinDate] = useState(null);
+  const [checkinDay, setCheckinDay] = useState("");
   const [checkoutDate, setCheckoutDate] = useState(null);
-  const [checkoutDayName, setCheckoutDayName] = useState("");
+  const [checkoutDay, setCheckoutDay] = useState("");
 
   const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user?.id;
@@ -38,27 +36,30 @@ export default function Services() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Handle query param "book"
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const svcId = params.get("book");
     if (!svcId) return;
     const svc = ALL_SERVICES.find((x) => x.id === svcId);
-    if (svc) setBookingService(svc);
+    if (svc) openBooking(svc);
   }, [location.search]);
 
-  // Auto-fill user name when booking opens
+  // Auto-fill user name
   useEffect(() => {
     if (bookingService && user) {
-      setForm((prev) => ({ ...prev, name: user.name || "" }));
+      setForm(prev => ({ ...prev, name: user.name || "" }));
     }
   }, [bookingService, user]);
- // Auto-scroll details
+
+  // Auto-scroll details
   useEffect(() => {
     if (detailsService) {
       document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth" });
     }
   }, [detailsService]);
 
+  // Open booking modal
   const openBooking = (svc) => {
     if (!isLoggedIn) {
       const returnUrl = `/services?book=${svc.id}`;
@@ -66,50 +67,54 @@ export default function Services() {
       return;
     }
     setBookingService(svc);
-    setForm({ name: user.name, petName: "", petType: "", slot: "",description: "" });
-  };
-
-  setSelectedDate(null);
-    setDayName("");
+    setForm({ name: user.name || "", petName: "", petType: "", slot: "", description: "" });
+    setCheckinDate(null);
+    setCheckinDay("");
     setCheckoutDate(null);
-    setCheckoutDayName("");
+    setCheckoutDay("");
   };
 
+  // Close booking modal
   const closeBooking = () => {
     setBookingService(null);
-
-const handleDateSelect = (date) => {
-    setSelectedDate(date);
-    if (date) {
-      setDayName(date.toLocaleDateString("en-US", { weekday: "long" }));
-    }
+    setCheckinDate(null);
+    setCheckinDay("");
+    setCheckoutDate(null);
+    setCheckoutDay("");
   };
 
-const handleCheckoutSelect = (date) => {
+  // Open & close service details
+  const openDetails = (svc) => setDetailsService(svc);
+  const closeDetails = () => setDetailsService(null);
+
+  // Handle date selection
+  const handleCheckinSelect = (date) => {
+    setCheckinDate(date);
+    setCheckinDay(date ? date.toLocaleDateString("en-US", { weekday: "long" }) : "");
+  };
+
+  const handleCheckoutSelect = (date) => {
     setCheckoutDate(date);
-    if (date) {
-      setCheckoutDayName(date.toLocaleDateString("en-US", { weekday: "long" }));
-    }
-  };  
+    setCheckoutDay(date ? date.toLocaleDateString("en-US", { weekday: "long" }) : "");
+  };
 
-  //Confirm Booking
-
+  // Confirm booking (async!)
   const confirmBooking = async () => {
-    if (!user || !user.id) {
+    if (!isLoggedIn) {
       alert("You must be logged in to book.");
       return;
     }
 
-    if (!selectedDate) {
+    if (!checkinDate) {
       alert("Please select a check-in date!");
       return;
     }
 
-    if (bookingService.id === "hostel" && !checkoutDate) {
+    if (bookingService.showCheckout && !checkoutDate) 
+ {
       alert("Please select a check-out date for Pet Hostel!");
       return;
     }
-
 
     const payload = {
       userId: user.id,
@@ -118,20 +123,15 @@ const handleCheckoutSelect = (date) => {
       petName: form.petName,
       petType: form.petType,
       slot: form.slot,
-      ddate: selectedDate.toISOString().split("T")[0],
-      day: dayName,
-      description: form.description
-    };
+      ddate: checkinDate.toISOString().split("T")[0],
+      day: checkinDay,
+      description: form.description,
+      checkoutDate: bookingService.showCheckout && checkoutDate
+  ? checkoutDate.toISOString().split("T")[0]
+  : null,
 
+checkoutDay: bookingService.showCheckout ? checkoutDay : null
 
-    // Only send checkout fields for hostel
-      checkoutDate
-        bookingService.id === "hostel" && checkoutDate
-          ? checkoutDate.toISOString().split("T")[0]
-          : null,
-
-      checkoutDay
-        bookingService.id === "hostel" ? checkoutDayName : null
     };
 
     try {
@@ -148,6 +148,7 @@ const handleCheckoutSelect = (date) => {
         alert(data.message || "Booking failed. Try again.");
       }
     } catch (err) {
+      console.error(err);
       alert("Server error. Try again.");
     }
   };
@@ -232,20 +233,37 @@ const handleCheckoutSelect = (date) => {
         <div className="booking-overlay" onClick={closeBooking}>
           <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Book: {bookingService.title}</h2>
+
             <input className="booking-input" placeholder="Your Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input className="booking-input" placeholder="Pet Name" value={form.petName} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
             <input className="booking-input" placeholder="Pet Type" value={form.petType} onChange={(e) => setForm({ ...form, petType: e.target.value })} />
-           <label className="booking-label">Select Date</label>
+
+            <label className="booking-label">Check-In Date</label>
             <DatePicker
-            selected={selectedDate}
-        onChange={handleDateChange}
-        minDate={new Date()}
-        placeholderText="Choose appointment date"
-        className="booking-input"
-        dateFormat="yyyy-MM-dd"
-      />
-          <input className="booking-input"value={dayName}placeholder="Day" disabled/>
- 
+              selected={checkinDate}
+              onChange={handleCheckinSelect}
+              minDate={new Date()}
+              placeholderText="Choose check-in date"
+              className="booking-input"
+              dateFormat="yyyy-MM-dd"
+            />
+            <input className="booking-input" value={checkinDay} placeholder="Day" disabled />
+
+            {bookingService.showCheckout && (
+              <>
+                <label className="booking-label">Check-Out Date</label>
+                <DatePicker
+                  selected={checkoutDate}
+                  onChange={handleCheckoutSelect}
+                  minDate={checkinDate || new Date()}
+                  placeholderText="Choose check-out date"
+                  className="booking-input"
+                  dateFormat="yyyy-MM-dd"
+                />
+                <input className="booking-input" value={checkoutDay} placeholder="Day" disabled />
+              </>
+            )}
+
             <select className="booking-input" value={form.slot} onChange={(e) => setForm({ ...form, slot: e.target.value })}>
               <option value="">Select Slot</option>
               <option>9 AM - 11 AM</option>
@@ -253,38 +271,19 @@ const handleCheckoutSelect = (date) => {
               <option>3 PM - 5 PM</option>
             </select>
 
-            {/* CHECK-IN CALENDAR */}
-            <h4>Check-In Date</h4>
-            <DayPicker mode="single" selected={selectedDate} onSelect={handleDateSelect} />
-
-            <p><strong>Check-In:</strong> {selectedDate ? selectedDate.toISOString().split("T")[0] : "-"}</p>
-            <p><strong>Day:</strong> {dayName || "-"}</p>
-
-            {/* CHECK-OUT DATE — ONLY FOR HOSTEL */}
-            {bookingService.id === "hostel" && (
-              <>
-                <h4>Check-Out Date</h4>
-                <DayPicker mode="single" selected={checkoutDate} onSelect={handleCheckoutSelect} />
-
-                <p><strong>Check-Out:</strong> {checkoutDate ? checkoutDate.toISOString().split("T")[0] : "-"}</p>
-                <p><strong>Day:</strong> {checkoutDayName || "-"}</p>
-              </>
-            )}
             <textarea
               className="booking-input"
               placeholder="Pet Description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={4}
             />
 
-            <button className="booking-submit" onClick={confirmBooking}>
-              Confirm
-            </button>
-            <button className="booking-close" onClick={closeBooking}>
-              Close
-            </button>
+            <button className="booking-submit" onClick={confirmBooking}>Confirm</button>
+            <button className="booking-close" onClick={closeBooking}>Close</button>
           </div>
         </div>
       )}
     </div>
   );
+}
