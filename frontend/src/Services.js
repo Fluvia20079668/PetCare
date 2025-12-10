@@ -264,12 +264,19 @@ checkoutDay: bookingService.showCheckout ? checkoutDay : null
               </>
             )}
 
-            <select className="booking-input" value={form.slot} onChange={(e) => setForm({ ...form, slot: e.target.value })}>
-              <option value="">Select Slot</option>
-              <option>9 AM - 11 AM</option>
-              <option>11 AM - 1 PM</option>
-              <option>3 PM - 5 PM</option>
-            </select>
+            {!bookingService.showCheckout && (
+  <select
+    className="booking-input"
+    value={form.slot}
+    onChange={(e) => setForm({ ...form, slot: e.target.value })}
+  >
+    <option value="">Select Slot</option>
+    <option>9 AM - 11 AM</option>
+    <option>11 AM - 1 PM</option>
+    <option>3 PM - 5 PM</option>
+  </select>
+)}
+
 
             <textarea
               className="booking-input"
