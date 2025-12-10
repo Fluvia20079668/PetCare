@@ -103,12 +103,25 @@ if (!userId) {
         <div className="booking-list">
           {bookings.map((b) => (
             <div key={b._id} className="booking-card">
-              <h3>{b.serviceName || b.type}</h3>
+              <h3>{b.serviceName}</h3>
 
-            <p><strong>Pet:</strong> {b.petName}</p>
-            <p><strong>Date:</strong> {b.day}</p>
+            <p><strong>Pet Name:</strong> {b.petName}</p>
+            <p><strong>Pet Type:</strong> {b.petType}</p>
+             <p><strong>ServiceType:</strong> {b.serviceType}</p>
+            {b.ddate && (
+              <p>
+                <strong>Check-In:</strong>{" "}
+                {new Date(b.ddate).toLocaleDateString()}
+              </p>
+            )}
+            {b.serviceType === "hostel" && b.checkoutDate && (
+              <p>
+                <strong>Check-Out:</strong>{" "}
+                {new Date(b.checkoutDate).toLocaleDateString()}
+              </p>
+            )}
+            <p><strong>Day:</strong> {b.day || "-"}</p>
             <p><strong>Time:</strong> {b.slot}</p>
-            <p><strong>ServiceType:</strong> {b.serviceType}</p>
             <p><strong>Description</strong> {b.description}</p>
 
               <p>

@@ -315,7 +315,7 @@ return { labels, data: labels.map((l) => map[l]) };
             <div className="glass-table-wrap">
               <table className="glass-table">
                 <thead>
-                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Pet Type</th><th>Service</th><th>Status</th><th>Day</th><th>Slot</th><th>Description</th><th>Actions</th></tr>
+                  <tr><th>ID</th><th>User</th><th>Pet</th><th>Pet Type</th><th>Service</th><th>Status</th><th>Check-In</th><th>Check-Out</th><th>Slot</th><th>Description</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                   {loadingBookings ? (
@@ -337,7 +337,8 @@ return { labels, data: labels.map((l) => map[l]) };
                           <option value="cancelled">Cancelled</option>
                         </select>
                       </td>
-                      <td>{b.day || b.date}</td>
+                      <td>{b.ddate ? new Date(b.ddate).toLocaleDateString() : "-"}</td> 
+                      <td>{b.type === "hostel" && b.checkoutDate ? new Date(b.checkoutDate).toLocaleDateString() : "-"}</td>
                       <td>{b.slot}</td>
                       <td>{b.description || "-"}</td>
                       <td className="actions">
@@ -368,6 +369,8 @@ return { labels, data: labels.map((l) => map[l]) };
               <p><strong>User:</strong> {detailBooking.user_name || `#${detailBooking.userId}`}</p>
               <p><strong>Service:</strong> {detailBooking.type || detailBooking.service}</p>
               <p><strong>Pet:</strong> {detailBooking.pet_name || detailBooking.petName} — {detailBooking.petType || "-"}</p>
+              <p><strong>Check-In:</strong> {detailBooking.ddate ? new Date(detailBooking.ddate).toLocaleDateString() : "-"}</p>
+              <p><strong>Check-Out:</strong> {detailBooking.type === "hostel" && detailBooking.checkoutDate ? new Date(detailBooking.checkoutDate).toLocaleDateString() : "-"}</p>
               <p><strong>Slot & Day:</strong> {detailBooking.slot || "-"} • {detailBooking.day || detailBooking.date || "-"}</p>
               <p><strong>Description:</strong><br/>{detailBooking.description || "-"}</p>
               <p><strong>Status:</strong> {detailBooking.status}</p>
