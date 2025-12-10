@@ -7,12 +7,17 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [editBooking, setEditBooking] = useState(null);//user can edit the Booking
-  
+  const [editCheckout, setEditCheckout] = useState(null);
+
   const user = getUser();
   const userId = user?._id || user?.id;
 
+
+
 //fetches a user's bookings details from API
+
   useEffect(() => {
     if (!userId) return;
 
@@ -39,6 +44,8 @@ export default function MyBookings() {
     fetchBookings();
   }, [userId]);
 
+
+
 //The user can cancel for Booking
 
 const handleCancel = async (id) => {
@@ -58,6 +65,7 @@ try{
     }
   };
 //The user saveEdit function
+
 const saveEdit = async () => {
   if (!editBooking) return;
 
@@ -85,6 +93,48 @@ const saveEdit = async () => {
       alert("Failed to save changes.");
     }
   };
+/*--------------------Save Checkout Edit---------------------------*/
+{editCheckout && (
+        <div className="modal">
+          <div className="edit-modal">
+            <h3>Edit Check-Out</h3>
+
+            <label>Check-Out Date</label>
+            <input
+              type="date"
+              value={
+                editCheckout.checkoutDate
+                  ? editCheckout.checkoutDate.substring(0, 10)
+                  : ""
+              }
+              onChange={(e) =>
+                setEditCheckout({
+                  ...editCheckout,
+                  checkoutDate: e.target.value,
+                })
+              }
+            />
+
+            <label>Description</label>
+            <textarea
+              value={editCheckout.description}
+              onChange={(e) =>
+                setEditCheckout({
+                  ...editCheckout,
+                  description: e.target.value,
+                })
+              }
+            />
+
+            <button onClick={saveCheckoutEdit}>Save</button>
+            <button onClick={() => setEditCheckout(null)}>Close</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 //---------------------------------------------------------------------//
 
 if (!userId) {
@@ -131,6 +181,21 @@ if (!userId) {
                 </span>
               </p>
               <button onClick={() => setEditBooking(b)}>Edit</button>
+              {b.serviceType === "hostel" && (
+              //ADDED CHECKOUT EDIT BUTTON ONLY FOR PETHOSTEL 
+              <button
+                onClick={() =>
+                  setEditCheckout({
+                    _id: b._id,
+                    checkoutDate: b.checkoutDate,
+                    description: b.description,
+                  })
+                }
+                className="edit-checkout-btn"
+              >
+                Edit Checkout
+              </button>
+            )}
             <button onClick={() => handleCancel(b._id)} className="cancel-btn">
             Cancel
             </button>
@@ -149,33 +214,33 @@ if (!userId) {
     <div className="edit-modal">
       <h3>Edit Booking</h3>
 
-      <label>Date</label>
+      <label>Day</label>
       <input
-        type="date"
-        value={editBooking.day}
-        onChange={(e) =>
-          setEditBooking({ ...editBooking, day: e.target.value })
-        }
+        type="text"
+        value={
+                editBooking.day || ""}
+                onChange={(e) =>
+                  setEditBooking({ ...editBooking, day: e.target.value })
+              }
       />
-
-      <label>Slot</label>
+              <label>Time Slot</label>
       <input
-        type="time"
-        value={editBooking.slot}
+        type="text"
+        value={editBooking.slot || ""}
         onChange={(e) =>
           setEditBooking({ ...editBooking, slot: e.target.value })
         }
       />
-
+      
       <label>Description</label>
       <textarea
         value={editBooking.description}
         onChange={(e) =>
-          setEditBooking({ ...editBooking, description: e.target.value })
+          setEditBooking({ ...editCheckout, description: e.target.value })
         }
       />
 
-      <button onClick={saveEdit}>Save</button>
+          <button onClick={saveEdit}>Save</button>
             <button onClick={() => setEditBooking(null)}>Close</button>
       </div>
     </div>
