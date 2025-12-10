@@ -122,7 +122,7 @@ export default function Services() {
       name: form.name,
       petName: form.petName,
       petType: form.petType,
-      slot: form.slot,
+      slot: bookingService.showCheckout ? null : form.slot, // slot only if not Pet Hostel
       ddate: checkinDate.toISOString().split("T")[0],
       day: checkinDay,
       description: form.description,
@@ -133,6 +133,8 @@ export default function Services() {
 checkoutDay: bookingService.showCheckout ? checkoutDay : null
 
     };
+console.log("Payload:", payload);
+
 
     try {
       const res = await fetch("http://localhost:8080/book", {

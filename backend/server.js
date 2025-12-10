@@ -5,7 +5,6 @@ const app = express();
 // -----------------------------
 // CORS
 // -----------------------------
-app.options("*", cors());
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
@@ -17,7 +16,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.options("*", cors());
+
 // -----------------------------
 // ROUTES 
 // -----------------------------

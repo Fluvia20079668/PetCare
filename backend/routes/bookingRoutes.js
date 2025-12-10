@@ -6,25 +6,41 @@ const db = require("../db");
    CREATE BOOKING  (USER SIDE)
 ====================================================== */
 router.post("/", (req, res) => {
-  const { userId, serviceType, petName,petType, day, slot, description } = req.body;
+  const { 
+    userId, serviceType, petName, petType, day,
+    slot, description, ddate, checkoutDate, checkoutDay 
+  } = req.body;
 
-  if (!userId || !serviceType || !petName || !day || !slot) 
-    {
-    return res.json({
-      status: "error",
-      message: "Please fill the missing fields",
-    });
-  }
+  if (!userId || !serviceType || !petName || !day) {
+  return res.json({
+    status: "error",
+    message: "Missing required fields"
+  });
+}
+
+// For non-hostel services, slot is required
+if (serviceType !== "hostel" && !slot) {
+  return res.json({
+    status: "error",
+    message: "Slot is required for this service"
+  });
+}
+
 
   const sql = `
-  INSERT INTO bookings (userId, serviceType, petName, petType, day, slot, status, description)
-  VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
-`;
+    INSERT INTO bookings 
+    (userId, serviceType, petName, petType, day, slot, ddate, checkoutDate, checkoutDay, status, description)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+  `;
 
 
   db.query(
     sql,
-    [userId, serviceType, petName,petType, day, slot, description || ""],
+    [
+      userId, serviceType, petName, petType, day,
+      slot || null, ddate || null, checkoutDate || null,
+      checkoutDay || null, description || ""
+    ],
     (err, result) => {
       if (err) {
         console.error("Insert Error:", err);
@@ -49,18 +65,21 @@ router.post("/", (req, res) => {
 router.get("/", (req, res) => {
   const sql = `
     SELECT 
-      b.id,
-      b.userId,
-      u.name AS user_name,
-      b.serviceType AS type,
-      b.petName AS pet_name,
-      b.petType,
-      b.day,
-      b.slot,
-      b.status,
-      b.created_at,
-      b.description
-    FROM bookings b
+  b.id,
+  b.userId,
+  u.name AS user_name,
+  b.serviceType AS type,
+  b.petName AS pet_name,
+  b.petType,
+  b.day,
+  b.slot,
+  b.ddate,
+  b.checkoutDate,
+  b.checkoutDay,
+  b.status,
+  b.created_at,
+  b.description
+   FROM bookings b
     LEFT JOIN users u ON b.userId = u.id
     ORDER BY b.id DESC
   `;
@@ -103,7 +122,7 @@ router.put("/:id", (req, res) => {
    USER: EDIT BOOKING
 ====================================================== */
 router.put("/user/:id", (req, res) => {
-  const { day, slot, description } = req.body;
+  const { day, slot, description, ddate, checkoutDate, checkoutDay } = req.body;
 
   const sql = `
     UPDATE bookings
@@ -111,7 +130,15 @@ router.put("/user/:id", (req, res) => {
     WHERE id=?
   `;
 
-  db.query(sql, [day, slot, description, req.params.id], (err) => {
+  db.query(sql, [
+  day,
+  slot || null,
+  description || "",
+  ddate || null,
+  checkoutDate || null,
+  checkoutDay || null,
+  req.params.id
+], (err) => {
     if (err) {
       console.error("User Update Error:", err);
       return res.json({ status: "error", error: err.message });
