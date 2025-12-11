@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -7,12 +5,22 @@ const app = express();
 // -----------------------------
 // CORS
 // -----------------------------
+// Allow requests from local dev AND your Netlify frontend
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://693b4afa04c9360007542168--hilarious-donut-189de9.netlify.app"
+];
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_ORIGIN || "http://localhost:3000",
-      "https://693b4afa04c9360007542168--hilarious-donut-189de9.netlify.app"
-    ],
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps or Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
@@ -60,5 +68,5 @@ app.get("/", (req, res) => {
 // -----------------------------
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
-  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(`✅ Server running on port ${PORT}`)
 );
