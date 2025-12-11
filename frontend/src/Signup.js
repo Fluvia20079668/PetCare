@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthForm.css";
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE || "https://petcare-production-5959.up.railway.app";
 
 export default function Signup() {
   const navigate = useNavigate();
