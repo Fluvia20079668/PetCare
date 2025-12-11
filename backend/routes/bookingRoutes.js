@@ -122,25 +122,25 @@ router.put("/:id", (req, res) => {
    USER: EDIT BOOKING
 ====================================================== */
 router.put("/user/:id", (req, res) => {
-  const { day, slot, description} = req.body;
+  const { ddate, slot, description} = req.body;
 
   const sql = `
     UPDATE bookings
-    SET day=?, slot=?, description=?
+    SET ddate=?, slot=?, description=?
     WHERE id=?
   `;
 
   db.query(sql, [
-  day,
+  ddate,
   slot || null,
   description || "",
-req.params.id
-  ], (err) => {
+  req.params.id
+  ], (err,result) => {
     if (err) {
       console.error("User Update Error:", err);
       return res.json({ status: "error", error: err.message });
     }
-
+    console.log("Update result:", result);
     res.json({
       status: "success",
       message: "Booking updated successfully",
@@ -148,7 +148,7 @@ req.params.id
   });
 });
 /* ======================================================
-   USER: EDIT HOSTEL CHECKOUT DATE
+   USER: UPDATE AND SAVE HOSTEL CHECKOUT DATE AND DAY
 
 ====================================================== */
 router.put("/user/checkout/:id", (req, res) => {
@@ -162,8 +162,8 @@ router.put("/user/checkout/:id", (req, res) => {
 
   const sql = `
     UPDATE bookings
-    SET checkoutDate=?, description=?
-    WHERE id=?
+    SET checkoutDate = ?, checkoutDescription = ?
+    WHERE id = ? AND serviceType = 'hostel'
   `;
 
   db.query(
@@ -171,56 +171,18 @@ router.put("/user/checkout/:id", (req, res) => {
     [checkoutDate || null, description || "", req.params.id],
     (err, result) => {
       if (err) {
-        console.error("Checkout Update Error:", err);
+        console.error("Checkout update error:", err);
         return res.json({ status: "error", error: err.sqlMessage });
       }
 
-      console.log("MySQL update result:", result);
-
       if (result.affectedRows === 0) {
-        return res.json({
-          status: "error",
-          message: "No booking found for this ID",
-        });
+        return res.json({ status: "error", message: "No booking found" });
       }
 
       res.json({ status: "success", message: "Checkout updated" });
     }
   );
 });
-/* ======================================================
-   USER: UPDATE HOSTEL CHECKOUT DATE AND DAY
-
-====================================================== */
-router.put("user/checkout/:id",(req, res) => {
-
-  const { checkoutDate, description } = req.body;
-
-  {
-    const sql = `
-      UPDATE bookings
-      SET checkoutDate = ?, description = ?
-      WHERE id = ?
-    `;
-
-    db.query(
-    sql,
-    [checkoutDate || null, description || "", req.params.id],
-    (err, result) => {
-      if (err) {
-        console.error("Checkout update error:", err);
-        return res.status(500).json({ message: "Server error" });
-      }
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Booking not found" });
-      }
-
-      res.json({ message: "Checkout updated successfully" });
-    });
-  } 
-  }
-);
 
 /* ======================================================
    USER: CANCEL BOOKING

@@ -82,7 +82,7 @@ const saveEdit = async () => {
  await axios.put(
       `http://localhost:8080/book/user/${editBooking._id}`,
       {
-        day: editBooking.day,
+        ddate: new Date(editBooking.ddate).toISOString().split("T")[0], 
         slot: editBooking.slot,
         description: editBooking.description,
       }
@@ -90,10 +90,11 @@ const saveEdit = async () => {
 
 
     setBookings(bookings.map((b) =>
+  b._id === editBooking._id
+    ? { ...b, ddate: editBooking.ddate, slot: editBooking.slot, description: editBooking.description }
+    : b
+));
 
-          b._id === editBooking._id ? editBooking : b
-
-        ));
 
     setEditBooking(null);
   }catch (err) {
@@ -172,7 +173,6 @@ const saveEdit = async () => {
                 {new Date(b.checkoutDate).toLocaleDateString()}
               </p>
             )}
-            <p><strong>Day:</strong> {b.day || "-"}</p>
             <p><strong>Time:</strong> {b.slot}</p>
             <p><strong>Description</strong> {b.description}</p>
 
@@ -222,9 +222,9 @@ const saveEdit = async () => {
       <label>Day</label>
       <input
         type="date"
-        value={editBooking.day || ""}
+        value={editBooking.ddate ? new Date(editBooking.ddate).toISOString().split("T")[0] : ""}
         onChange={(e) =>
-          setEditBooking({ ...editBooking, day: e.target.value })
+          setEditBooking({ ...editBooking, ddate: e.target.value })
         }
       />
 

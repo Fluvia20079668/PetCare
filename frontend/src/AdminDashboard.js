@@ -301,6 +301,7 @@ return { labels, data: labels.map((l) => map[l]) };
                       <td>{u.role || "user"}</td>
                       <td>{u.created_at ? u.created_at.slice(0,10) : "-"}</td>
                       <td><button className="btn danger" onClick={() => deleteUser(u.id)}>Delete</button></td>
+                      
                     </tr>
                   ))}
                 </tbody>
