@@ -13,11 +13,11 @@ const pool = mysql.createPool({
 
 // Use Railway environment variables if available, fallback to local for dev
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || "localhost",
-  user: process.env.MYSQL_USER || "root",
-  password: process.env.MYSQL_PASSWORD || "MyNewStrongPassword!",
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "root",
+  password: process.env.MYSQLPASSWORD || "MyNewStrongPassword!",
   database: process.env.MYSQL_DATABASE || "petcare",
-  port: process.env.MYSQL_PORT || 3306,
+  port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
