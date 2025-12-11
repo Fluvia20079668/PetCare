@@ -8,16 +8,25 @@ const app = express();
 // Allow requests from local dev AND your Netlify frontend
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://693b4afa04c9360007542168--hilarious-donut-189de9.netlify.app"
+    "https://your-production-site.netlify.app"
 ];
+
+// Use a regex to allow all Netlify previews dynamically
+const netlifyPreviewRegex = /\.netlify\.app$/;
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // allow requests with no origin (like mobile apps or Postman)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+    
+      if (
+        allowedOrigins.includes(origin) || 
+        netlifyPreviewRegex.test(origin)
+      ) {
         return callback(null, true);
       } else {
+        console.log("Blocked by CORS:", origin);
         return callback(new Error("CORS not allowed"));
       }
     },
