@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./AuthForm.css";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_URL;
 
 export default function Login() {
   const [email, setEmail] = useState("");
