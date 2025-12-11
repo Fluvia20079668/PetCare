@@ -28,8 +28,8 @@ export default function MyBookings() {
 
       try {
         
-        const res = await axios.get(
-          `http://localhost:8080/users/user/${userId}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/user/${userId}`);
+
 
          // Map id → _id for frontend consistency
         const bookingsData = res.data.map((b) => ({ ...b, _id: b._id || b.id }));
@@ -54,7 +54,7 @@ const handleCancel = async (id) => {
     if (!window.confirm("Cancel this booking?")) return;
 
 try{
-    await axios.delete(`http://localhost:8080/book/user/${id}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/book/user/${id}`);
 
     setBookings(
       bookings.map((b) =>
@@ -80,7 +80,7 @@ const saveEdit = async () => {
    // console.log("Saving edit booking ID:", editBooking._id, editBooking);
 
  await axios.put(
-      `http://localhost:8080/book/user/${editBooking._id}`,
+      `${process.env.REACT_APP_API_URL}/book/user/${editBooking._id}`,
       {
         ddate: new Date(editBooking.ddate).toISOString().split("T")[0], 
         slot: editBooking.slot,
@@ -110,7 +110,7 @@ const saveEdit = async () => {
 
     try {
     const res = await axios.put(
-        `http://localhost:8080/book/user/checkout/${editCheckout._id}`,
+        `${process.env.REACT_APP_API_URL}/book/user/checkout/${editCheckout._id}`,
         {
           checkoutDate: editCheckout.checkoutDate,
           description: editCheckout.description,

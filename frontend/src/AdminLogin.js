@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminLogin.css";
 
+const API = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -13,7 +15,8 @@ export default function AdminLogin() {
     setError("");
 
     //try {
-      const res = await fetch("http://localhost:8080/admin/login", {
+      const res = await fetch(`${API}/admin/login`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

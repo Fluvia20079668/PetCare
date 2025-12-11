@@ -6,7 +6,7 @@ import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 
-
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
 const BANNER_IMAGE = "/dogbanner.jpg";
 
 const ALL_SERVICES = [
@@ -137,7 +137,8 @@ console.log("Payload:", payload);
 
 
     try {
-      const res = await fetch("http://localhost:8080/book", {
+      const res = await fetch(`${API_BASE}/book`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

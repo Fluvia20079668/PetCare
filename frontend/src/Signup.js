@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthForm.css";
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState("");
 
   const handleSignup = async (e) => {
@@ -19,10 +21,11 @@ export default function Signup() {
     setMsg("");
 
     try {
-      const res = await fetch("http://localhost:8080/users/signup", {
+      const res = await fetch(`${API_BASE}/users/signup`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, phone})
       });
 
       const data = await res.json();
@@ -70,10 +73,10 @@ export default function Signup() {
         />
         <input
           className="auth-input"
-          type="Phone"
+          type="text"
           placeholder="Phone"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           required
         />
         <button className="auth-btn" type="submit">Sign Up</button>

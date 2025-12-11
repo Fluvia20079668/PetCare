@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./AuthForm.css";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,8 @@ export default function Login() {
 
     try {
       // Try user login first
-      const res = await fetch("http://localhost:8080/users/login", {
+      const res = await fetch(`${API_BASE}/users/login`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -50,7 +53,8 @@ export default function Login() {
       }
 
       // If user login fails, try admin login
-      const adminRes = await fetch("http://localhost:8080/admin/login", {
+      const adminRes = await fetch(`${API_BASE}/admin/login`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
