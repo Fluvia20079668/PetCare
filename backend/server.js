@@ -10,8 +10,8 @@ const app = express();
 app.use(
   cors({
     origin: [
-      process.env.CLIENT_ORIGIN || "http://localhost:3000", // local dev
-      "https://hilarious-donut-189de9.netlify.app"         // Netlify frontend
+      process.env.CLIENT_ORIGIN || "http://localhost:3000",
+      "https://693b4afa04c9360007542168--hilarious-donut-189de9.netlify.app"
     ],
     credentials: true,
     methods: "GET,POST,PUT,DELETE,OPTIONS",
