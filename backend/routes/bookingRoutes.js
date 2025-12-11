@@ -134,7 +134,8 @@ router.put("/user/:id", (req, res) => {
   day,
   slot || null,
   description || "",
-], (err) => {
+req.params.id
+  ], (err) => {
     if (err) {
       console.error("User Update Error:", err);
       return res.json({ status: "error", error: err.message });
@@ -148,9 +149,16 @@ router.put("/user/:id", (req, res) => {
 });
 /* ======================================================
    USER: EDIT HOSTEL CHECKOUT DATE
+
 ====================================================== */
 router.put("/user/checkout/:id", (req, res) => {
   const { checkoutDate, description } = req.body;
+
+  console.log("Incoming checkout update:", {
+    checkoutDate,
+    description,
+    id: req.params.id
+  });
 
   const sql = `
     UPDATE bookings
@@ -158,22 +166,62 @@ router.put("/user/checkout/:id", (req, res) => {
     WHERE id=?
   `;
 
-  db.query(sql, [
-  day,
-  slot || null,
-  description || "",
-], (err) => {
-    if (err) {
-      console.error("User Update Error:", err);
-      return res.json({ status: "error", error: err.message });
-    }
-      res.json({
-        status: "success",
-        message: "Checkout updated successfully",
-      });
+  db.query(
+    sql,
+    [checkoutDate || null, description || "", req.params.id],
+    (err, result) => {
+      if (err) {
+        console.error("Checkout Update Error:", err);
+        return res.json({ status: "error", error: err.sqlMessage });
+      }
+
+      console.log("MySQL update result:", result);
+
+      if (result.affectedRows === 0) {
+        return res.json({
+          status: "error",
+          message: "No booking found for this ID",
+        });
+      }
+
+      res.json({ status: "success", message: "Checkout updated" });
     }
   );
 });
+/* ======================================================
+   USER: UPDATE HOSTEL CHECKOUT DATE AND DAY
+
+====================================================== */
+router.put("user/checkout/:id",(req, res) => {
+
+  const { checkoutDate, description } = req.body;
+
+  {
+    const sql = `
+      UPDATE bookings
+      SET checkoutDate = ?, description = ?
+      WHERE id = ?
+    `;
+
+    db.query(
+    sql,
+    [checkoutDate || null, description || "", req.params.id],
+    (err, result) => {
+      if (err) {
+        console.error("Checkout update error:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      res.json({ message: "Checkout updated successfully" });
+    });
+  } 
+  }
+);
+
 /* ======================================================
    USER: CANCEL BOOKING
 ====================================================== */
