@@ -29,7 +29,7 @@ ChartJS.register(
 );
 
 axios.defaults.baseURL =
-  process.env.REACT_APP_API_BASE || "http://localhost:8080";
+  process.env.REACT_APP_API_BASE || "https://petcare-production-5959.up.railway.app";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -45,6 +45,7 @@ export default function AdminDashboard() {
 
   const token = localStorage.getItem("admin_token") || "";
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+  
   //  Fetch users
   const fetchUsers = async () => {
     setLoadingUsers(true);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminLogin.css";
 
-const API = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+const API = process.env.REACT_APP_API_BASE || "https://petcare-production-5959.up.railway.app";
 
 export default function AdminLogin() {
   const navigate = useNavigate();

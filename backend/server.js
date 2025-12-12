@@ -8,7 +8,7 @@ const app = express();
 // Allow requests from local dev AND your Netlify frontend
 const allowedOrigins = [
   "http://localhost:3000",
-    "https://your-production-site.netlify.app"
+    "https://petcare-production-5959.up.railway.app"
 ];
 
 // Use a regex to allow all Netlify previews dynamically
@@ -27,7 +27,8 @@ app.use(
         return callback(null, true);
       } else {
         console.log("Blocked by CORS:", origin);
-        return callback(new Error("CORS not allowed"));
+        return callback(null, false);
+
       }
     },
     credentials: true,

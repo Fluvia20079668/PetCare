@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const auth = require("../middleware/auth");
 
 /* ======================================================
    CREATE BOOKING  (USER SIDE)
@@ -62,7 +63,7 @@ if (serviceType !== "hostel" && !slot) {
 /* ======================================================
    GET ALL BOOKINGS (ADMIN SIDE)
 ====================================================== */
-router.get("/", (req, res) => {
+router.get("/", auth, (req, res) => {
   const sql = `
     SELECT 
   b.id,
@@ -93,7 +94,7 @@ router.get("/", (req, res) => {
 /* ======================================================
    UPDATE BOOKING (ADMIN SIDE)
 ====================================================== */
-router.put("/:id", (req, res) => {
+router.put("/:id", auth, (req, res) => {
   const { status } = req.body;
 
   if (!status) {
@@ -187,7 +188,7 @@ router.put("/user/checkout/:id", (req, res) => {
 /* ======================================================
    USER: CANCEL BOOKING
 ====================================================== */
-router.delete("/user/:id", (req, res) => {
+router.delete("/user/:id", auth, (req, res) => {
   const sql = "UPDATE bookings SET status='cancelled' WHERE id=?";
 
   db.query(sql, [req.params.id], (err) => {

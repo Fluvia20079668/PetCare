@@ -6,7 +6,7 @@ import { FaDog, FaCat, FaBath, FaWalking, FaClinicMedical, FaBone } from "react-
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE || "https://petcare-production-5959.up.railway.app";
 const BANNER_IMAGE = "/dogbanner.jpg";
 
 const ALL_SERVICES = [

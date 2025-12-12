@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
 
 // TEST
 router.get("/test", (req, res) => {
@@ -10,7 +11,7 @@ router.get("/test", (req, res) => {
 });
 
 // GET ALL USERS
-router.get("/users", (req, res) => {
+router.get("/users", auth, (req, res) => {
   db.query(
     "SELECT id, name, email, phone, role, created_at FROM users ORDER BY id DESC",
     (err, result) => {
@@ -79,7 +80,7 @@ router.post("/login", (req, res) => {
 });
         
 // DELETE USER
-router.delete("/users/:id", (req, res) => {
+router.delete("/users/:id",auth,  (req, res) => {
   db.query("DELETE FROM users WHERE id = ?", [req.params.id], (err) => {
     if (err) return res.json({ status: "error", error: err.message });
     res.json({ status: "success", message: "User deleted" });
