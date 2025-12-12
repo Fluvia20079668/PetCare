@@ -24,3 +24,9 @@ Mysql Error:
 
 Solution reference:
 https://www.perplexity.ai/search/stored-hash-2b-10-mgnsoz6azcrf-BtdBfDmST0aJ53ezUie6RQ
+
+REFERENCE CHATGPT :
+
+https://chatgpt.com/g/g-p-68f5f36aa8ac8191ac08069771b1e14a-programming/project
+
+
