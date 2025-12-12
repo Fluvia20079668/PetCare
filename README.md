@@ -4,12 +4,6 @@
 The Pet Care Management System is a comprehensive platform designed to streamline pet-related services for pet owners, veterinarians, and pet care providers. Inspired by leading pet care organizations such as Anicare Vet, the system facilitates efficient management of pet records and appointment scheduling for different services. It also promotes seamless communication between pet owners and veterinarians and incorporates additional services, including pet daycare and pet hostel management, ensuring a holistic approach to pet care.
 
 
-Admin Login:
-# Admin Email: admin@petcare.com
-
-#Password: Admin123!
-
-
 REFERENCE
 
 
@@ -24,6 +18,12 @@ ERROR :React Hook "useEffect" is called in function "openDetails" that is neithe
 
 https://chatgpt.com/g/g-p-68f5f36aa8ac8191ac08069771b1e14a-programming/project
 
+Deplyment : rederence :
+
+https://youtu.be/nrG0tKSYMHc?si=treNjqIi-sF-urMP
+https://chatgpt.com/share/693ca0b1-2118-8007-a9ef-fbef3b33e91b
+https://chatgpt.com/share/693ca142-40ac-8007-8c4b-65703e6a6590
+
 
 Mysql Error:
 
@@ -33,5 +33,9 @@ Solution reference:
 https://www.perplexity.ai/search/stored-hash-2b-10-mgnsoz6azcrf-BtdBfDmST0aJ53ezUie6RQ
 
 
+Admin Login:
+# Admin Email: admin@petcare.com
+
+#Password: Admin123!
 
 
