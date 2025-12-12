@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getUser, isLoggedIn } from "./utils/auth";
 import "./Home.css";
 
+//reads URL query parameter using react Router
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -25,7 +26,6 @@ export default function Booking() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you'd call your booking API to create booking in MySQL via backend
     alert(`Booking created for ${serviceName} (user: ${user?.name || "Unknown"})`);
     navigate("/");
   };

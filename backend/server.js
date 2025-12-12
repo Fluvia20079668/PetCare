@@ -3,7 +3,10 @@ const cors = require("cors");
 const app = express();
 
 // -----------------------------
-// CORS
+// Confiquring cors
+//----------------------------
+//configures backend to only accept requests from trusted frontends while blocking others.
+//  It also supports credentials like cookies.
 // -----------------------------
 // Allow requests from local dev AND your Netlify frontend
 const allowedOrigins = [
@@ -11,32 +14,37 @@ const allowedOrigins = [
     "https://petcare-production-5959.up.railway.app"
 ];
 
-// Use a regex to allow all Netlify previews dynamically
+// Use a regex to allow all Netlify previews url dynamically
 const netlifyPreviewRegex = /\.netlify\.app$/;
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps or Postman)
+    //allow request with no orgin
+    origin: (origin, callback) => { 
+    
       if (!origin) return callback(null, true);
     
       if (
         allowedOrigins.includes(origin) || 
         netlifyPreviewRegex.test(origin)
       ) {
+//alow if origin is in allowedOrigins or matches  netlifyPreviewRegex
         return callback(null, true);
       } else {
         console.log("Blocked by CORS:", origin);
+        //block eveything else
         return callback(null, false);
 
       }
     },
-    credentials: true,
-    methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,//allow cookies to be set 
+    methods: "GET,POST,PUT,DELETE,OPTIONS",// alllow HTTP methods
+    allowedHeaders: "Content-Type,Authorization",//allow headers
   })
 );
 
+
+//Middleware to Parse Request Body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

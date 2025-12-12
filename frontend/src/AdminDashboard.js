@@ -1,4 +1,7 @@
+//useEffect is for lifecycle methods used for fecting data when the component mounts
+//useEffect is to manage component state
 import React, { useEffect, useState }from "react";
+//axios is to make http request to the backend API
 import axios from "axios";
 import "./AdminDashboard.css";
 
@@ -43,7 +46,9 @@ export default function AdminDashboard() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailBooking, setDetailBooking] = useState(null);
 
+  //Retrieves an admin token from local storage.
   const token = localStorage.getItem("admin_token") || "";
+  //Sets headers for authenticated API requests.
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
   
   //  Fetch users
@@ -60,7 +65,7 @@ export default function AdminDashboard() {
       setLoadingUsers(false);
     }
   };
-//Fetch Bookings done by cosomers
+//Fetch Bookings done by user
   const fetchBookings = async () => {
     setLoadingBookings(true);
     try {
@@ -116,12 +121,12 @@ export default function AdminDashboard() {
       alert("Update failed");
     }
   };
-
+//sets the booking to view,
   const openDetails = (b) => {
     setDetailBooking(b);
     setDetailsOpen(true);
   };
-
+  //hides the modal
   const closeDetails = () => {
     setDetailBooking(null);
     setDetailsOpen(false);
@@ -154,7 +159,7 @@ export default function AdminDashboard() {
 );
 
 
-  // chart data about  bookings
+  // chart data about  bookings --pie chat
 const bookingsByService = (() => {
 const map = {};
 bookings.forEach((b) => {
@@ -164,7 +169,7 @@ map[service] = (map[service] || 0) + 1;
 return { labels: Object.keys(map), data: Object.values(map) };
 })();
 
-
+//Counts bookings by creation date.
 const bookingsOverTime = (() => {
 const map = {};
 bookings.forEach((b) => {

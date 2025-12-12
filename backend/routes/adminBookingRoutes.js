@@ -60,6 +60,8 @@ router.put("/:id", (req, res) => {
   if (slot !== undefined) { fields.push("slot = ?"); values.push(slot); }
   if (description !== undefined) { fields.push("description = ?"); values.push(description); }
 
+  //Prevents empty updates
+  
   if (fields.length === 0) {
     return res.status(400).json({ status: "error", error: "No valid fields provided" });
   }

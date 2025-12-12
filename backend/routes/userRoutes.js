@@ -63,12 +63,13 @@ router.post("/login", (req, res) => {
 
     console.log("LOGIN SUCCESS:", user.email);
 
+    //If password matches, create JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       "SECRET_KEY",
       { expiresIn: "7d" }
     );
-
+//send the response
     res.json({
       status: "success",
       token,
@@ -81,6 +82,7 @@ router.post("/login", (req, res) => {
     });
   });
 });
+//Get Logged-in User Route
 router.get("/me", authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });

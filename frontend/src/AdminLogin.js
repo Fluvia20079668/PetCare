@@ -6,12 +6,15 @@ const API = process.env.REACT_APP_API_BASE || "https://petcare-production-5959.u
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+//email and password store the input from the login form.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   async function handleLogin(e) {
+    // Prevent form submission from refreshing the page
     e.preventDefault();
+   //// Reset previous errors
     setError("");
 
     //try {

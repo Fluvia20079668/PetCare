@@ -1,4 +1,4 @@
-// src/Home.js
+
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
@@ -9,6 +9,7 @@ export default function Home() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const navigate = useNavigate();
+  //Used to detect if the user clicked outside the dropdown.
   const dropdownRef = useRef(null);
   const circleRef = useRef(null);
 
