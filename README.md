@@ -1,7 +1,25 @@
 # PetCare
 
 
-The Pet Care Management System is a comprehensive platform designed to streamline pet-related services for pet owners, veterinarians, and pet care providers. Inspired by leading pet care organizations such as Anicare Vet, the system facilitates efficient management of pet records and appointment scheduling for different services. It also promotes seamless communication between pet owners and veterinarians and incorporates additional services, including pet daycare and pet hostel management, ensuring a holistic approach to pet care.
+The Pet Care Management System is a comprehensive platform designed to streamline pet-related services for pet owners, veterinarians, and pet care providers. Inspired by leading pet care organizations such as Anicare Vet, the system facilitates efficient management of pet records and appointment scheduling for different services. It also promotes seamless communication between pet owners and veterinarians and incorporates additional services, including pet daycare and pet hostel, ensuring a holistic approach to pet care.
+
+Inspired  Organization: https://www.anicare.ie/?utm_source=gmb&utm_medium=organic
+
+My Input: pet daycare and pet hostel
+
+Future enhancement: Food delivery, with a map to track the order and online payment.
+
+Web Application:
+
+https://hilarious-donut-189de9.netlify.app/
+
+Admin
+https://hilarious-donut-189de9.netlify.app/admin
+
+Frontend: netify  :  https://app.netlify.com/projects/hilarious-donut-189de9/deploys/693c9f001275ba00080724
+Backend: Railway   : https://railway.com/project/95a43fd4-b8b0-4f81-866e-197d41f77d61/service/dc1e8c26-d862-4fc2-bb28-3a363fede2b4?environmentId=329f0870-5517-405e-b62d-1d17ff19a08e
+
+
 
 
 REFERENCE
@@ -18,7 +36,7 @@ ERROR :React Hook "useEffect" is called in function "openDetails" that is neithe
 
 https://chatgpt.com/g/g-p-68f5f36aa8ac8191ac08069771b1e14a-programming/project
 
-Deplyment : rederence :
+Deployment: reference:
 
 https://youtu.be/nrG0tKSYMHc?si=treNjqIi-sF-urMP
 https://chatgpt.com/share/693ca0b1-2118-8007-a9ef-fbef3b33e91b
