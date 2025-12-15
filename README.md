@@ -9,6 +9,28 @@ My Input: pet daycare and pet hostel
 
 Future enhancement: Food delivery, with a map to track the order and online payment.
 
+Tools Used: Frontend: React
+          : Backend: NodeJS +Express
+          : Database: MySQL
+
+
+Project overflow :
+
+USER : 
+
+Users can log in to the webpage and book any service of their choice. The booking form includes the following fields: username, pet name, pet type, check-in date, time slot, and description. A check-out option is available for the pet hostel service only.
+
+Once the booking is successful, users can view their existing bookings in the **My Bookings** section. They also have the option to edit or cancel their appointments and can track the booking status while waiting for the admin to update it.
+
+ADMIN :
+
+The admin is responsible for managing all users and bookings. The admin has the authority to delete users and bookings, view all bookings, and update the booking status, such as approving, completing, or canceling a booking.
+
+Admin access is secured, and login is authorized.
+
+
+
+
 Web Application:
 
 https://hilarious-donut-189de9.netlify.app/
